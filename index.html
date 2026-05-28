@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#07111f">
+<link rel="manifest" href="manifest.json">
+<title>Escape Glacière</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root {
+  --accent:  #00d4ff;
+  --accent2: #0088bb;
+  --bg:      #07111f;
+  --surface: #0d1f35;
+  --card:    #112233;
+  --gold:    #ffc84a;
+  --green:   #00e676;
+  --red:     #ff4444;
+  --orange:  #ff8800;
+  --ice:     #d0f0ff;
+  --muted:   rgba(208,240,255,0.42);
+  --border:  rgba(255,255,255,0.09);
+  --border2: rgba(255,255,255,0.16);
+  --fd: 'Bebas Neue', sans-serif;
+  --fb: 'Outfit', sans-serif;
+}
+body { background:var(--bg); color:var(--ice); font-family:var(--fb); min-height:100vh; overflow-x:hidden; }
+body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background: radial-gradient(ellipse 70% 50% at 15% 0%, rgba(0,180,255,0.07) 0%, transparent 70%),
+              radial-gradient(ellipse 50% 70% at 85% 100%, rgba(0,80,160,0.09) 0%, transparent 70%); }
+#root { position:relative; z-index:1; }
+.screen { display:none; min-height:100vh; flex-direction:column; }
+.screen.active { display:flex; }
+
+/* LOADING */
+#s-loading { align-items:center; justify-content:center; text-align:center; }
+.loading-ice { font-size:72px; animation:iceFloat 2s ease-in-out infinite; display:block; margin-bottom:20px; }
+@keyframes iceFloat { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-12px) rotate(3deg)} }
+.loading-text { font-family:var(--fd); font-size:18px; letter-spacing:4px; color:var(--muted); }
+.loading-dots::after { content:'...'; animation:dots 1.5s infinite; }
+@keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+
+/* SETUP */
+#s-setup { align-items:center; justify-content:center; padding:28px 20px; gap:24px; }
+.brand { text-align:center; }
+.brand-logo { width:100px; height:100px; border-radius:20px; object-fit:contain; display:none; margin:0 auto 14px; border:1px solid var(--border2); background:var(--card); }
+.brand-ice { font-size:64px; line-height:1; display:block; animation:iceFloat 4s ease-in-out infinite; }
+.brand-name { font-family:var(--fd); font-size:clamp(44px,11vw,84px); letter-spacing:5px; line-height:.95;
+  background:linear-gradient(155deg,#fff 0%,var(--accent) 55%,var(--accent2) 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.brand-escape { font-size:12px; letter-spacing:5px; text-transform:uppercase; color:var(--accent); opacity:.55; margin-top:6px; display:none; }
+.setup-box { width:100%; max-width:420px; background:var(--card); border:1px solid var(--border2); border-radius:24px; padding:26px 22px; display:flex; flex-direction:column; gap:22px; }
+.field-label { font-size:11px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--accent); opacity:.7; margin-bottom:10px; display:block; }
+.stepper { display:flex; align-items:center; justify-content:center; gap:16px; }
+.step-btn { width:48px; height:48px; border-radius:50%; border:2px solid var(--border2); background:transparent; color:var(--accent); font-size:26px; cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; }
+.step-btn:hover { background:rgba(0,212,255,.15); border-color:var(--accent); }
+.step-val { font-family:var(--fd); font-size:64px; color:#fff; width:72px; text-align:center; line-height:1; }
+.dur-row { display:flex; gap:8px; }
+.dur-pill { flex:1; padding:11px 4px; border-radius:12px; border:2px solid var(--border); background:transparent; color:var(--ice); opacity:.6; font-size:15px; font-weight:500; cursor:pointer; transition:all .2s; text-align:center; }
+.dur-pill.on { border-color:var(--accent); background:rgba(0,212,255,.1); color:var(--accent); opacity:1; }
+.launch-btn { width:100%; padding:17px; border-radius:16px; border:none; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:var(--bg); font-family:var(--fd); font-size:26px; letter-spacing:4px; cursor:pointer; transition:all .25s; box-shadow:0 0 28px rgba(0,212,255,.22); }
+.launch-btn:hover { transform:translateY(-2px); box-shadow:0 0 48px rgba(0,212,255,.4); }
+.launch-btn:active { transform:translateY(0); }
+.no-config { text-align:center; padding:20px; color:var(--orange); font-size:13px; line-height:1.7; }
+
+/* TOPBAR */
+#s-game { padding:0; }
+.topbar { position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:rgba(7,17,31,.92); border-bottom:1px solid var(--border); backdrop-filter:blur(14px); }
+.topbar-logo { width:34px; height:34px; border-radius:7px; object-fit:contain; display:none; }
+.topbar-brand { font-family:var(--fd); font-size:17px; letter-spacing:3px; color:var(--accent); }
+.timer { font-family:var(--fd); font-size:42px; letter-spacing:3px; color:#fff; line-height:1; transition:color .4s; text-align:center; }
+.timer.warn  { color:var(--orange); text-shadow:0 0 14px rgba(255,136,0,.5); }
+.timer.danger{ color:var(--red); text-shadow:0 0 14px rgba(255,68,68,.5); animation:blink 1s infinite; }
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.timer-sub { font-size:9px; letter-spacing:3px; color:var(--muted); text-transform:uppercase; margin-top:1px; text-align:center; }
+.players-chip { background:rgba(0,212,255,.08); border:1px solid var(--border2); border-radius:20px; padding:6px 12px; font-size:12px; font-weight:500; color:var(--accent); }
+
+/* GAME BODY */
+.game-body { flex:1; overflow-y:auto; padding:16px 15px 48px; }
+.game-tabs { display:flex; gap:6px; margin-bottom:18px; }
+.gtab { flex:1; padding:10px 4px; border-radius:10px; border:1px solid var(--border); background:transparent; color:var(--muted); font-size:11px; font-weight:500; letter-spacing:1px; cursor:pointer; transition:all .2s; text-align:center; }
+.gtab.on { border-color:var(--accent); background:rgba(0,212,255,.09); color:var(--accent); }
+.tab-pane { display:none; }
+.tab-pane.on { display:block; }
+
+/* HINTS */
+.hint-zone { background:var(--card); border:1px solid var(--border2); border-radius:20px; padding:20px 16px; margin-bottom:18px; }
+.hint-zone-top { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.hint-zone-title { font-size:15px; font-weight:600; color:#fff; }
+.hint-zone-sub { font-size:11px; color:var(--muted); margin-top:2px; }
+.numdisp { display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.38); border:2px solid var(--border2); border-radius:14px; padding:12px 20px; margin-bottom:12px; min-height:68px; gap:6px; }
+.numdisp-val { font-family:var(--fd); font-size:50px; letter-spacing:8px; color:#fff; line-height:1; min-width:30px; text-align:center; }
+.numdisp-cursor { width:3px; height:44px; background:var(--accent); border-radius:2px; animation:cur 1s infinite; }
+@keyframes cur{0%,100%{opacity:1}50%{opacity:0}}
+.numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+.npbtn { padding:15px; border-radius:11px; border:1px solid var(--border); background:rgba(255,255,255,.04); color:#fff; font-family:var(--fd); font-size:25px; cursor:pointer; transition:all .12s; text-align:center; user-select:none; }
+.npbtn:active { transform:scale(.88); background:rgba(0,212,255,.14); }
+.npbtn.del { color:var(--orange); font-size:17px; }
+.npbtn.go  { background:rgba(0,212,255,.15); border-color:var(--accent); color:var(--accent); font-size:15px; letter-spacing:2px; }
+
+/* HINT RESULT */
+.hint-result { border-radius:18px; border:1px solid var(--border); overflow:hidden; margin-bottom:16px; display:none; animation:slideUp .32s ease; }
+.hint-result.visible { display:block; }
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.hint-header { display:flex; align-items:center; justify-content:space-between; padding:13px 17px; background:var(--card); border-bottom:1px solid var(--border); }
+.hint-badge { font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--accent); }
+.penalty-badge { font-size:10px; font-weight:600; letter-spacing:1px; color:var(--red); background:rgba(255,68,68,.1); border:1px solid rgba(255,68,68,.3); border-radius:20px; padding:3px 10px; }
+.hint-img-wrap { background:#000; display:flex; align-items:center; justify-content:center; min-height:200px; max-height:400px; overflow:hidden; }
+.hint-img-wrap img { width:100%; max-height:400px; object-fit:contain; display:block; }
+.hint-placeholder { text-align:center; padding:36px 20px; color:var(--muted); }
+.hint-placeholder-emoji { font-size:44px; margin-bottom:10px; display:block; }
+.hint-caption { padding:13px 17px; background:var(--card); font-size:14px; line-height:1.6; color:var(--ice); }
+.hint-error { display:none; text-align:center; padding:17px; border-radius:13px; border:1px dashed rgba(255,136,0,.3); background:rgba(255,136,0,.06); color:var(--orange); font-size:13px; margin-bottom:16px; }
+.hint-error.visible { display:block; }
+
+/* HISTORY */
+.section-label { font-size:10px; letter-spacing:5px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; display:block; }
+.history-item { display:flex; align-items:center; gap:13px; padding:11px 15px; background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:7px; cursor:pointer; transition:all .2s; }
+.history-item:hover { border-color:var(--border2); }
+.history-num { font-family:var(--fd); font-size:24px; color:var(--accent); min-width:34px; text-align:center; }
+.history-label { font-size:12px; color:var(--muted); }
+.history-arrow { margin-left:auto; color:var(--muted); font-size:13px; }
+
+/* INFO TAB */
+.info-card { background:var(--card); border:1px solid var(--border2); border-radius:18px; padding:22px 18px; margin-bottom:14px; }
+.info-card-title { font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--accent); opacity:.7; margin-bottom:14px; display:block; }
+.info-logo { width:80px; height:80px; border-radius:16px; object-fit:contain; border:1px solid var(--border2); margin:0 auto 14px; display:none; }
+.info-escape-name { font-family:var(--fd); font-size:28px; letter-spacing:3px; color:#fff; margin-bottom:4px; display:none; text-align:center; }
+.tel-block { display:none; margin-top:14px; background:rgba(0,0,0,.25); border-radius:12px; padding:14px 16px; border:1px solid var(--border); }
+.tel-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; display:block; }
+.tel-number { font-family:var(--fd); font-size:30px; letter-spacing:3px; color:var(--green); text-decoration:none; display:block; }
+.tel-note { font-size:11px; color:var(--muted); margin-top:4px; }
+.rules-list { list-style:none; }
+.rules-list li { display:flex; align-items:flex-start; gap:10px; padding:9px 0; border-bottom:1px solid var(--border); font-size:13px; color:var(--ice); line-height:1.5; }
+.rules-list li:last-child { border-bottom:none; }
+.rules-list li span { font-size:17px; flex-shrink:0; margin-top:1px; }
+
+/* PENALTY TOAST */
+.penalty-toast { position:fixed; top:76px; left:50%; transform:translateX(-50%); background:var(--red); color:#fff; font-family:var(--fd); font-size:18px; letter-spacing:2px; padding:9px 22px; border-radius:30px; opacity:0; pointer-events:none; transition:opacity .3s; z-index:200; white-space:nowrap; }
+.penalty-toast.show { opacity:1; }
+
+/* PAUSE */
+.pause-overlay { display:none; position:fixed; inset:0; z-index:150; background:rgba(0,0,0,.88); backdrop-filter:blur(8px); align-items:center; justify-content:center; flex-direction:column; gap:18px; text-align:center; padding:30px; }
+.pause-overlay.show { display:flex; }
+.resume-btn { padding:15px 46px; border-radius:14px; border:none; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:var(--bg); font-family:var(--fd); font-size:23px; letter-spacing:3px; cursor:pointer; margin-top:6px; }
+
+/* TIME UP */
+#s-timeup { align-items:center; justify-content:center; text-align:center; padding:40px 22px; gap:20px; }
+.timeup-emoji { font-size:78px; }
+.timeup-title { font-family:var(--fd); font-size:clamp(46px,12vw,78px); letter-spacing:4px; color:var(--red); line-height:.92; }
+.timeup-stats { background:var(--card); border:1px solid var(--border2); border-radius:20px; padding:22px 30px; width:100%; max-width:360px; }
+.stat-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
+.stat-row+.stat-row { border-top:1px solid var(--border); }
+.stat-label { font-size:13px; color:var(--muted); }
+.stat-val { font-family:var(--fd); font-size:22px; color:#fff; letter-spacing:1px; }
+.restart-btn { padding:15px 46px; border-radius:14px; border:none; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:var(--bg); font-family:var(--fd); font-size:23px; letter-spacing:3px; cursor:pointer; }
+
+::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="root">
+
+  <!-- LOADING -->
+  <div id="s-loading" class="screen active">
+    <span class="loading-ice">🧊</span>
+    <div class="loading-text">CHARGEMENT<span class="loading-dots"></span></div>
+  </div>
+
+  <!-- SETUP -->
+  <div id="s-setup" class="screen">
+    <div class="brand">
+      <img class="brand-logo" id="brand-logo" src="" alt="logo">
+      <span class="brand-ice" id="setup-ice">🧊</span>
+      <div class="brand-name" id="brand-name">ESCAPE<br>GLACIÈRE</div>
+      <div class="brand-escape" id="brand-escape"></div>
+    </div>
+    <div class="setup-box">
+      <div>
+        <span class="field-label">👥 Nombre de joueurs</span>
+        <div class="stepper">
+          <button class="step-btn" onclick="adj(-1)">−</button>
+          <div class="step-val" id="pcount">4</div>
+          <button class="step-btn" onclick="adj(1)">+</button>
+        </div>
+      </div>
+      <div>
+        <span class="field-label">⏱ Durée de la mission</span>
+        <div class="dur-row">
+          <button class="dur-pill" onclick="setDur(30,this)">30 min</button>
+          <button class="dur-pill on" onclick="setDur(60,this)">60 min</button>
+          <button class="dur-pill" onclick="setDur(90,this)">90 min</button>
+        </div>
+      </div>
+      <button class="launch-btn" onclick="startGame()">🔐 LANCER L'ESCAPE</button>
+    </div>
+    <div class="no-config" id="no-config" style="display:none">⚠️ Aucune glacière configurée.<br>Contactez l'organisateur.</div>
+  </div>
+
+  <!-- GAME -->
+  <div id="s-game" class="screen">
+    <div class="topbar">
+      <img class="topbar-logo" id="topbar-logo" src="" alt="">
+      <div>
+        <div class="timer" id="timer">60:00</div>
+        <div class="timer-sub" id="timer-sub">en cours</div>
+      </div>
+      <div class="players-chip" id="players-chip">4 🧑</div>
+    </div>
+    <div class="game-body">
+      <div class="game-tabs">
+        <button class="gtab on" onclick="gtab('hints',this)">🃏 Indices</button>
+        <button class="gtab" onclick="gtab('info',this)">ℹ️ Infos</button>
+      </div>
+
+      <!-- HINTS -->
+      <div id="tp-hints" class="tab-pane on">
+        <div class="hint-zone">
+          <div class="hint-zone-top">
+            <div style="font-size:26px">🃏</div>
+            <div>
+              <div class="hint-zone-title">Numéro de carte</div>
+              <div class="hint-zone-sub">Tape le numéro imprimé sur ta carte</div>
+            </div>
+          </div>
+          <div class="numdisp">
+            <div class="numdisp-val" id="numdisp">—</div>
+            <div class="numdisp-cursor" id="cursor"></div>
+          </div>
+          <div class="numpad">
+            <button class="npbtn" onclick="np('1')">1</button>
+            <button class="npbtn" onclick="np('2')">2</button>
+            <button class="npbtn" onclick="np('3')">3</button>
+            <button class="npbtn" onclick="np('4')">4</button>
+            <button class="npbtn" onclick="np('5')">5</button>
+            <button class="npbtn" onclick="np('6')">6</button>
+            <button class="npbtn" onclick="np('7')">7</button>
+            <button class="npbtn" onclick="np('8')">8</button>
+            <button class="npbtn" onclick="np('9')">9</button>
+            <button class="npbtn del" onclick="npDel()">⌫</button>
+            <button class="npbtn" onclick="np('0')">0</button>
+            <button class="npbtn go" onclick="searchHint()">OK ✓</button>
+          </div>
+        </div>
+        <div class="hint-result" id="hint-result">
+          <div class="hint-header">
+            <div class="hint-badge" id="hint-badge">CARTE N°—</div>
+            <div class="penalty-badge" id="hint-penalty">−2 min</div>
+          </div>
+          <div class="hint-img-wrap" id="hint-img-wrap">
+            <div class="hint-placeholder" id="hint-ph">
+              <span class="hint-placeholder-emoji">🔍</span>
+              <div id="hint-ph-text">Indice visuel non configuré</div>
+            </div>
+            <img id="hint-img" src="" alt="indice" style="display:none">
+          </div>
+          <div class="hint-caption" id="hint-caption" style="display:none"></div>
+        </div>
+        <div class="hint-error" id="hint-error">❓ Aucune carte trouvée avec ce numéro.<br>Vérifie le numéro sur ta carte.</div>
+        <div id="history-section" style="display:none">
+          <span class="section-label">Indices déjà consultés</span>
+          <div id="history-list"></div>
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div id="tp-info" class="tab-pane">
+        <div class="info-card">
+          <span class="info-card-title">🧊 L'escape game</span>
+          <img class="info-logo" id="info-logo" src="" alt="logo">
+          <div class="info-escape-name" id="info-name"></div>
+          <div class="tel-block" id="tel-block">
+            <span class="tel-label">📞 Besoin d'aide ?</span>
+            <a class="tel-number" id="tel-number" href=""></a>
+            <div class="tel-note">Appelez-nous si vous êtes bloqués</div>
+          </div>
+        </div>
+        <div class="info-card">
+          <span class="info-card-title">📋 Règles du jeu</span>
+          <ul class="rules-list">
+            <li><span>⏱</span> Vous avez 60 minutes pour résoudre toutes les énigmes</li>
+            <li><span>🃏</span> Chaque carte consultée vous coûte des minutes sur le chrono</li>
+            <li><span>🔒</span> Les récompenses se débloquent avec les codes trouvés physiquement</li>
+            <li><span>🧊</span> Tout se passe dans et autour de la glacière</li>
+            <li><span>🎉</span> Bonne chance et bon apéro !</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="penalty-toast" id="penalty-toast">−2 min ⏱</div>
+    <div class="pause-overlay" id="pause-overlay">
+      <div style="font-size:60px">⏸</div>
+      <div style="font-family:var(--fd);font-size:50px;letter-spacing:4px;color:#fff">PAUSE</div>
+      <div style="font-size:14px;color:var(--muted)">Le timer est suspendu</div>
+      <button class="resume-btn" onclick="togglePause()">▶ REPRENDRE</button>
+    </div>
+  </div>
+
+  <!-- TIME UP -->
+  <div id="s-timeup" class="screen">
+    <div class="timeup-emoji">⏰</div>
+    <div class="timeup-title">TEMPS<br>ÉCOULÉ !</div>
+    <div class="timeup-stats">
+      <div class="stat-row"><span class="stat-label">Joueurs</span><span class="stat-val" id="tu-players">—</span></div>
+      <div class="stat-row"><span class="stat-label">Indices consultés</span><span class="stat-val" id="tu-hints">—</span></div>
+      <div class="stat-row"><span class="stat-label">Temps perdu</span><span class="stat-val" id="tu-penalty">—</span></div>
+    </div>
+    <button class="restart-btn" onclick="resetGame()">🔄 Nouvelle partie</button>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// ⚠️ REMPLACE CES DEUX VALEURS ⚠️
+const SUPABASE_URL = 'https://krqkqcnsmcmerwbfencb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2TzK9VfplPjCRi_WhPj4nA_BooLFTQs';
+// ══════════════════════════════════════════
+
+// Récupère le slug depuis l'URL (?g=nom-glaciere)
+const params  = new URLSearchParams(window.location.search);
+const SLUG    = params.get('g') || 'default';
+
+let glaciere  = null;
+let cartes    = {};
+let players   = 4;
+let durMin    = 60;
+let secsLeft  = 3600;
+let timerInt  = null;
+let paused    = false;
+let npVal     = '';
+let history   = [];
+let penaltyMin= 2;
+let totalPen  = 0;
+
+// ── API SUPABASE ──
+async function supaFetch(path, opts={}) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', ...opts.headers },
+    ...opts
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// ── INIT ──
+async function init() {
+  try {
+    // Charge la glacière
+    const gs = await supaFetch('glacieres?slug=eq.' + SLUG + '&actif=eq.true&limit=1');
+    if (!gs.length) { showNoConfig(); return; }
+    glaciere  = gs[0];
+    penaltyMin= glaciere.penalty_min || 2;
+    applyBranding();
+
+    // Charge les cartes
+    const cs = await supaFetch('cartes?glaciere_id=eq.' + glaciere.id);
+    cs.forEach(c => cartes[c.numero] = c);
+
+    showScreen('s-setup');
+  } catch(e) {
+    console.error(e);
+    showNoConfig();
+  }
+}
+
+function applyBranding() {
+  if (!glaciere) return;
+  // Couleurs
+  if (glaciere.couleur_accent) document.documentElement.style.setProperty('--accent', glaciere.couleur_accent);
+  if (glaciere.couleur_bg)     document.documentElement.style.setProperty('--bg', glaciere.couleur_bg);
+  // Logo
+  if (glaciere.logo_url) {
+    document.getElementById('brand-logo').src = glaciere.logo_url;
+    document.getElementById('brand-logo').style.display = 'block';
+    document.getElementById('setup-ice').style.display  = 'none';
+    document.getElementById('topbar-logo').src = glaciere.logo_url;
+    document.getElementById('topbar-logo').style.display = 'block';
+    document.getElementById('info-logo').src = glaciere.logo_url;
+    document.getElementById('info-logo').style.display = 'block';
+  }
+  // Nom escape game
+  if (glaciere.nom_escape) {
+    document.getElementById('brand-escape').textContent = glaciere.nom_escape;
+    document.getElementById('brand-escape').style.display = 'block';
+    document.getElementById('info-name').textContent = glaciere.nom_escape;
+    document.getElementById('info-name').style.display = 'block';
+    document.title = glaciere.nom_escape;
+  }
+  // Téléphone
+  if (glaciere.telephone) {
+    document.getElementById('tel-number').textContent = glaciere.telephone;
+    document.getElementById('tel-number').href = 'tel:' + glaciere.telephone.replace(/\s/g,'');
+    document.getElementById('tel-block').style.display = 'block';
+  }
+}
+
+function showNoConfig() {
+  showScreen('s-setup');
+  document.getElementById('no-config').style.display = 'block';
+  document.querySelector('.launch-btn').style.display = 'none';
+}
+
+// ── SETUP ──
+function adj(d) { players = Math.max(1,Math.min(12,players+d)); document.getElementById('pcount').textContent = players; }
+function setDur(m,btn) { durMin=m; document.querySelectorAll('.dur-pill').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
+
+function startGame() {
+  secsLeft=durMin*60; totalPen=0; history=[]; npVal=''; paused=false;
+  document.getElementById('players-chip').textContent = players+' 🧑';
+  document.getElementById('history-section').style.display='none';
+  document.getElementById('history-list').innerHTML='';
+  document.getElementById('hint-result').classList.remove('visible');
+  document.getElementById('hint-error').classList.remove('visible');
+  document.getElementById('numdisp').textContent='—';
+  showScreen('s-game');
+  updateTimer();
+  clearInterval(timerInt);
+  timerInt = setInterval(tick,1000);
+}
+
+// ── TIMER ──
+function tick() {
+  if (paused) return;
+  secsLeft--;
+  if (secsLeft<=0) { secsLeft=0; updateTimer(); clearInterval(timerInt); endGame(); return; }
+  updateTimer();
+}
+function updateTimer() {
+  const m=Math.floor(secsLeft/60).toString().padStart(2,'0');
+  const s=(secsLeft%60).toString().padStart(2,'0');
+  const el=document.getElementById('timer');
+  el.textContent=m+':'+s;
+  el.className='timer';
+  const pct=secsLeft/(durMin*60);
+  if(pct<.1) el.classList.add('danger');
+  else if(pct<.25) el.classList.add('warn');
+  document.getElementById('timer-sub').textContent = paused ? '⏸ pause' : 'en cours';
+}
+function applyPenalty() {
+  if(!penaltyMin) return;
+  secsLeft=Math.max(0,secsLeft-penaltyMin*60);
+  totalPen+=penaltyMin;
+  updateTimer();
+  const t=document.getElementById('penalty-toast');
+  t.textContent='−'+penaltyMin+' min ⏱';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+function togglePause() {
+  paused=!paused;
+  document.getElementById('pause-overlay').classList.toggle('show',paused);
+  updateTimer();
+}
+function endGame() {
+  document.getElementById('tu-players').textContent=players+' joueur'+(players>1?'s':'');
+  document.getElementById('tu-hints').textContent=history.length;
+  document.getElementById('tu-penalty').textContent=totalPen+' min';
+  showScreen('s-timeup');
+}
+function resetGame() { clearInterval(timerInt); showScreen('s-setup'); }
+
+// ── NUMPAD ──
+function np(d) { if(npVal.length>=2) return; npVal+=d; refreshDisp(); }
+function npDel() { npVal=npVal.slice(0,-1); refreshDisp(); document.getElementById('hint-result').classList.remove('visible'); document.getElementById('hint-error').classList.remove('visible'); }
+function refreshDisp() {
+  document.getElementById('numdisp').textContent=npVal||'—';
+  document.getElementById('cursor').style.display=npVal?'none':'block';
+}
+
+// ── SEARCH HINT ──
+function searchHint() {
+  const num=parseInt(npVal);
+  document.getElementById('hint-result').classList.remove('visible');
+  document.getElementById('hint-error').classList.remove('visible');
+  if(!npVal||isNaN(num)) return;
+  const card=cartes[num];
+  if(!card) { document.getElementById('hint-error').classList.add('visible'); npVal=''; refreshDisp(); return; }
+  const seen=history.find(h=>h.num===num);
+  document.getElementById('hint-badge').textContent='CARTE N°'+num;
+  document.getElementById('hint-penalty').textContent=seen?'déjà consulté':'−'+penaltyMin+' min';
+  document.getElementById('hint-penalty').style.color=seen?'var(--muted)':'var(--red)';
+  const imgEl=document.getElementById('hint-img');
+  const ph=document.getElementById('hint-ph');
+  if(card.image_url) { imgEl.src=card.image_url; imgEl.style.display='block'; ph.style.display='none'; }
+  else { imgEl.style.display='none'; ph.style.display='block'; }
+  const capEl=document.getElementById('hint-caption');
+  if(card.caption) { capEl.textContent=card.caption; capEl.style.display='block'; } else { capEl.style.display='none'; }
+  document.getElementById('hint-result').classList.add('visible');
+  if(!seen) { applyPenalty(); history.unshift({num,label:card.caption||'Carte n°'+num}); renderHistory(); }
+  npVal=''; refreshDisp();
+}
+function renderHistory() {
+  const s=document.getElementById('history-section');
+  const l=document.getElementById('history-list');
+  if(!history.length){s.style.display='none';return;}
+  s.style.display='block';
+  l.innerHTML=history.map(h=>`<div class="history-item" onclick="reloadHint(${h.num})"><div class="history-num">${h.num}</div><div class="history-label">${h.label}</div><div class="history-arrow">↗</div></div>`).join('');
+}
+function reloadHint(num){npVal=String(num);searchHint();}
+
+// ── TABS ──
+function gtab(id,btn){document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.gtab').forEach(b=>b.classList.remove('on'));document.getElementById('tp-'+id).classList.add('on');btn.classList.add('on');}
+
+// ── SCREENS ──
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+// ── START ──
+init();
+</script>
+</body>
+</html>

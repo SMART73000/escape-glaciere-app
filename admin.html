@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Back-office — Escape Glacière</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --accent:#00d4ff; --accent2:#0088bb; --bg:#07111f; --surface:#0d1f35; --card:#112233;
+  --gold:#ffc84a; --green:#00e676; --red:#ff4444; --orange:#ff8800; --ice:#d0f0ff;
+  --muted:rgba(208,240,255,0.42); --border:rgba(255,255,255,0.09); --border2:rgba(255,255,255,0.16);
+  --fd:'Bebas Neue',sans-serif; --fb:'Outfit',sans-serif;
+}
+body { background:var(--bg); color:var(--ice); font-family:var(--fb); min-height:100vh; }
+body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:radial-gradient(ellipse 70% 50% at 15% 0%,rgba(0,180,255,0.07) 0%,transparent 70%); }
+#root { position:relative; z-index:1; }
+
+/* GATE */
+#s-gate { display:flex; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:20px; text-align:center; padding:30px; }
+.gate-icon { font-size:56px; }
+.gate-title { font-family:var(--fd); font-size:30px; letter-spacing:3px; color:var(--gold); }
+.gate-sub { font-size:14px; color:var(--muted); }
+.gate-pin { background:rgba(0,0,0,.4); border:2px solid var(--border2); border-radius:13px; color:#fff; font-family:var(--fd); font-size:36px; letter-spacing:10px; padding:13px 22px; text-align:center; outline:none; width:100%; max-width:260px; transition:border-color .2s; }
+.gate-pin:focus { border-color:var(--gold); }
+.gate-pin.error { border-color:var(--red); animation:shake .4s; }
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.gate-btn { width:100%; max-width:260px; padding:13px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--gold),#cc8800); color:var(--bg); font-family:var(--fd); font-size:21px; letter-spacing:3px; cursor:pointer; }
+
+/* MAIN */
+#s-main { display:none; flex-direction:column; }
+.bo-top { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:50; }
+.bo-title { font-family:var(--fd); font-size:20px; letter-spacing:3px; color:var(--gold); }
+.bo-logout { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:12px; padding:6px 14px; border-radius:8px; cursor:pointer; font-family:var(--fb); transition:all .2s; }
+.bo-logout:hover { border-color:var(--red); color:var(--red); }
+
+/* TABS */
+.bo-tabs { display:flex; border-bottom:1px solid var(--border); background:var(--surface); }
+.bo-tab { flex:1; padding:13px 8px; border:none; background:transparent; color:var(--muted); font-family:var(--fb); font-size:12px; font-weight:500; letter-spacing:1px; cursor:pointer; transition:all .2s; border-bottom:2px solid transparent; text-transform:uppercase; }
+.bo-tab.on { color:var(--gold); border-bottom-color:var(--gold); }
+
+.bo-body { padding:18px 15px 60px; max-width:700px; margin:0 auto; width:100%; }
+.tab-pane { display:none; }
+.tab-pane.on { display:block; }
+
+/* SECTIONS */
+.bo-section { background:var(--card); border:1px solid var(--border2); border-radius:17px; padding:18px; margin-bottom:14px; }
+.bo-stitle { font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--gold); opacity:.8; margin-bottom:14px; display:block; }
+.bo-field { margin-bottom:13px; }
+.bo-field label { font-size:12px; color:var(--muted); margin-bottom:6px; display:block; letter-spacing:1px; }
+.bo-input { width:100%; background:rgba(0,0,0,.35); border:1px solid var(--border2); border-radius:10px; color:#fff; font-family:var(--fb); font-size:15px; padding:10px 13px; outline:none; transition:border-color .2s; }
+.bo-input:focus { border-color:var(--accent); }
+.bo-input[type=number] { font-family:var(--fd); font-size:20px; letter-spacing:2px; }
+select.bo-input { cursor:pointer; }
+
+/* COLOR GRID */
+.color-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.color-field label { font-size:11px; color:var(--muted); margin-bottom:7px; display:block; }
+.color-row { display:flex; align-items:center; gap:8px; }
+.color-swatch { width:40px; height:40px; border-radius:9px; border:2px solid var(--border2); cursor:pointer; flex-shrink:0; overflow:hidden; position:relative; }
+.color-swatch input[type=color] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; border:none; }
+.color-hex { flex:1; background:rgba(0,0,0,.35); border:1px solid var(--border2); border-radius:9px; color:#fff; font-family:var(--fd); font-size:16px; letter-spacing:2px; padding:8px 10px; outline:none; text-transform:uppercase; transition:border-color .2s; }
+.color-hex:focus { border-color:var(--accent); }
+
+/* LOGO UPLOAD */
+.logo-zone { border:2px dashed var(--border2); border-radius:13px; padding:16px; text-align:center; cursor:pointer; transition:all .2s; position:relative; overflow:hidden; }
+.logo-zone:hover { border-color:var(--accent); }
+.logo-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.logo-zone-label { font-size:12px; color:var(--muted); pointer-events:none; }
+.logo-preview { max-width:100px; max-height:60px; object-fit:contain; border-radius:8px; display:none; margin:0 auto 6px; }
+
+/* GLACIERES LIST */
+.glaciere-row { background:rgba(0,0,0,.2); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:10px; }
+.gr-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.gr-name { font-family:var(--fd); font-size:18px; letter-spacing:2px; color:var(--accent); }
+.gr-actions { display:flex; gap:8px; }
+.gr-btn { padding:6px 14px; border-radius:8px; border:1px solid var(--border); background:transparent; color:var(--muted); font-size:12px; cursor:pointer; transition:all .2s; font-family:var(--fb); }
+.gr-btn:hover { border-color:var(--border2); color:var(--ice); }
+.gr-btn.edit { border-color:var(--accent); color:var(--accent); }
+.gr-btn.del  { border-color:var(--red); color:var(--red); }
+.gr-slug { font-size:11px; color:var(--muted); margin-bottom:6px; }
+.gr-cards { font-size:12px; color:var(--green); }
+.gr-qr { font-size:11px; color:var(--muted); margin-top:6px; word-break:break-all; }
+
+/* CARDS LIST */
+.card-row { background:rgba(0,0,0,.22); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:8px; }
+.card-row-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }
+.card-del { background:transparent; border:none; color:var(--red); font-size:16px; cursor:pointer; opacity:.6; transition:opacity .2s; }
+.card-del:hover { opacity:1; }
+.card-caption { width:100%; background:rgba(0,0,0,.22); border:1px solid var(--border); border-radius:8px; color:var(--ice); font-family:var(--fb); font-size:13px; padding:8px 11px; outline:none; margin-bottom:7px; resize:none; transition:border-color .2s; }
+.card-caption:focus { border-color:var(--accent); }
+.img-zone { border:2px dashed var(--border2); border-radius:10px; padding:13px; text-align:center; cursor:pointer; transition:all .2s; position:relative; overflow:hidden; }
+.img-zone:hover { border-color:var(--accent); }
+.img-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.img-zone-label { font-size:11px; color:var(--muted); pointer-events:none; }
+.img-preview { width:100%; max-height:150px; object-fit:contain; border-radius:7px; display:none; margin-top:6px; }
+
+/* BTN */
+.add-btn { width:100%; padding:12px; border-radius:11px; border:2px dashed var(--border2); background:transparent; color:var(--accent); font-size:13px; font-weight:500; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all .2s; margin-top:10px; }
+.add-btn:hover { border-color:var(--accent); background:rgba(0,212,255,.06); }
+.save-btn { width:100%; padding:14px; border-radius:13px; border:none; background:linear-gradient(135deg,var(--gold),#bb7700); color:var(--bg); font-family:var(--fd); font-size:20px; letter-spacing:3px; cursor:pointer; transition:all .2s; margin-top:4px; }
+.save-btn:hover { transform:translateY(-2px); box-shadow:0 0 28px rgba(255,200,74,.3); }
+.feedback { text-align:center; font-size:14px; color:var(--green); margin-top:10px; display:none; animation:fi .3s; }
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.feedback.show { display:block; }
+.back-link { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:13px; padding:8px 16px; border-radius:8px; cursor:pointer; font-family:var(--fb); transition:all .2s; }
+.back-link:hover { border-color:var(--border2); color:var(--ice); }
+
+/* EDIT PANEL */
+#edit-panel { display:none; }
+#edit-panel.show { display:block; }
+#list-panel.hidden { display:none; }
+
+::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="root">
+
+  <!-- GATE -->
+  <div id="s-gate">
+    <div class="gate-icon">🔑</div>
+    <div class="gate-title">Back-Office</div>
+    <div class="gate-sub">Accès réservé au créateur de l'escape game</div>
+    <input type="password" class="gate-pin" id="gate-pin" placeholder="····" maxlength="4" onkeydown="if(event.key==='Enter')checkPin()">
+    <button class="gate-btn" onclick="checkPin()">ENTRER</button>
+  </div>
+
+  <!-- MAIN -->
+  <div id="s-main">
+    <div class="bo-top">
+      <div class="bo-title">⚙️ BACK-OFFICE</div>
+      <button class="bo-logout" onclick="logout()">Déconnexion</button>
+    </div>
+    <div class="bo-tabs">
+      <button class="bo-tab on" onclick="boTab('glacieres',this)">🧊 Glacières</button>
+      <button class="bo-tab" onclick="boTab('config',this)">⚙️ Config</button>
+    </div>
+
+    <div class="bo-body">
+
+      <!-- GLACIERES TAB -->
+      <div id="tp-glacieres" class="tab-pane on">
+
+        <!-- LIST -->
+        <div id="list-panel">
+          <div class="bo-section">
+            <span class="bo-stitle">🧊 Vos glacières</span>
+            <div id="glacieres-list"><div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Chargement...</div></div>
+            <button class="add-btn" onclick="newGlaciere()" style="margin-top:14px">➕ Nouvelle glacière</button>
+          </div>
+        </div>
+
+        <!-- EDIT -->
+        <div id="edit-panel">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <button class="back-link" onclick="backToList()">← Retour</button>
+            <span id="edit-title" style="font-family:var(--fd);font-size:18px;letter-spacing:2px;color:var(--accent)">Nouvelle glacière</span>
+          </div>
+
+          <div class="bo-section">
+            <span class="bo-stitle">📋 Informations</span>
+            <div class="bo-field"><label>Nom de la glacière</label><input type="text" class="bo-input" id="e-nom" placeholder="ex: Glacière Été 2026"></div>
+            <div class="bo-field"><label>Slug (identifiant URL — sans espace ni accents)</label><input type="text" class="bo-input" id="e-slug" placeholder="ex: glaciere-ete-2026"></div>
+            <div class="bo-field"><label>Nom de l'escape game (affiché aux joueurs)</label><input type="text" class="bo-input" id="e-escape" placeholder="ex: Smart Escape Game"></div>
+            <div class="bo-field"><label>📞 Numéro de téléphone de secours</label><input type="text" class="bo-input" id="e-tel" placeholder="ex: 06 12 34 56 78"></div>
+            <div class="bo-field"><label>⏱ Pénalité par indice consulté (minutes)</label><input type="number" class="bo-input" id="e-penalty" value="2" min="0" max="30"></div>
+          </div>
+
+          <div class="bo-section">
+            <span class="bo-stitle">🎨 Apparence</span>
+            <div class="bo-field">
+              <label>Logo (affiché sur l'écran d'accueil)</label>
+              <div class="logo-zone" id="logo-zone">
+                <input type="file" accept="image/*" onchange="handleLogo(event)">
+                <img class="logo-preview" id="logo-preview">
+                <div class="logo-zone-label" id="logo-label"><span style="font-size:24px;display:block;margin-bottom:5px">🖼</span>Appuyez pour uploader votre logo</div>
+              </div>
+            </div>
+            <div class="color-grid">
+              <div class="color-field">
+                <label>Couleur principale</label>
+                <div class="color-row">
+                  <div class="color-swatch" id="sw-accent"><input type="color" value="#00d4ff" oninput="syncColor('accent',this.value)"></div>
+                  <input type="text" class="color-hex" id="hex-accent" value="#00D4FF" maxlength="7" oninput="syncHex('accent',this.value)">
+                </div>
+              </div>
+              <div class="color-field">
+                <label>Couleur de fond</label>
+                <div class="color-row">
+                  <div class="color-swatch" id="sw-bg"><input type="color" value="#07111f" oninput="syncColor('bg',this.value)"></div>
+                  <input type="text" class="color-hex" id="hex-bg" value="#07111F" maxlength="7" oninput="syncHex('bg',this.value)">
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:10px;text-align:center">
+              <span style="font-size:11px;color:var(--muted)">Préréglages :</span>
+              <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap">
+                <button onclick="applyPreset('#00d4ff','#07111f')" style="padding:6px 12px;border-radius:8px;border:none;background:#07111f;color:#00d4ff;font-size:12px;cursor:pointer;border:1px solid #00d4ff">❄️ Glace</button>
+                <button onclick="applyPreset('#ff6600','#1a0a00')" style="padding:6px 12px;border-radius:8px;border:none;background:#1a0a00;color:#ff6600;font-size:12px;cursor:pointer;border:1px solid #ff6600">🔥 Feu</button>
+                <button onclick="applyPreset('#00e676','#071a0f')" style="padding:6px 12px;border-radius:8px;border:none;background:#071a0f;color:#00e676;font-size:12px;cursor:pointer;border:1px solid #00e676">🌿 Forêt</button>
+                <button onclick="applyPreset('#ffc84a','#1a1200')" style="padding:6px 12px;border-radius:8px;border:none;background:#1a1200;color:#ffc84a;font-size:12px;cursor:pointer;border:1px solid #ffc84a">☀️ Or</button>
+                <button onclick="applyPreset('#cc44ff','#12001a')" style="padding:6px 12px;border-radius:8px;border:none;background:#12001a;color:#cc44ff;font-size:12px;cursor:pointer;border:1px solid #cc44ff">🔮 Violet</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bo-section">
+            <span class="bo-stitle">🃏 Cartes & Indices</span>
+            <div id="cards-list"></div>
+            <button class="add-btn" onclick="addCard()">➕ Ajouter une carte</button>
+          </div>
+
+          <button class="save-btn" onclick="saveGlaciere()">💾 SAUVEGARDER</button>
+          <div class="feedback" id="save-fb">✅ Sauvegardé !</div>
+        </div>
+      </div>
+
+      <!-- CONFIG TAB -->
+      <div id="tp-config" class="tab-pane">
+        <div class="bo-section">
+          <span class="bo-stitle">🔑 Sécurité</span>
+          <div class="bo-field"><label>PIN back-office actuel</label><input type="password" class="bo-input" id="cfg-old-pin" placeholder="PIN actuel" maxlength="4"></div>
+          <div class="bo-field"><label>Nouveau PIN (4 chiffres)</label><input type="password" class="bo-input" id="cfg-new-pin" placeholder="Nouveau PIN" maxlength="4"></div>
+          <button class="save-btn" onclick="changePin()">💾 CHANGER LE PIN</button>
+          <div class="feedback" id="pin-fb"></div>
+        </div>
+        <div class="bo-section">
+          <span class="bo-stitle">📱 QR Codes</span>
+          <div style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:12px">
+            Pour générer les QR codes de vos glacières :<br>
+            1. Allez sur <strong style="color:var(--ice)">qr-code-generator.com</strong><br>
+            2. Entrez l'URL de la glacière (visible sur chaque glacière dans l'onglet Glacières)<br>
+            3. Téléchargez en PNG et imprimez
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// ⚠️ REMPLACE CES DEUX VALEURS ⚠️
+const SUPABASE_URL = 'https://krqkqcnsmcmerwbfencb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2TzK9VfplPjCRi_WhPj4nA_BooLFTQs';
+// ══════════════════════════════════════════
+
+const APP_URL = window.location.origin + '/index.html';
+const PIN_KEY  = 'bo_pin';
+let editingId  = null;
+let logoData   = '';
+let cardCtr    = 0;
+
+// ── PIN ──
+function getPin() { return localStorage.getItem(PIN_KEY) || '1234'; }
+function checkPin() {
+  const v = document.getElementById('gate-pin').value;
+  if (v === getPin()) {
+    document.getElementById('s-gate').style.display = 'none';
+    document.getElementById('s-main').style.display = 'flex';
+    document.getElementById('s-main').style.flexDirection = 'column';
+    loadGlacieres();
+  } else {
+    const inp = document.getElementById('gate-pin');
+    inp.classList.add('error');
+    setTimeout(()=>inp.classList.remove('error'),500);
+    inp.value='';
+  }
+}
+function logout() { document.getElementById('s-gate').style.display='flex'; document.getElementById('s-main').style.display='none'; document.getElementById('gate-pin').value=''; }
+function changePin() {
+  const old = document.getElementById('cfg-old-pin').value;
+  const nw  = document.getElementById('cfg-new-pin').value;
+  const fb  = document.getElementById('pin-fb');
+  if (old !== getPin()) { fb.textContent='❌ PIN actuel incorrect'; fb.style.color='var(--red)'; fb.classList.add('show'); return; }
+  if (nw.length !== 4)  { fb.textContent='❌ Le nouveau PIN doit faire 4 chiffres'; fb.style.color='var(--red)'; fb.classList.add('show'); return; }
+  localStorage.setItem(PIN_KEY, nw);
+  fb.textContent='✅ PIN modifié !'; fb.style.color='var(--green)'; fb.classList.add('show');
+  document.getElementById('cfg-old-pin').value=''; document.getElementById('cfg-new-pin').value='';
+  setTimeout(()=>fb.classList.remove('show'),2500);
+}
+
+// ── API ──
+async function supaFetch(path, opts={}) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
+    headers: { 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY, 'Content-Type':'application/json', 'Prefer':'return=representation', ...opts.headers },
+    ...opts
+  });
+  const text = await r.text();
+  if (!r.ok) throw new Error(text);
+  return text ? JSON.parse(text) : [];
+}
+
+// ── STORAGE ──
+async function uploadImage(file, name) {
+  const ext  = file.name.split('.').pop();
+  const path = name + '_' + Date.now() + '.' + ext;
+  const r = await fetch(SUPABASE_URL + '/storage/v1/object/indices/' + path, {
+    method: 'POST',
+    headers: { 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY, 'Content-Type':file.type },
+    body: file
+  });
+  if (!r.ok) throw new Error('Upload échoué');
+  return SUPABASE_URL + '/storage/v1/object/public/indices/' + path;
+}
+
+// ── GLACIERES LIST ──
+async function loadGlacieres() {
+  const list = document.getElementById('glacieres-list');
+  try {
+    const gs = await supaFetch('glacieres?order=created_at.desc');
+    if (!gs.length) { list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Aucune glacière — créez-en une !</div>'; return; }
+    list.innerHTML = await Promise.all(gs.map(async g => {
+      const cs = await supaFetch('cartes?glaciere_id=eq.'+g.id+'&select=id');
+      const url = APP_URL + '?g=' + g.slug;
+      return `<div class="glaciere-row">
+        <div class="gr-header">
+          <div class="gr-name">${g.nom}</div>
+          <div class="gr-actions">
+            <button class="gr-btn edit" onclick="editGlaciere('${g.id}')">✏️ Modifier</button>
+            <button class="gr-btn del" onclick="delGlaciere('${g.id}','${g.nom}')">🗑</button>
+          </div>
+        </div>
+        <div class="gr-slug">🔗 Slug : ${g.slug}</div>
+        <div class="gr-cards">🃏 ${cs.length} carte${cs.length>1?'s':''} configurée${cs.length>1?'s':''}</div>
+        <div class="gr-qr">📱 URL joueurs : ${url}</div>
+      </div>`;
+    })).then(html => html.join(''));
+  } catch(e) { list.innerHTML='<div style="color:var(--red);font-size:13px;padding:10px">Erreur : '+e.message+'</div>'; }
+}
+
+// ── NEW / EDIT ──
+function newGlaciere() {
+  editingId=null; logoData='';
+  document.getElementById('e-nom').value='';
+  document.getElementById('e-slug').value='';
+  document.getElementById('e-escape').value='';
+  document.getElementById('e-tel').value='';
+  document.getElementById('e-penalty').value='2';
+  document.getElementById('logo-preview').style.display='none';
+  document.getElementById('logo-label').style.display='block';
+  document.getElementById('cards-list').innerHTML='';
+  document.getElementById('edit-title').textContent='Nouvelle glacière';
+  showEdit();
+}
+
+async function editGlaciere(id) {
+  editingId=id; logoData='';
+  try {
+    const [g] = await supaFetch('glacieres?id=eq.'+id);
+    const cs  = await supaFetch('cartes?glaciere_id=eq.'+id+'&order=numero.asc');
+    document.getElementById('e-nom').value    = g.nom||'';
+    document.getElementById('e-slug').value   = g.slug||'';
+    document.getElementById('e-escape').value = g.nom_escape||'';
+    document.getElementById('e-tel').value    = g.telephone||'';
+    document.getElementById('e-penalty').value= g.penalty_min||2;
+    if (g.couleur_accent) { syncColor('accent',g.couleur_accent); document.querySelector('#sw-accent input').value=g.couleur_accent; document.getElementById('hex-accent').value=g.couleur_accent.toUpperCase(); }
+    if (g.couleur_bg)     { syncColor('bg',g.couleur_bg);         document.querySelector('#sw-bg input').value=g.couleur_bg;       document.getElementById('hex-bg').value=g.couleur_bg.toUpperCase(); }
+    if (g.logo_url) { document.getElementById('logo-preview').src=g.logo_url; document.getElementById('logo-preview').style.display='block'; document.getElementById('logo-label').style.display='none'; }
+    else { document.getElementById('logo-preview').style.display='none'; document.getElementById('logo-label').style.display='block'; }
+    document.getElementById('cards-list').innerHTML='';
+    cs.forEach(c => addCardRow(c.numero, c.caption||'', c.image_url||''));
+    document.getElementById('edit-title').textContent = g.nom;
+    showEdit();
+  } catch(e) { alert('Erreur : '+e.message); }
+}
+
+async function delGlaciere(id,nom) {
+  if (!confirm('Supprimer "'+nom+'" et toutes ses cartes ?')) return;
+  try { await supaFetch('glacieres?id=eq.'+id, {method:'DELETE'}); loadGlacieres(); }
+  catch(e) { alert('Erreur : '+e.message); }
+}
+
+function showEdit() {
+  document.getElementById('list-panel').classList.add('hidden');
+  document.getElementById('edit-panel').classList.add('show');
+}
+function backToList() {
+  document.getElementById('edit-panel').classList.remove('show');
+  document.getElementById('list-panel').classList.remove('hidden');
+  loadGlacieres();
+}
+
+// ── SAVE ──
+async function saveGlaciere() {
+  const nom     = document.getElementById('e-nom').value.trim();
+  const slug    = document.getElementById('e-slug').value.trim().toLowerCase().replace(/\s+/g,'-');
+  const escape  = document.getElementById('e-escape').value.trim();
+  const tel     = document.getElementById('e-tel').value.trim();
+  const penalty = parseInt(document.getElementById('e-penalty').value)||2;
+  const accent  = document.getElementById('hex-accent').value;
+  const bg      = document.getElementById('hex-bg').value;
+
+  if (!nom || !slug) { alert('Nom et slug obligatoires !'); return; }
+
+  // Upload logo si nouveau
+  let logoUrl = null;
+  const logoFile = document.getElementById('logo-zone').querySelector('input[type=file]').files[0];
+  if (logoFile) {
+    try { logoUrl = await uploadImage(logoFile, 'logo_'+slug); }
+    catch(e) { alert('Erreur upload logo : '+e.message); return; }
+  }
+
+  // Collecte des cartes
+  const rows = document.querySelectorAll('.card-row');
+  const cards = [];
+  for (const row of rows) {
+    const num     = parseInt(row.dataset.num);
+    const caption = row.querySelector('.card-caption').value.trim();
+    const imgFile = row.querySelector('input[type=file]').files[0];
+    let imgUrl    = row.dataset.img || '';
+    if (imgFile) {
+      try { imgUrl = await uploadImage(imgFile, 'carte_'+slug+'_'+num); }
+      catch(e) { alert('Erreur upload image carte '+num+' : '+e.message); return; }
+    }
+    if (!isNaN(num)) cards.push({numero:num, caption, image_url:imgUrl});
+  }
+
+  try {
+    let gId = editingId;
+    const payload = { nom, slug, nom_escape:escape||null, telephone:tel||null, penalty_min:penalty, couleur_accent:accent, couleur_bg:bg };
+    if (logoUrl) payload.logo_url = logoUrl;
+
+    if (editingId) {
+      await supaFetch('glacieres?id=eq.'+editingId, {method:'PATCH', body:JSON.stringify(payload)});
+      await supaFetch('cartes?glaciere_id=eq.'+editingId, {method:'DELETE'});
+    } else {
+      const [g] = await supaFetch('glacieres', {method:'POST', body:JSON.stringify(payload)});
+      gId = g.id;
+    }
+
+    // Save cartes
+    if (cards.length) {
+      await supaFetch('cartes', {method:'POST', body:JSON.stringify(cards.map(c=>({...c,glaciere_id:gId})))});
+    }
+
+    const fb = document.getElementById('save-fb');
+    fb.classList.add('show');
+    setTimeout(()=>fb.classList.remove('show'),2500);
+    editingId = gId;
+    document.getElementById('edit-title').textContent = nom;
+  } catch(e) { alert('Erreur sauvegarde : '+e.message); }
+}
+
+// ── CARDS ──
+function addCard() {
+  const existing = Array.from(document.querySelectorAll('.card-row')).map(r=>parseInt(r.dataset.num)).filter(n=>!isNaN(n));
+  let next=1; while(existing.includes(next)) next++;
+  addCardRow(next,'','');
+}
+
+function addCardRow(num,caption,img) {
+  cardCtr++;
+  const id='cr-'+cardCtr;
+  const list=document.getElementById('cards-list');
+  const div=document.createElement('div');
+  div.className='card-row'; div.id=id; div.dataset.num=num; div.dataset.img=img;
+  div.innerHTML=`
+    <div class="card-row-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase">N°</span>
+        <input type="number" class="bo-input" style="width:65px;font-family:var(--fd);font-size:20px;letter-spacing:2px;text-align:center" value="${num}" min="1" max="99" oninput="document.getElementById('${id}').dataset.num=this.value">
+      </div>
+      <button class="card-del" onclick="document.getElementById('${id}').remove()">🗑</button>
+    </div>
+    <textarea class="card-caption" rows="2" placeholder="Texte d'indice optionnel (affiché sous l'image)...">${caption}</textarea>
+    <div class="img-zone" id="iz-${id}">
+      <input type="file" accept="image/*" onchange="handleCardImg(event,'${id}')">
+      <div class="img-zone-label" id="izl-${id}">${img?'':'<span style=\"font-size:20px;display:block;margin-bottom:4px\">🖼</span>Image d\'indice (JPG/PNG)'}</div>
+      <img class="img-preview" id="izp-${id}" src="${img}" style="${img?'display:block':''}">
+    </div>`;
+  list.appendChild(div);
+}
+
+function handleCardImg(event, rowId) {
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{ document.getElementById('izp-'+rowId).src=e.target.result; document.getElementById('izp-'+rowId).style.display='block'; document.getElementById('izl-'+rowId).style.display='none'; };
+  reader.readAsDataURL(file);
+}
+
+function handleLogo(event) {
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{ document.getElementById('logo-preview').src=e.target.result; document.getElementById('logo-preview').style.display='block'; document.getElementById('logo-label').style.display='none'; };
+  reader.readAsDataURL(file);
+}
+
+// ── COLORS ──
+function syncColor(key,val) { document.getElementById('hex-'+key).value=val.toUpperCase(); document.getElementById('sw-'+key).style.background=val; }
+function syncHex(key,val) { if(/^#[0-9A-Fa-f]{6}$/.test(val)) { document.querySelector('#sw-'+key+' input').value=val; document.getElementById('sw-'+key).style.background=val; } }
+function applyPreset(accent,bg) { syncColor('accent',accent); document.querySelector('#sw-accent input').value=accent; document.getElementById('hex-accent').value=accent.toUpperCase(); syncColor('bg',bg); document.querySelector('#sw-bg input').value=bg; document.getElementById('hex-bg').value=bg.toUpperCase(); }
+
+// ── TABS ──
+function boTab(id,btn) { document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on')); document.querySelectorAll('.bo-tab').forEach(b=>b.classList.remove('on')); document.getElementById('tp-'+id).classList.add('on'); btn.classList.add('on'); }
+</script>
+</body>
+</html>

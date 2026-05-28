@@ -1,0 +1,22 @@
+{
+  "name": "Escape Glacière",
+  "short_name": "Glacière",
+  "description": "L'application de l'Escape Game Glacière",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://fakeimg.pl/192x192/07111f/00d4ff?text=🧊&font_size=80",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://fakeimg.pl/512x512/07111f/00d4ff?text=🧊&font_size=200",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
