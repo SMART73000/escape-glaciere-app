@@ -525,8 +525,7 @@ async function init() {
     // Charger bip
     if(glaciere.bip_url) loadBipAudio(glaciere.bip_url);
 
-    if(glaciere.synopsis) showScreen('s-briefing');
-    else showScreen('s-setup');
+    showScreen('s-setup');
   } catch(e) {
     console.error(e);
     showScreen('s-setup');
