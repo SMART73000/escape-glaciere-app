@@ -553,7 +553,7 @@ function addCard(type){
 function addCardRow(num,caption,img,type='hint'){
   cardCtr++;
   const id='cr-'+cardCtr;
-  const isAnswer=type==='answer'||（num>=100&&num<200);
+  const isAnswer=type==='answer'||(num>=100&&num<200);
   const isCode=type==='code'||num>=200;
   const isHint=!isAnswer&&!isCode;
   const list=document.getElementById('cards-list');
