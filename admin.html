@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Back-office v3 — Mission Apéro</title>
+<title>Back-office V4 — Mission Apéro</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -14,11 +14,9 @@
   --fd:'Bebas Neue',sans-serif;--fb:'Outfit',sans-serif;
 }
 body{background:var(--bg);color:var(--ice);font-family:var(--fb);min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 70% 50% at 15% 0%,rgba(0,180,255,0.06) 0%,transparent 70%);}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 70% 50% at 15% 0%,rgba(0,180,255,0.06) 0%,transparent 70%);}
 #root{position:relative;z-index:1;}
 
-/* GATE */
 #s-gate{display:flex;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:20px;text-align:center;padding:30px;}
 .gate-icon{font-size:52px;}
 .gate-title{font-family:var(--fd);font-size:28px;letter-spacing:3px;color:var(--gold);}
@@ -29,22 +27,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .gate-btn{width:100%;max-width:260px;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold),#cc8800);color:var(--bg);font-family:var(--fd);font-size:21px;letter-spacing:3px;cursor:pointer;}
 
-/* MAIN */
 #s-main{display:none;flex-direction:column;}
 .bo-top{display:flex;align-items:center;justify-content:space-between;padding:14px 17px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
 .bo-title{font-family:var(--fd);font-size:19px;letter-spacing:3px;color:var(--gold);}
 .bo-logout{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:12px;padding:6px 13px;border-radius:8px;cursor:pointer;font-family:var(--fb);transition:all .2s;}
 .bo-logout:hover{border-color:var(--red);color:var(--red);}
-
 .bo-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto;}
 .bo-tab{flex-shrink:0;padding:12px 14px;border:none;background:transparent;color:var(--muted);font-family:var(--fb);font-size:11px;font-weight:500;letter-spacing:1px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;text-transform:uppercase;}
 .bo-tab.on{color:var(--gold);border-bottom-color:var(--gold);}
-
 .bo-body{padding:16px 14px 70px;max-width:680px;margin:0 auto;width:100%;}
-.tp{display:none;}
-.tp.on{display:block;}
+.tp{display:none;}.tp.on{display:block;}
 
-/* SECTIONS */
 .bo-sec{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:12px;}
 .bo-stitle{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold);opacity:.8;margin-bottom:12px;display:block;}
 .bo-field{margin-bottom:11px;}
@@ -54,7 +47,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .bo-input[type=number]{font-family:var(--fd);font-size:20px;letter-spacing:2px;}
 textarea.bo-input{resize:vertical;min-height:90px;}
 
-/* COLORS */
+/* Toggle switch */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;}
+.toggle-label{font-size:13px;color:var(--ice);}
+.toggle-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.toggle-switch{position:relative;width:52px;height:28px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.1);border:1px solid var(--border2);border-radius:28px;cursor:pointer;transition:all .3s;}
+.toggle-slider:before{content:'';position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform .3s;}
+.toggle-switch input:checked+.toggle-slider{background:rgba(0,230,118,.3);border-color:var(--green);}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(24px);background:var(--green);}
+
+/* Penalité selector */
+.pen-selector{display:flex;gap:8px;margin-top:10px;}
+.pen-btn{flex:1;padding:10px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--fd);font-size:18px;letter-spacing:2px;cursor:pointer;transition:all .2s;text-align:center;}
+.pen-btn.on{border-color:var(--orange);background:rgba(255,136,0,.15);color:var(--orange);}
+
 .color-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .color-field label{font-size:11px;color:var(--muted);margin-bottom:6px;display:block;}
 .color-row{display:flex;align-items:center;gap:8px;}
@@ -63,12 +71,10 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 .color-hex{flex:1;background:rgba(0,0,0,.35);border:1px solid var(--border2);border-radius:9px;color:#fff;font-family:var(--fd);font-size:15px;letter-spacing:2px;padding:8px 10px;outline:none;text-transform:uppercase;transition:border-color .2s;}
 .color-hex:focus{border-color:var(--accent);}
 
-/* PRESETS */
 .presets{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
 .preset-btn{padding:6px 11px;border-radius:8px;font-size:11px;cursor:pointer;transition:all .2s;font-family:var(--fb);}
 .preset-btn:hover{transform:scale(1.08);}
 
-/* UPLOAD ZONES */
 .upload-zone{border:2px dashed var(--border2);border-radius:12px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
 .upload-zone:hover{border-color:var(--accent);background:rgba(255,102,0,.04);}
 .upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
@@ -77,7 +83,19 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 .uz-preview-img{max-width:90px;max-height:55px;object-fit:contain;border-radius:7px;display:none;margin:0 auto 5px;}
 .uz-preview-audio{width:100%;margin-top:7px;display:none;border-radius:8px;}
 
-/* GLACIERES LIST */
+/* Loupe tabs */
+.loupe-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.loupe-tab{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:var(--fb);font-size:11px;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;text-align:center;text-transform:uppercase;}
+.loupe-tab.on{border-color:#00d4ff;background:rgba(0,212,255,.1);color:#00d4ff;}
+.loupe-panel{display:none;}.loupe-panel.on{display:block;}
+
+/* Filtre selector */
+.filtre-selector{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.filtre-btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:1px;}
+.filtre-btn.rouge.on{border-color:var(--red);background:rgba(255,68,68,.15);color:var(--red);}
+.filtre-btn.vert.on{border-color:var(--green);background:rgba(0,230,118,.15);color:var(--green);}
+.filtre-btn.contraste.on{border-color:#888;background:rgba(255,255,255,.08);color:#ccc;}
+
 .gl-row{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:9px;}
 .gl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
 .gl-name{font-family:var(--fd);font-size:17px;letter-spacing:2px;color:var(--accent);}
@@ -90,7 +108,6 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 .gl-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
 .gl-badge{font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,102,0,.1);color:var(--accent);border:1px solid rgba(255,102,0,.2);}
 
-/* CARDS */
 .cards-list{display:flex;flex-direction:column;gap:8px;}
 .card-row{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:12px;padding:11px 13px;}
 .card-row-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
@@ -114,13 +131,10 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 .audio-zone-lbl{font-size:11px;color:var(--muted);pointer-events:none;}
 .audio-preview-card{width:100%;margin-top:7px;display:none;border-radius:6px;}
 
-/* BTNS */
 .add-btn{width:100%;padding:11px;border-radius:10px;border:2px dashed var(--border2);background:transparent;color:var(--accent);font-size:12px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:9px;}
 .add-btn:hover{border-color:var(--accent);background:rgba(255,102,0,.06);}
-.add-btn.green{color:var(--green);}
-.add-btn.green:hover{border-color:var(--green);background:rgba(0,230,118,.06);}
-.add-btn.orange{color:var(--orange);}
-.add-btn.orange:hover{border-color:var(--orange);background:rgba(255,136,0,.06);}
+.add-btn.green{color:var(--green);}.add-btn.green:hover{border-color:var(--green);background:rgba(0,230,118,.06);}
+.add-btn.orange{color:var(--orange);}.add-btn.orange:hover{border-color:var(--orange);background:rgba(255,136,0,.06);}
 .save-btn{width:100%;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--gold),#bb7700);color:var(--bg);font-family:var(--fd);font-size:20px;letter-spacing:3px;cursor:pointer;transition:all .2s;margin-top:4px;}
 .save-btn:hover{transform:translateY(-2px);box-shadow:0 0 26px rgba(255,200,74,.3);}
 .feedback{text-align:center;font-size:13px;color:var(--green);margin-top:9px;display:none;animation:fi .3s;}
@@ -136,6 +150,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 .info-box{background:rgba(255,102,0,.06);border:1px solid rgba(255,102,0,.2);border-radius:10px;padding:11px 13px;font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
 .info-box.green{background:rgba(0,230,118,.06);border-color:rgba(0,230,118,.2);}
 .info-box.blue{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.2);}
+.info-box.cyan{background:rgba(0,212,255,.06);border-color:rgba(0,212,255,.3);}
 
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </style>
@@ -146,7 +161,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 <!-- GATE -->
 <div id="s-gate">
   <div class="gate-icon">🔑</div>
-  <div class="gate-title">Back-Office v3</div>
+  <div class="gate-title">Back-Office V4</div>
   <div class="gate-sub">Mission Apéro — Accès créateur</div>
   <input type="password" class="gate-pin" id="gate-pin" placeholder="····" maxlength="4" onkeydown="if(event.key==='Enter')checkPin()">
   <button class="gate-btn" onclick="checkPin()">ENTRER</button>
@@ -155,7 +170,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 <!-- MAIN -->
 <div id="s-main">
   <div class="bo-top">
-    <div class="bo-title">⚙️ BACK-OFFICE v3</div>
+    <div class="bo-title">⚙️ BACK-OFFICE V4</div>
     <button class="bo-logout" onclick="logout()">Déconnexion</button>
   </div>
   <div class="bo-tabs">
@@ -188,17 +203,38 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           <div class="bo-field"><label>Slug (identifiant URL — minuscules, tirets)</label><input type="text" class="bo-input" id="e-slug" placeholder="ex: bronzes-ete"></div>
           <div class="bo-field"><label>Nom affiché aux joueurs</label><input type="text" class="bo-input" id="e-escape" placeholder="ex: Sauvez les Bronzés"></div>
           <div class="bo-field"><label>📞 Numéro de téléphone de secours</label><input type="text" class="bo-input" id="e-tel" placeholder="ex: 06 12 34 56 78"></div>
-          <div class="bo-field"><label>⏱ Pénalité par indice (minutes)</label><input type="number" class="bo-input" id="e-penalty" value="2" min="0" max="30"></div>
+        </div>
+
+        <!-- V4: PÉNALITÉ INDICES -->
+        <div class="bo-sec">
+          <span class="bo-stitle">⏱ Pénalité Indices</span>
+          <div class="info-box">💡 Configurez si les indices retirent du temps au chrono, et combien de minutes par indice consulté.</div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Activer la pénalité de temps</div>
+              <div class="toggle-sub">Si désactivé, les indices sont gratuits</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="e-penalite-active" checked onchange="updatePenToggle()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="pen-config" style="margin-top:10px">
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:1px">Minutes retirées par indice :</label>
+            <div class="pen-selector">
+              <button class="pen-btn" onclick="setPen(1,this)">−1 min</button>
+              <button class="pen-btn on" onclick="setPen(2,this)">−2 min</button>
+              <button class="pen-btn" onclick="setPen(3,this)">−3 min</button>
+            </div>
+            <input type="hidden" id="e-penalty" value="2">
+          </div>
         </div>
 
         <!-- SYNOPSIS -->
         <div class="bo-sec">
           <span class="bo-stitle">📖 Briefing & Synopsis</span>
-          <div class="info-box">💡 Ce texte s'affiche quand les joueurs cliquent sur "Lire le briefing". Raconte le scénario de la mission !</div>
-          <div class="bo-field">
-            <label>Texte du briefing</label>
-            <textarea class="bo-input" id="e-synopsis" placeholder="Ex: Catastrophe au Club Med ! Jean-Claude Dusse a cadenassé la glacière..."></textarea>
-          </div>
+          <div class="info-box">💡 Ce texte s'affiche quand les joueurs cliquent sur "Lire le briefing".</div>
+          <div class="bo-field"><label>Texte du briefing</label><textarea class="bo-input" id="e-synopsis" placeholder="Ex: Catastrophe au Club Med ! Jean-Claude Dusse a cadenassé la glacière..."></textarea></div>
         </div>
 
         <!-- APPARENCE -->
@@ -206,67 +242,108 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           <span class="bo-stitle">🎨 Apparence</span>
           <div class="bo-field">
             <label>Logo (affiché sur l'écran d'accueil)</label>
-            <div class="upload-zone" id="logo-zone">
-              <input type="file" accept="image/*" onchange="handleImg(event,'logo')">
-              <img class="uz-preview-img" id="logo-preview">
-              <div class="uz-label" id="logo-label"><span>🖼</span>Uploader votre logo</div>
-            </div>
+            <div class="upload-zone" id="logo-zone"><input type="file" accept="image/*" onchange="handleImg(event,'logo')"><img class="uz-preview-img" id="logo-preview"><div class="uz-label" id="logo-label"><span>🖼</span>Uploader votre logo</div></div>
           </div>
           <div class="bo-field">
             <label>Image de fond (écran sélection de missions)</label>
-            <div class="info-box blue">🎨 Cette image s'affiche en fond sur la carte de sélection de mission. Recommandé : image thématique 800x400px (plage pour été, montagne pour ski, etc.)</div>
-            <div class="upload-zone" id="bg-zone">
-              <input type="file" accept="image/*" onchange="handleImg(event,'bg')">
-              <img class="uz-preview-img" id="bg-preview" style="max-width:100%;max-height:80px;">
-              <div class="uz-label" id="bg-label"><span>🖼</span>Image de fond thématique</div>
-            </div>
+            <div class="info-box blue">🎨 Image thématique 800x400px recommandée</div>
+            <div class="upload-zone" id="bg-zone"><input type="file" accept="image/*" onchange="handleImg(event,'bg')"><img class="uz-preview-img" id="bg-preview" style="max-width:100%;max-height:80px;"><div class="uz-label" id="bg-label"><span>🖼</span>Image de fond thématique</div></div>
           </div>
           <div class="color-grid">
-            <div class="color-field">
-              <label>Couleur principale</label>
-              <div class="color-row">
-                <div class="color-swatch" id="sw-accent"><input type="color" value="#ff6600" oninput="syncColor('accent',this.value)"></div>
-                <input type="text" class="color-hex" id="hex-accent" value="#FF6600" maxlength="7" oninput="syncHex('accent',this.value)">
-              </div>
-            </div>
-            <div class="color-field">
-              <label>Couleur de fond</label>
-              <div class="color-row">
-                <div class="color-swatch" id="sw-bg"><input type="color" value="#07111f" oninput="syncColor('bg',this.value)"></div>
-                <input type="text" class="color-hex" id="hex-bg" value="#07111F" maxlength="7" oninput="syncHex('bg',this.value)">
-              </div>
-            </div>
+            <div class="color-field"><label>Couleur principale</label><div class="color-row"><div class="color-swatch" id="sw-accent"><input type="color" value="#ff6600" oninput="syncColor('accent',this.value)"></div><input type="text" class="color-hex" id="hex-accent" value="#FF6600" maxlength="7" oninput="syncHex('accent',this.value)"></div></div>
+            <div class="color-field"><label>Couleur de fond</label><div class="color-row"><div class="color-swatch" id="sw-bg"><input type="color" value="#07111f" oninput="syncColor('bg',this.value)"></div><input type="text" class="color-hex" id="hex-bg" value="#07111F" maxlength="7" oninput="syncHex('bg',this.value)"></div></div>
           </div>
           <div style="margin-top:10px">
             <span style="font-size:10px;color:var(--muted)">Préréglages thèmes :</span>
             <div class="presets">
               <button class="preset-btn" onclick="applyPreset('#ff6600','#1a0800')" style="background:#1a0800;color:#ff6600;border:1px solid #ff6600">🌞 Bronzés Été</button>
               <button class="preset-btn" onclick="applyPreset('#88ccff','#0a1525')" style="background:#0a1525;color:#88ccff;border:1px solid #88ccff">⛷️ Bronzés Ski</button>
-              <button class="preset-btn" onclick="applyPreset('#cc44ff','#12001a')" style="background:#12001a;color:#cc44ff;border:1px solid #cc44ff">🌺 Fête des Âmes</button>
-              <button class="preset-btn" onclick="applyPreset('#00d4ff','#07111f')" style="background:#07111f;color:#00d4ff;border:1px solid #00d4ff">❄️ Glace</button>
-              <button class="preset-btn" onclick="applyPreset('#ffc84a','#1a1200')" style="background:#1a1200;color:#ffc84a;border:1px solid #ffc84a">☀️ Or</button>
+              <button class="preset-btn" onclick="applyPreset('#cc44ff','#1a0033')" style="background:#1a0033;color:#cc44ff;border:1px solid #cc44ff">🌺 Anniversaire</button>
             </div>
           </div>
         </div>
 
-        <!-- AUDIO -->
+        <!-- SONS -->
         <div class="bo-sec">
-          <span class="bo-stitle">🎵 Sons & Musique</span>
+          <span class="bo-stitle">🎵 Sons</span>
           <div class="bo-field">
-            <label>🎵 Musique d'ambiance (MP3 — jouée en boucle pendant la partie)</label>
-            <div class="upload-zone" id="music-zone">
-              <input type="file" accept="audio/*" onchange="handleAudio(event,'music')">
-              <div class="uz-label" id="music-label"><span>🎵</span>Uploader la musique d'ambiance (MP3)</div>
-              <audio class="uz-preview-audio" id="music-preview" controls></audio>
-            </div>
+            <label>🎵 Musique d'ambiance</label>
+            <div class="upload-zone" id="music-zone"><input type="file" accept="audio/*" onchange="handleAudio(event,'music')"><div class="uz-label" id="music-label"><span>🎵</span>Uploader la musique d'ambiance (MP3)</div><audio class="uz-preview-audio" id="music-preview" controls></audio></div>
           </div>
           <div class="bo-field">
-            <label>🔔 Bip de fin (MP3 — joué pendant les 10 dernières secondes)</label>
-            <div class="info-box">💡 Ex: "Bip bip WHAOUUU" des Bronzés — se déclenche en boucle pendant les 10 dernières secondes !</div>
-            <div class="upload-zone" id="bip-zone">
-              <input type="file" accept="audio/*" onchange="handleAudio(event,'bip')">
-              <div class="uz-label" id="bip-label"><span>🔔</span>Uploader le bip de fin (MP3)</div>
-              <audio class="uz-preview-audio" id="bip-preview" controls></audio>
+            <label>🔔 Bip de fin (10 dernières secondes)</label>
+            <div class="upload-zone" id="bip-zone"><input type="file" accept="audio/*" onchange="handleAudio(event,'bip')"><div class="uz-label" id="bip-label"><span>🔔</span>Uploader le bip de fin (MP3)</div><audio class="uz-preview-audio" id="bip-preview" controls></audio></div>
+          </div>
+          <!-- V4: Son Morse -->
+          <div class="bo-field">
+            <label>🔊 Son Morse (bouton MORSE en jeu)</label>
+            <div class="info-box cyan">🔊 Ce son se lance quand les joueurs appuient sur le bouton MORSE. Ils écoutent et décodent avec leur feuille de traduction.</div>
+            <div class="upload-zone" id="morse-zone"><input type="file" accept="audio/*" onchange="handleAudio(event,'morse')"><div class="uz-label" id="morse-label"><span>🔊</span>Uploader le son morse (MP3)</div><audio class="uz-preview-audio" id="morse-preview" controls></audio></div>
+          </div>
+        </div>
+
+        <!-- V4: LOUPE — filtres caméra -->
+        <div class="bo-sec">
+          <span class="bo-stitle">🔍 Loupe — Filtres Caméra</span>
+          <div class="info-box cyan">
+            🔍 <strong>3 loupes disponibles par mission, déclenchées dans l'ordre.</strong><br>
+            Loupe 1 → Loupe 2 → Loupe 3 (linéaire, automatique).<br>
+            Choisissez le filtre et uploadez la photo de référence pour chaque loupe.
+          </div>
+          <div class="loupe-tabs">
+            <button class="loupe-tab on" onclick="loupeTab(1,this)">🔍 Loupe 1</button>
+            <button class="loupe-tab" onclick="loupeTab(2,this)">🔍 Loupe 2</button>
+            <button class="loupe-tab" onclick="loupeTab(3,this)">🔍 Loupe 3</button>
+          </div>
+
+          <!-- Loupe 1 -->
+          <div class="loupe-panel on" id="loupe-p1">
+            <div class="bo-field">
+              <label>Filtre caméra pour la Loupe 1</label>
+              <div class="filtre-selector">
+                <button class="filtre-btn contraste on" onclick="setFiltre(1,'contraste',this)">⬛ Contraste / N&B</button>
+                <button class="filtre-btn rouge" onclick="setFiltre(1,'rouge',this)">🔴 Filtre Rouge</button>
+                <button class="filtre-btn vert" onclick="setFiltre(1,'vert',this)">🟢 Filtre Vert</button>
+              </div>
+              <input type="hidden" id="loupe1-filtre" value="contraste">
+            </div>
+            <div class="bo-field">
+              <label>Photo de référence Loupe 1 (pour ton usage)</label>
+              <div class="upload-zone" id="loupe1-zone"><input type="file" accept="image/*" onchange="handleImg(event,'loupe1')"><img class="uz-preview-img" id="loupe1-preview" style="max-width:100%;max-height:80px;"><div class="uz-label" id="loupe1-label"><span>🖼</span>Photo de référence (ce que révèle la loupe)</div></div>
+            </div>
+          </div>
+
+          <!-- Loupe 2 -->
+          <div class="loupe-panel" id="loupe-p2">
+            <div class="bo-field">
+              <label>Filtre caméra pour la Loupe 2</label>
+              <div class="filtre-selector">
+                <button class="filtre-btn contraste on" onclick="setFiltre(2,'contraste',this)">⬛ Contraste / N&B</button>
+                <button class="filtre-btn rouge" onclick="setFiltre(2,'rouge',this)">🔴 Filtre Rouge</button>
+                <button class="filtre-btn vert" onclick="setFiltre(2,'vert',this)">🟢 Filtre Vert</button>
+              </div>
+              <input type="hidden" id="loupe2-filtre" value="contraste">
+            </div>
+            <div class="bo-field">
+              <label>Photo de référence Loupe 2</label>
+              <div class="upload-zone" id="loupe2-zone"><input type="file" accept="image/*" onchange="handleImg(event,'loupe2')"><img class="uz-preview-img" id="loupe2-preview" style="max-width:100%;max-height:80px;"><div class="uz-label" id="loupe2-label"><span>🖼</span>Photo de référence</div></div>
+            </div>
+          </div>
+
+          <!-- Loupe 3 -->
+          <div class="loupe-panel" id="loupe-p3">
+            <div class="bo-field">
+              <label>Filtre caméra pour la Loupe 3</label>
+              <div class="filtre-selector">
+                <button class="filtre-btn contraste on" onclick="setFiltre(3,'contraste',this)">⬛ Contraste / N&B</button>
+                <button class="filtre-btn rouge" onclick="setFiltre(3,'rouge',this)">🔴 Filtre Rouge</button>
+                <button class="filtre-btn vert" onclick="setFiltre(3,'vert',this)">🟢 Filtre Vert</button>
+              </div>
+              <input type="hidden" id="loupe3-filtre" value="contraste">
+            </div>
+            <div class="bo-field">
+              <label>Photo de référence Loupe 3</label>
+              <div class="upload-zone" id="loupe3-zone"><input type="file" accept="image/*" onchange="handleImg(event,'loupe3')"><img class="uz-preview-img" id="loupe3-preview" style="max-width:100%;max-height:80px;"><div class="uz-label" id="loupe3-label"><span>🖼</span>Photo de référence</div></div>
             </div>
           </div>
         </div>
@@ -276,9 +353,9 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           <span class="bo-stitle">🃏 Cartes & Indices</span>
           <div class="info-box">
             💡 <strong>3 types de cartes :</strong><br>
-            • <strong>💡 INDICE N°1-99</strong> — Indice visuel, coûte 1 pénalité<br>
-            • <strong>🔓 RÉPONSE N°101-199</strong> — Réponse de l'énigme N°(X-100), coûte 1 pénalité<br>
-            • <strong>🔐 CODE MORSE N°201-299</strong> — Son morse déclenché par code, upload un MP3
+            • <strong>💡 INDICE N°1-99</strong> — Indice visuel<br>
+            • <strong>🔓 RÉPONSE N°101-199</strong> — Réponse de l'énigme N°(X-100)<br>
+            • <strong>🔐 CODE MORSE N°201-299</strong> — Upload MP3 du morse (le son global est configuré dans Sons)
           </div>
           <div class="cards-list" id="cards-list"></div>
           <button class="add-btn" onclick="addCard('hint')" style="margin-top:10px">💡 Ajouter carte INDICE</button>
@@ -302,32 +379,22 @@ textarea.bo-input{resize:vertical;min-height:90px;}
       </div>
       <div class="bo-sec">
         <span class="bo-stitle">📱 QR Codes</span>
-        <div class="info-box blue">
-          URL joueurs par mission :<br>
-          <strong>app.smartescapegame.fr/index.html?g=[slug]</strong><br><br>
-          QR codes gratuits : <strong>qr-code-generator.com</strong><br>
-          Taille minimum : <strong>8×8 cm</strong>
-        </div>
+        <div class="info-box blue">URL joueurs par mission :<br><strong>app.smartescapegame.fr/index.html?g=[slug]</strong><br><br>QR codes gratuits : <strong>qr-code-generator.com</strong><br>Taille minimum : <strong>8×8 cm</strong></div>
       </div>
       <div class="bo-sec">
-        <span class="bo-stitle">✅ Fonctionnalités v3</span>
+        <span class="bo-stitle">✅ Fonctionnalités V4</span>
         <div class="info-box green">
-          ✅ Écran sélection de missions<br>
-          ✅ Tutoriel intégré<br>
-          ✅ Nom "Mission Apéro" / "Mission Anniversaire"<br>
-          ✅ 5 boutons : 💡 ⚙️ 🔐 🎤 📷<br>
-          ✅ Boussole + Gyroscope<br>
-          ✅ Reconnaissance vocale<br>
-          ✅ Scanner QR code<br>
-          ✅ Jauge de chaleur visuelle<br>
-          ✅ Messages Jean-Claude sur erreur<br>
-          ✅ Bouton 👁️ dernier indice<br>
-          ✅ Confettis sur victoire<br>
-          ✅ Répliques cultes des Bronzés<br>
-          ✅ Photo souvenir carrée<br>
-          ✅ Max 7 joueurs / 60 min uniquement<br>
-          ✅ Image de fond par mission<br>
-          ✅ Cartes Code Morse (MP3)
+          ✅ Layout cercle avec chrono au centre<br>
+          ✅ Boutons ronds : 💡 ⚙️ 🔊 🎤 📷 🔍<br>
+          ✅ Logo agrandi + joueurs agrandis dans header<br>
+          ✅ Indices restants toujours visibles dans header<br>
+          ✅ Pénalité indices configurable (on/off + 1/2/3 min)<br>
+          ✅ Son Morse uploadable — lecture directe<br>
+          ✅ Micro → mot reconnu → code affiché auto<br>
+          ✅ Loupe × 3 avec filtres caméra (rouge/vert/contraste)<br>
+          ✅ Photo souvenir : MISSION APÉRO orange + by Smart Escape Game blanc en haut, sans cadre<br>
+          ✅ Emoji 🍺 devant la barre orange sélection missions<br>
+          ✅ Scanner QR code
         </div>
       </div>
     </div>
@@ -343,10 +410,11 @@ const SUPABASE_URL = 'https://krqkqcnsmcmerwbfencb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_2TzK9VfplPjCRi_WhPj4nA_BooLFTQs';
 // ══════════════════════════════════════════
 
-const PIN_KEY='bo_pin_v3';
+const PIN_KEY='bo_pin_v4';
 let editingId=null, cardCtr=0;
-let musicFile=null, bipFile=null, logoFile=null, bgFile=null;
-let existingUrls={music:'',bip:'',logo:'',bg:''};
+let musicFile=null, bipFile=null, morseFile=null, logoFile=null, bgFile=null;
+let loupeFiles={1:null,2:null,3:null};
+let existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:''};
 
 function getPin(){return localStorage.getItem(PIN_KEY)||'1234';}
 function checkPin(){
@@ -412,7 +480,10 @@ async function loadGlacieres(){
         g.synopsis?'📖 Briefing':'',
         g.music_url?'🎵 Musique':'',
         g.bip_url?'🔔 Bip':'',
+        g.morse_url?'🔊 Morse':'',
         g.mission_bg_url?'🖼 Image fond':'',
+        g.loupe1_url?'🔍 Loupe':'',
+        g.penalite_active===false?'⏱ Sans pénalité':'',
       ].filter(Boolean);
       return `<div class="gl-row">
         <div class="gl-header">
@@ -422,12 +493,7 @@ async function loadGlacieres(){
             <button class="gl-btn del" onclick="delGlaciere('${g.id}','${g.nom}')">🗑</button>
           </div>
         </div>
-        <div class="gl-info">
-          🔗 ${g.slug} &nbsp;|&nbsp;
-          💡 ${hints} indice${hints>1?'s':''} &nbsp;|&nbsp;
-          🔓 ${answers} réponse${answers>1?'s':''} &nbsp;|&nbsp;
-          🔐 ${codes} code${codes>1?'s':''}
-        </div>
+        <div class="gl-info">🔗 ${g.slug} &nbsp;|&nbsp; 💡 ${hints} indice${hints>1?'s':''} &nbsp;|&nbsp; 🔓 ${answers} réponse${answers>1?'s':''} &nbsp;|&nbsp; 🔐 ${codes} code${codes>1?'s':''}</div>
         ${badges.length?`<div class="gl-badges">${badges.map(b=>`<span class="gl-badge">${b}</span>`).join('')}</div>`:''}
         <div class="gl-url">📱 ${url}</div>
       </div>`;
@@ -436,19 +502,33 @@ async function loadGlacieres(){
 }
 
 function newGlaciere(){
-  editingId=null;musicFile=null;bipFile=null;logoFile=null;bgFile=null;
-  existingUrls={music:'',bip:'',logo:'',bg:''};
+  editingId=null;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;
+  loupeFiles={1:null,2:null,3:null};
+  existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:''};
   ['e-nom','e-slug','e-escape','e-tel','e-synopsis'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('e-penalty').value='2';
-  ['logo','bg'].forEach(k=>{document.getElementById(k+'-preview').style.display='none';document.getElementById(k+'-label').style.display='block';});
-  ['music','bip'].forEach(k=>{document.getElementById(k+'-preview').style.display='none';document.getElementById(k+'-label').style.display='block';});
+  document.getElementById('e-penalite-active').checked=true;
+  setPen(2,document.querySelectorAll('.pen-btn')[1]);
+  ['logo','bg','loupe1','loupe2','loupe3'].forEach(k=>{
+    const p=document.getElementById(k+'-preview');
+    if(p){p.style.display='none';}
+    const l=document.getElementById(k+'-label');
+    if(l)l.style.display='block';
+  });
+  ['music','bip','morse'].forEach(k=>{
+    const p=document.getElementById(k+'-preview');
+    if(p){p.style.display='none';}
+    const l=document.getElementById(k+'-label');
+    if(l)l.style.display='block';
+  });
   document.getElementById('cards-list').innerHTML='';
   document.getElementById('edit-title').textContent='Nouvelle mission';
   showEdit();
 }
 
 async function editGlaciere(id){
-  editingId=id;musicFile=null;bipFile=null;logoFile=null;bgFile=null;
+  editingId=id;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;
+  loupeFiles={1:null,2:null,3:null};
   try{
     const [g]=await supaFetch('glacieres?id=eq.'+id);
     const cs=await supaFetch('cartes?glaciere_id=eq.'+id+'&order=numero.asc');
@@ -458,18 +538,32 @@ async function editGlaciere(id){
     document.getElementById('e-tel').value=g.telephone||'';
     document.getElementById('e-penalty').value=g.penalty_min||2;
     document.getElementById('e-synopsis').value=g.synopsis||'';
-    existingUrls={music:g.music_url||'',bip:g.bip_url||'',logo:g.logo_url||'',bg:g.mission_bg_url||''};
+    // Pénalité
+    document.getElementById('e-penalite-active').checked=g.penalite_active!==false;
+    updatePenToggle();
+    const pm=g.penalty_min||2;
+    document.querySelectorAll('.pen-btn').forEach(b=>{
+      b.classList.remove('on');
+      if(b.textContent.includes(pm)) b.classList.add('on');
+    });
+    existingUrls={
+      music:g.music_url||'',bip:g.bip_url||'',morse:g.morse_url||'',
+      logo:g.logo_url||'',bg:g.mission_bg_url||'',
+      loupe1:g.loupe1_url||'',loupe2:g.loupe2_url||'',loupe3:g.loupe3_url||''
+    };
+    // Filtres loupe
+    if(g.loupe1_filtre) setFiltreById(1,g.loupe1_filtre);
+    if(g.loupe2_filtre) setFiltreById(2,g.loupe2_filtre);
+    if(g.loupe3_filtre) setFiltreById(3,g.loupe3_filtre);
     if(g.couleur_accent){syncColor('accent',g.couleur_accent);document.querySelector('#sw-accent input').value=g.couleur_accent;document.getElementById('hex-accent').value=g.couleur_accent.toUpperCase();}
     if(g.couleur_bg){syncColor('bg',g.couleur_bg);document.querySelector('#sw-bg input').value=g.couleur_bg;document.getElementById('hex-bg').value=g.couleur_bg.toUpperCase();}
-    ['logo','bg','music','bip'].forEach(k=>{
-      const url=k==='logo'?g.logo_url:k==='bg'?g.mission_bg_url:k==='music'?g.music_url:g.bip_url;
+    ['logo','bg','music','bip','morse','loupe1','loupe2','loupe3'].forEach(k=>{
+      const url=existingUrls[k];
       if(url){
         const el=document.getElementById(k+'-preview');
-        el.src=url;el.style.display='block';
-        document.getElementById(k+'-label').style.display='none';
-      } else {
-        document.getElementById(k+'-preview').style.display='none';
-        document.getElementById(k+'-label').style.display='block';
+        if(el){el.src=url;el.style.display='block';}
+        const lbl=document.getElementById(k+'-label');
+        if(lbl)lbl.style.display='none';
       }
     });
     document.getElementById('cards-list').innerHTML='';
@@ -497,17 +591,28 @@ async function saveGlaciere(){
   const escape=document.getElementById('e-escape').value.trim();
   const tel=document.getElementById('e-tel').value.trim();
   const penalty=parseInt(document.getElementById('e-penalty').value)||2;
+  const penaliteActive=document.getElementById('e-penalite-active').checked;
   const synopsis=document.getElementById('e-synopsis').value.trim();
   const accent=document.getElementById('hex-accent').value;
   const bg=document.getElementById('hex-bg').value;
+  const loupe1Filtre=document.getElementById('loupe1-filtre').value;
+  const loupe2Filtre=document.getElementById('loupe2-filtre').value;
+  const loupe3Filtre=document.getElementById('loupe3-filtre').value;
   if(!nom||!slug){alert('Nom et slug obligatoires !');return;}
 
-  // Uploads
-  let logoUrl=existingUrls.logo,bgUrl=existingUrls.bg,musicUrl=existingUrls.music,bipUrl=existingUrls.bip;
-  if(logoFile){try{logoUrl=await uploadFile(logoFile,'logo_'+slug);}catch(e){alert('Erreur logo : '+e.message);return;}}
-  if(bgFile){try{bgUrl=await uploadFile(bgFile,'bg_'+slug);}catch(e){alert('Erreur bg : '+e.message);return;}}
-  if(musicFile){try{musicUrl=await uploadFile(musicFile,'music_'+slug);}catch(e){alert('Erreur musique : '+e.message);return;}}
-  if(bipFile){try{bipUrl=await uploadFile(bipFile,'bip_'+slug);}catch(e){alert('Erreur bip : '+e.message);return;}}
+  let logoUrl=existingUrls.logo,bgUrl=existingUrls.bg,musicUrl=existingUrls.music,bipUrl=existingUrls.bip,morseUrl=existingUrls.morse;
+  let loupe1Url=existingUrls.loupe1,loupe2Url=existingUrls.loupe2,loupe3Url=existingUrls.loupe3;
+
+  try{
+    if(logoFile) logoUrl=await uploadFile(logoFile,'logo_'+slug);
+    if(bgFile) bgUrl=await uploadFile(bgFile,'bg_'+slug);
+    if(musicFile) musicUrl=await uploadFile(musicFile,'music_'+slug);
+    if(bipFile) bipUrl=await uploadFile(bipFile,'bip_'+slug);
+    if(morseFile) morseUrl=await uploadFile(morseFile,'morse_'+slug);
+    if(loupeFiles[1]) loupe1Url=await uploadFile(loupeFiles[1],'loupe1_'+slug);
+    if(loupeFiles[2]) loupe2Url=await uploadFile(loupeFiles[2],'loupe2_'+slug);
+    if(loupeFiles[3]) loupe3Url=await uploadFile(loupeFiles[3],'loupe3_'+slug);
+  }catch(e){alert('Erreur upload : '+e.message);return;}
 
   // Cartes
   const rows=document.querySelectorAll('.card-row');
@@ -518,14 +623,23 @@ async function saveGlaciere(){
     const imgInput=row.querySelector('.img-input');
     const audioInput=row.querySelector('.audio-input');
     let imgUrl=row.dataset.img||'';
-    if(imgInput&&imgInput.files[0]){try{imgUrl=await uploadFile(imgInput.files[0],'carte_'+slug+'_'+num);}catch(e){alert('Erreur carte '+num+' : '+e.message);return;}}
-    if(audioInput&&audioInput.files[0]){try{imgUrl=await uploadFile(audioInput.files[0],'morse_'+slug+'_'+num);}catch(e){alert('Erreur audio '+num+' : '+e.message);return;}}
+    if(imgInput&&imgInput.files[0]){try{imgUrl=await uploadFile(imgInput.files[0],'carte_'+slug+'_'+num);}catch(e){alert('Erreur carte '+num);return;}}
+    if(audioInput&&audioInput.files[0]){try{imgUrl=await uploadFile(audioInput.files[0],'morse_'+slug+'_'+num);}catch(e){alert('Erreur audio '+num);return;}}
     if(!isNaN(num)) cards.push({numero:num,caption,image_url:imgUrl});
   }
 
   try{
     let gId=editingId;
-    const payload={nom,slug,nom_escape:escape||null,telephone:tel||null,penalty_min:penalty,couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,music_url:musicUrl||null,bip_url:bipUrl||null,mission_bg_url:bgUrl||null};
+    const payload={
+      nom,slug,nom_escape:escape||null,telephone:tel||null,
+      penalty_min:penalty,penalite_active:penaliteActive,
+      couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,
+      music_url:musicUrl||null,bip_url:bipUrl||null,morse_url:morseUrl||null,
+      mission_bg_url:bgUrl||null,
+      loupe1_filtre:loupe1Filtre,loupe1_url:loupe1Url||null,
+      loupe2_filtre:loupe2Filtre,loupe2_url:loupe2Url||null,
+      loupe3_filtre:loupe3Filtre,loupe3_url:loupe3Url||null,
+    };
     if(logoUrl) payload.logo_url=logoUrl;
     if(editingId){
       await supaFetch('glacieres?id=eq.'+editingId,{method:'PATCH',body:JSON.stringify(payload)});
@@ -540,6 +654,40 @@ async function saveGlaciere(){
     editingId=gId;
     document.getElementById('edit-title').textContent=escape||nom;
   }catch(e){alert('Erreur sauvegarde : '+e.message);}
+}
+
+// ── PENALITE ──
+function updatePenToggle(){
+  const active=document.getElementById('e-penalite-active').checked;
+  document.getElementById('pen-config').style.opacity=active?'1':'0.4';
+  document.getElementById('pen-config').style.pointerEvents=active?'auto':'none';
+}
+function setPen(val,btn){
+  document.getElementById('e-penalty').value=val;
+  document.querySelectorAll('.pen-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// ── LOUPE ──
+function loupeTab(n,btn){
+  document.querySelectorAll('.loupe-tab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.loupe-panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('loupe-p'+n).classList.add('on');
+}
+function setFiltre(n,filtre,btn){
+  document.getElementById('loupe'+n+'-filtre').value=filtre;
+  btn.closest('.filtre-selector').querySelectorAll('.filtre-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+function setFiltreById(n,filtre){
+  const sel=document.getElementById('loupe-p'+n).querySelector('.filtre-selector');
+  if(!sel)return;
+  document.getElementById('loupe'+n+'-filtre').value=filtre;
+  sel.querySelectorAll('.filtre-btn').forEach(b=>{
+    b.classList.remove('on');
+    if(b.classList.contains(filtre)) b.classList.add('on');
+  });
 }
 
 // ── CARDS ──
@@ -581,7 +729,7 @@ function addCardRow(num,caption,img,type='hint'){
       </div>
       <button class="card-del" onclick="document.getElementById('${id}').remove()">🗑</button>
     </div>
-    <textarea class="card-caption" rows="2" placeholder="${isCode?'Description du code morse...':isAnswer?'Texte de la réponse/solution...':'Texte d\'indice optionnel...'}">${caption}</textarea>
+    <textarea class="card-caption" rows="2" placeholder="${isCode?'Mot de passe associé à ce son morse...':isAnswer?'Texte de la réponse/solution...':'Texte d\'indice optionnel...'}">${caption}</textarea>
     ${mediaZone}`;
   list.appendChild(div);
 }
@@ -603,22 +751,28 @@ function handleImg(event,type){
   const file=event.target.files[0];if(!file)return;
   if(type==='logo') logoFile=file;
   else if(type==='bg') bgFile=file;
+  else if(type==='loupe1') loupeFiles[1]=file;
+  else if(type==='loupe2') loupeFiles[2]=file;
+  else if(type==='loupe3') loupeFiles[3]=file;
   const reader=new FileReader();
   reader.onload=e=>{
     const prev=document.getElementById(type+'-preview');
-    prev.src=e.target.result;prev.style.display='block';
-    document.getElementById(type+'-label').style.display='none';
+    if(prev){prev.src=e.target.result;prev.style.display='block';}
+    const lbl=document.getElementById(type+'-label');
+    if(lbl)lbl.style.display='none';
   };
   reader.readAsDataURL(file);
 }
 function handleAudio(event,type){
   const file=event.target.files[0];if(!file)return;
   if(type==='music') musicFile=file;
-  else bipFile=file;
+  else if(type==='bip') bipFile=file;
+  else if(type==='morse') morseFile=file;
   const url=URL.createObjectURL(file);
   const prev=document.getElementById(type+'-preview');
   prev.src=url;prev.style.display='block';
-  document.getElementById(type+'-label').style.display='none';
+  const lbl=document.getElementById(type+'-label');
+  if(lbl)lbl.style.display='none';
 }
 
 // ── COLORS ──

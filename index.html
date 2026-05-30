@@ -67,94 +67,37 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .mission-card:active{transform:scale(.97);}
 .mission-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);}
-
-.mission-bg{
-  position:absolute;inset:0;
-  background-size:cover;background-position:center;
-  filter:brightness(0.55);background-size:150% !important;transition:filter .3s;
-}
+.mission-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(0.55);background-size:150% !important;transition:filter .3s;}
 .mission-card:hover .mission-bg{filter:brightness(0.7);}
-
-.mission-overlay{
-  position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 100%);
-}
-
-.mission-content{
-  position:relative;z-index:2;
-  padding:20px 18px;height:100%;
-  display:flex;flex-direction:column;justify-content:flex-end;
-}
-.mission-type{
-  font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
-  padding:3px 10px;border-radius:4px;display:inline-block;margin-bottom:8px;
-  backdrop-filter:blur(4px);
-}
+.mission-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 100%);}
+.mission-content{position:relative;z-index:2;padding:20px 18px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;}
+.mission-type{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;padding:3px 10px;border-radius:4px;display:inline-block;margin-bottom:8px;backdrop-filter:blur(4px);}
 .mission-type.apero{background:rgba(255,102,0,.3);color:#ffaa66;border:1px solid rgba(255,102,0,.4);}
 .mission-type.anniv{background:rgba(200,0,200,.3);color:#ff88ff;border:1px solid rgba(200,0,200,.4);}
-
 .mission-title{font-family:var(--fd);font-size:26px;letter-spacing:3px;color:#fff;line-height:1;}
 .mission-name{font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px;font-weight:500;}
+/* V4: emoji bière devant la barre orange */
 .mission-emoji{position:absolute;top:16px;right:16px;font-size:32px;}
-.mission-locked{
-  position:absolute;top:12px;left:12px;
-  background:rgba(0,0,0,.5);border-radius:6px;padding:3px 8px;
-  font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;
-  backdrop-filter:blur(4px);
-}
+.mission-bar{position:absolute;top:12px;left:12px;background:rgba(255,102,0,.85);border-radius:6px;padding:3px 10px;font-size:11px;letter-spacing:1px;color:#fff;font-weight:700;display:flex;align-items:center;gap:5px;}
 
-/* ── TUTORIEL OVERLAY ── */
-.tuto-overlay{
-  display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(0,0,0,.9);backdrop-filter:blur(8px);
-  align-items:center;justify-content:center;padding:24px;
-}
+/* ── TUTORIEL ── */
+.tuto-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.9);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;}
 .tuto-overlay.show{display:flex;}
-.tuto-box{
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:20px;padding:28px 22px;max-width:400px;width:100%;
-  text-align:center;
-}
+.tuto-box{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:28px 22px;max-width:400px;width:100%;text-align:center;}
 .tuto-box-title{font-family:var(--fd);font-size:26px;letter-spacing:3px;color:var(--gold);margin-bottom:16px;}
 .tuto-steps{text-align:left;margin-bottom:20px;}
-.tuto-step{
-  display:flex;gap:12px;align-items:flex-start;
-  padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;
-}
+.tuto-step{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;}
 .tuto-step:last-child{border-bottom:none;}
-.tuto-step-num{
-  width:26px;height:26px;border-radius:50%;
-  background:var(--gold);color:var(--bg);
-  font-weight:800;font-size:12px;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.tuto-close{
-  width:100%;padding:13px;border-radius:12px;border:none;
-  background:linear-gradient(135deg,var(--gold),#cc8800);
-  color:var(--bg);font-family:var(--fd);font-size:20px;letter-spacing:3px;cursor:pointer;
-}
+.tuto-step-num{width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--bg);font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tuto-close{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--gold),#cc8800);color:var(--bg);font-family:var(--fd);font-size:20px;letter-spacing:3px;cursor:pointer;}
 
 /* ── BRIEFING ── */
 #s-briefing{align-items:center;justify-content:center;padding:24px 18px;}
-.brief-box{
-  width:100%;max-width:440px;
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:24px;padding:26px 20px;
-  display:flex;flex-direction:column;gap:16px;text-align:center;
-}
+.brief-box{width:100%;max-width:440px;background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:26px 20px;display:flex;flex-direction:column;gap:16px;text-align:center;}
 .brief-logo{width:72px;height:72px;border-radius:14px;object-fit:contain;margin:0 auto;display:none;}
 .brief-title{font-family:var(--fd);font-size:28px;letter-spacing:3px;color:var(--gold);}
-.brief-text{
-  font-size:13px;line-height:1.8;color:var(--ice);opacity:.85;
-  background:rgba(0,0,0,.2);border-radius:12px;padding:14px;
-  text-align:left;border:1px solid var(--border);max-height:220px;overflow-y:auto;
-}
-.brief-start{
-  width:100%;padding:15px;border-radius:14px;border:none;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#fff;font-family:var(--fd);font-size:22px;letter-spacing:4px;
-  cursor:pointer;transition:all .25s;
-}
+.brief-text{font-size:13px;line-height:1.8;color:var(--ice);opacity:.85;background:rgba(0,0,0,.2);border-radius:12px;padding:14px;text-align:left;border:1px solid var(--border);max-height:220px;overflow-y:auto;}
+.brief-start{width:100%;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:var(--fd);font-size:22px;letter-spacing:4px;cursor:pointer;transition:all .25s;}
 .brief-skip{background:transparent;border:none;color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:underline;}
 
 /* ── SETUP ── */
@@ -162,43 +105,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .brand{text-align:center;}
 .brand-logo{width:90px;height:90px;border-radius:18px;object-fit:contain;display:none;margin:0 auto 12px;border:1px solid var(--border2);}
 .brand-ice{font-size:56px;line-height:1;display:block;animation:iceFloat 4s ease-in-out infinite;}
-.brand-name{
-  font-family:var(--fd);font-size:clamp(40px,10vw,78px);letter-spacing:5px;line-height:.95;
-  background:linear-gradient(155deg,#fff 0%,var(--accent) 55%,var(--accent2) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
+.brand-name{font-family:var(--fd);font-size:clamp(40px,10vw,78px);letter-spacing:5px;line-height:.95;background:linear-gradient(155deg,#fff 0%,var(--accent) 55%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .brand-mission{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:var(--accent);opacity:.6;margin-top:5px;display:none;}
-
-.setup-box{
-  width:100%;max-width:400px;
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:22px;padding:24px 20px;
-  display:flex;flex-direction:column;gap:20px;
-}
+.setup-box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--border2);border-radius:22px;padding:24px 20px;display:flex;flex-direction:column;gap:20px;}
 .field-label{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--accent);opacity:.7;margin-bottom:10px;display:block;}
 .stepper{display:flex;align-items:center;justify-content:center;gap:14px;}
-.step-btn{
-  width:46px;height:46px;border-radius:50%;
-  border:2px solid var(--border2);background:transparent;
-  color:var(--accent);font-size:24px;cursor:pointer;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;
-}
+.step-btn{width:46px;height:46px;border-radius:50%;border:2px solid var(--border2);background:transparent;color:var(--accent);font-size:24px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
 .step-btn:hover{background:rgba(255,102,0,.15);border-color:var(--accent);}
 .step-val{font-family:var(--fd);font-size:60px;color:#fff;width:68px;text-align:center;line-height:1;}
 .step-max{font-size:10px;color:var(--muted);text-align:center;margin-top:2px;letter-spacing:2px;}
-
-.brief-btn{
-  width:100%;padding:12px;border-radius:11px;
-  border:1px solid var(--gold);background:transparent;
-  color:var(--gold);font-family:var(--fd);font-size:15px;letter-spacing:3px;cursor:pointer;transition:all .2s;
-}
+.brief-btn{width:100%;padding:12px;border-radius:11px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-family:var(--fd);font-size:15px;letter-spacing:3px;cursor:pointer;transition:all .2s;}
 .brief-btn:hover{background:rgba(255,200,74,.1);}
-.launch-btn{
-  width:100%;padding:16px;border-radius:15px;border:none;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#fff;font-family:var(--fd);font-size:24px;letter-spacing:4px;
-  cursor:pointer;transition:all .25s;box-shadow:0 0 28px rgba(255,102,0,.25);
-}
+.launch-btn{width:100%;padding:16px;border-radius:15px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:var(--fd);font-size:24px;letter-spacing:4px;cursor:pointer;transition:all .25s;box-shadow:0 0 28px rgba(255,102,0,.25);}
 .launch-btn:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(255,102,0,.4);}
 
 /* ── TOPBAR ── */
@@ -206,133 +124,172 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .topbar{
   position:sticky;top:0;z-index:50;
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;
-  background:rgba(7,17,31,.92);border-bottom:1px solid var(--border);
+  padding:10px 16px;
+  background:rgba(7,17,31,.95);border-bottom:1px solid var(--border);
   backdrop-filter:blur(14px);
 }
-.topbar-logo{width:30px;height:30px;border-radius:6px;object-fit:contain;display:none;}
-.timer{font-family:var(--fd);font-size:38px;letter-spacing:3px;color:#fff;line-height:1;transition:color .4s;text-align:center;}
-.timer.warn{color:var(--orange);text-shadow:0 0 14px rgba(255,136,0,.5);}
-.timer.danger{color:var(--red);text-shadow:0 0 14px rgba(255,68,68,.5);animation:blink 1s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
-.timer-sub{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:1px;text-align:center;}
-.players-chip{background:rgba(255,102,0,.1);border:1px solid rgba(255,102,0,.3);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:600;color:var(--accent);}
+/* V4: logo plus grand */
+.topbar-logo{width:44px;height:44px;border-radius:10px;object-fit:contain;display:none;}
+.topbar-lock{font-size:38px;line-height:1;}
+/* V4: compteur joueurs plus grand */
+.players-chip{
+  background:rgba(255,102,0,.15);border:1px solid rgba(255,102,0,.4);
+  border-radius:22px;padding:7px 14px;
+  font-size:16px;font-weight:700;color:var(--accent);
+  display:flex;align-items:center;gap:4px;
+}
+/* V4: indices dans le topbar */
+.topbar-center{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.topbar-indices{
+  font-size:10px;letter-spacing:2px;color:var(--muted);
+  display:flex;align-items:center;gap:6px;
+}
+.topbar-pen{font-size:10px;color:var(--orange);display:none;}
+.topbar-pen.visible{display:inline;}
 
 /* ── HEAT GAUGE ── */
-.heat-bar{
-  height:4px;background:rgba(255,255,255,.06);
-  position:relative;overflow:hidden;
-}
-.heat-fill{
-  height:100%;width:0%;
-  background:linear-gradient(90deg,#00d4ff,#ff6600,#ff0000);
-  transition:width .5s ease;
-}
-.heat-label{
-  display:none;
-  position:fixed;top:70px;left:50%;transform:translateX(-50%);
-  background:linear-gradient(135deg,var(--orange),var(--red));
-  color:#fff;font-family:var(--fd);font-size:14px;letter-spacing:2px;
-  padding:10px 22px;border-radius:28px;z-index:180;white-space:nowrap;
-  box-shadow:0 0 28px rgba(255,136,0,.5);animation:pulse2 1.5s infinite;
-}
+.heat-bar{height:3px;background:rgba(255,255,255,.06);position:relative;overflow:hidden;}
+.heat-fill{height:100%;width:0%;background:linear-gradient(90deg,#00d4ff,#ff6600,#ff0000);transition:width .5s ease;}
+.heat-label{display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--orange),var(--red));color:#fff;font-family:var(--fd);font-size:14px;letter-spacing:2px;padding:10px 22px;border-radius:28px;z-index:180;white-space:nowrap;box-shadow:0 0 28px rgba(255,136,0,.5);animation:pulse2 1.5s infinite;}
 .heat-label.show{display:block;}
 @keyframes pulse2{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.04)}}
 
-/* ── GAME BODY ── */
-.game-body{flex:1;overflow-y:auto;padding:14px 14px 100px;}
+/* ── GAME BODY — LAYOUT CERCLE V4 ── */
+.game-body{flex:1;overflow-y:auto;padding:10px 14px 100px;display:flex;flex-direction:column;align-items:center;}
 
-/* ── 5 BOUTONS PRINCIPAUX ── */
-.action-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;
-  margin-bottom:16px;
+/* Cercle de jeu */
+.game-circle-wrap{
+  width:100%;max-width:380px;
+  position:relative;
+  padding:20px 0;
 }
+
+/* V4: boutons ronds en grille 2x2 avec chrono au centre */
+.circle-grid{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  grid-template-rows:1fr auto 1fr;
+  gap:0;
+  align-items:center;
+  justify-items:center;
+  width:100%;
+}
+
+/* Chrono au centre */
+.timer-center{
+  grid-column:2;grid-row:2;
+  text-align:center;
+  padding:0 12px;
+}
+.timer{font-family:var(--fd);font-size:44px;letter-spacing:3px;color:#fff;line-height:1;transition:color .4s;}
+.timer.warn{color:var(--orange);text-shadow:0 0 14px rgba(255,136,0,.5);}
+.timer.danger{color:var(--red);text-shadow:0 0 14px rgba(255,68,68,.5);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.timer-sub{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:3px;}
+
+/* Cercle déco autour du chrono */
+.timer-ring{
+  width:130px;height:130px;border-radius:50%;
+  border:2px solid rgba(255,102,0,.25);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(255,102,0,.04),transparent);
+  position:relative;
+}
+.timer-ring::before{
+  content:'';position:absolute;inset:-8px;border-radius:50%;
+  border:1px solid rgba(255,102,0,.1);
+}
+
+/* V4: boutons ronds */
 .action-btn{
-  padding:16px 8px;border-radius:16px;
-  border:1px solid var(--border2);background:var(--card);
+  width:92px;height:92px;border-radius:50%;
+  border:2px solid var(--border2);background:var(--card);
   color:#fff;cursor:pointer;transition:all .2s;
   text-align:center;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  flex-shrink:0;
 }
-.action-btn::before{
-  content:'';position:absolute;inset:0;opacity:0;
-  background:radial-gradient(circle at center,rgba(255,255,255,.1),transparent);
-  transition:opacity .2s;
-}
+.action-btn::before{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(circle at center,rgba(255,255,255,.1),transparent);transition:opacity .2s;border-radius:50%;}
 .action-btn:active::before{opacity:1;}
-.action-btn:active{transform:scale(.95);}
-.action-btn.full{grid-column:1/-1;}
-.action-emoji{font-size:28px;display:block;margin-bottom:6px;}
-.action-label{font-family:var(--fd);font-size:15px;letter-spacing:2px;}
-.action-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.action-btn:active{transform:scale(.92);}
+.action-emoji{font-size:22px;display:block;}
+.action-label{font-family:var(--fd);font-size:11px;letter-spacing:1.5px;}
+.action-sub{font-size:8px;color:var(--muted);display:none;}
 
-.action-btn.indice{border-color:rgba(255,200,74,.4);}
+/* V4: positions dans la grille */
+.btn-indice{grid-column:1;grid-row:1;}
+.btn-meca{grid-column:3;grid-row:1;}
+.btn-code{grid-column:1;grid-row:3;}
+.btn-micro{grid-column:3;grid-row:3;}
+
+/* Couleurs boutons */
+.action-btn.indice{border-color:rgba(255,200,74,.5);background:rgba(255,200,74,.08);}
 .action-btn.indice .action-label{color:var(--gold);}
-.action-btn.mecanisme{border-color:rgba(0,212,255,.4);}
+.action-btn.mecanisme{border-color:rgba(0,212,255,.5);background:rgba(0,212,255,.06);}
 .action-btn.mecanisme .action-label{color:#00d4ff;}
-.action-btn.code{border-color:rgba(0,230,118,.4);}
+.action-btn.code{border-color:rgba(0,230,118,.5);background:rgba(0,230,118,.06);}
 .action-btn.code .action-label{color:var(--green);}
-.action-btn.micro{border-color:rgba(255,68,68,.4);}
+.action-btn.micro{border-color:rgba(255,68,68,.5);background:rgba(255,68,68,.06);}
 .action-btn.micro .action-label{color:var(--red);}
-.action-btn.scanner{border-color:rgba(200,0,255,.4);}
-.action-btn.scanner .action-label{color:#cc88ff;}
 
-/* Compteur indices */
+/* Lignes reliant les boutons (style Unlock) */
+.grid-line-h1,.grid-line-h2{grid-column:2;background:rgba(255,102,0,.15);height:1px;width:40px;}
+.grid-line-h1{grid-row:1;align-self:center;}
+.grid-line-h2{grid-row:3;align-self:center;}
+.grid-line-v1,.grid-line-v2{grid-row:2;background:rgba(255,102,0,.15);width:1px;height:40px;}
+.grid-line-v1{grid-column:1;justify-self:end;margin-right:-1px;}
+.grid-line-v2{grid-column:3;justify-self:start;margin-left:-1px;}
+
+/* Scanner en bas centré */
+.scanner-row{width:100%;max-width:380px;margin-top:14px;}
+.action-btn.scanner{
+  width:100%;height:58px;border-radius:40px;
+  border-color:rgba(200,0,255,.4);background:rgba(200,0,255,.06);
+  flex-direction:row;gap:10px;padding:0 20px;
+}
+.action-btn.scanner .action-label{color:#cc88ff;font-size:14px;letter-spacing:2px;}
+.action-btn.scanner .action-emoji{font-size:20px;}
+
+/* Loupe */
+.action-btn.loupe{
+  border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.06);
+}
+.action-btn.loupe .action-label{color:#00d4ff;}
+
+/* Compteur indices compact sous le cercle */
 .indice-counter{
   display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;border-radius:12px;
-  background:rgba(255,200,74,.06);border:1px solid rgba(255,200,74,.2);
-  margin-bottom:14px;
+  padding:8px 14px;border-radius:12px;
+  background:rgba(255,200,74,.06);border:1px solid rgba(255,200,74,.15);
+  width:100%;max-width:380px;margin-top:10px;
 }
-.ic-left{font-size:12px;color:var(--muted);}
-.ic-count{font-family:var(--fd);font-size:22px;color:var(--gold);}
+.ic-left{font-size:11px;color:var(--muted);}
+.ic-count{font-family:var(--fd);font-size:20px;color:var(--gold);}
 .ic-penalty{font-size:10px;color:var(--orange);letter-spacing:1px;}
-.eye-btn{
-  background:rgba(255,200,74,.1);border:1px solid rgba(255,200,74,.3);
-  border-radius:8px;padding:6px 12px;
-  color:var(--gold);font-size:18px;cursor:pointer;transition:all .2s;
-}
+.eye-btn{background:rgba(255,200,74,.1);border:1px solid rgba(255,200,74,.3);border-radius:8px;padding:5px 10px;color:var(--gold);font-size:16px;cursor:pointer;transition:all .2s;}
 .eye-btn:active{transform:scale(.9);}
 
-/* ── PANELS (modaux) ── */
-.panel-overlay{
-  display:none;position:fixed;inset:0;z-index:150;
-  background:rgba(0,0,0,.85);backdrop-filter:blur(8px);
-  align-items:flex-end;justify-content:center;padding:0;
-}
+/* ── PANELS ── */
+.panel-overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;}
 .panel-overlay.show{display:flex;}
-.panel{
-  background:var(--card);border-radius:24px 24px 0 0;
-  border-top:1px solid var(--border2);
-  padding:20px 18px 40px;width:100%;max-width:500px;
-  animation:slidePanel .3s ease;
-}
+.panel{background:var(--card);border-radius:24px 24px 0 0;border-top:1px solid var(--border2);padding:20px 18px 40px;width:100%;max-width:500px;animation:slidePanel .3s ease;}
 @keyframes slidePanel{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .panel-title{font-family:var(--fd);font-size:22px;letter-spacing:3px;}
 .panel-close{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:13px;padding:6px 14px;border-radius:8px;cursor:pointer;font-family:var(--fb);}
 
-/* Numpad compact */
-.numdisp{
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.4);border:2px solid var(--border2);
-  border-radius:12px;padding:10px 16px;margin-bottom:10px;min-height:58px;gap:5px;
-}
+/* Numpad */
+.numdisp{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);border:2px solid var(--border2);border-radius:12px;padding:10px 16px;margin-bottom:10px;min-height:58px;gap:5px;}
 .numdisp-val{font-family:var(--fd);font-size:42px;letter-spacing:6px;color:#fff;line-height:1;min-width:28px;text-align:center;}
 .numdisp-cursor{width:2px;height:38px;background:var(--accent);border-radius:2px;animation:cur 1s infinite;}
 @keyframes cur{0%,100%{opacity:1}50%{opacity:0}}
-
 .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
-.npbtn{
-  padding:12px;border-radius:10px;border:1px solid var(--border);
-  background:rgba(255,255,255,.04);color:#fff;
-  font-family:var(--fd);font-size:22px;cursor:pointer;transition:all .12s;text-align:center;
-  user-select:none;
-}
+.npbtn{padding:12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-family:var(--fd);font-size:22px;cursor:pointer;transition:all .12s;text-align:center;user-select:none;}
 .npbtn:active{transform:scale(.88);background:rgba(255,102,0,.15);}
 .npbtn.del{color:var(--orange);font-size:15px;}
 .npbtn.go{background:rgba(255,102,0,.15);border-color:var(--accent);color:var(--accent);font-size:14px;letter-spacing:2px;}
 
-/* Hint result dans panel */
+/* Hint result */
 .hint-result{border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-top:12px;display:none;animation:fadeIn .3s ease;}
 .hint-result.visible{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -345,24 +302,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .hint-caption{padding:10px 14px;background:rgba(0,0,0,.2);font-size:13px;line-height:1.6;color:var(--ice);}
 .hint-answer-btn{width:100%;padding:10px;border:none;background:linear-gradient(135deg,var(--orange),#cc4400);color:#fff;font-family:var(--fd);font-size:14px;letter-spacing:2px;cursor:pointer;display:none;}
 .hint-answer-btn.visible{display:block;}
-
-.hint-error{
-  display:none;text-align:center;padding:14px;border-radius:12px;
-  border:1px dashed rgba(255,136,0,.3);background:rgba(255,136,0,.06);
-  color:var(--orange);font-size:13px;margin-top:10px;
-}
+.hint-error{display:none;text-align:center;padding:14px;border-radius:12px;border:1px dashed rgba(255,136,0,.3);background:rgba(255,136,0,.06);color:var(--orange);font-size:13px;margin-top:10px;}
 .hint-error.visible{display:block;}
-
-/* Message Jean-Claude */
-.jc-message{
-  display:none;text-align:center;padding:12px 14px;border-radius:12px;
-  background:rgba(255,200,74,.08);border:1px solid rgba(255,200,74,.2);
-  color:var(--gold);font-size:13px;font-style:italic;margin-top:10px;
-  animation:fadeIn .3s ease;
-}
+.jc-message{display:none;text-align:center;padding:12px 14px;border-radius:12px;background:rgba(255,200,74,.08);border:1px solid rgba(255,200,74,.2);color:var(--gold);font-size:13px;font-style:italic;margin-top:10px;animation:fadeIn .3s ease;}
 .jc-message.visible{display:block;}
-
-/* History */
 .history-mini{margin-top:10px;}
 .section-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block;}
 .history-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:10px;margin-bottom:6px;cursor:pointer;transition:all .2s;}
@@ -371,31 +314,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .history-label{font-size:11px;color:var(--muted);}
 .history-arrow{margin-left:auto;color:var(--muted);font-size:12px;}
 
-/* Mécanisme panel */
+/* Mécanisme */
 .meca-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
-.meca-btn{
-  padding:18px 10px;border-radius:14px;border:1px solid var(--border2);
-  background:rgba(0,0,0,.3);cursor:pointer;transition:all .2s;text-align:center;
-}
+.meca-btn{padding:18px 10px;border-radius:14px;border:1px solid var(--border2);background:rgba(0,0,0,.3);cursor:pointer;transition:all .2s;text-align:center;}
 .meca-btn:active{transform:scale(.93);}
 .meca-emoji{font-size:32px;display:block;margin-bottom:8px;}
 .meca-label{font-family:var(--fd);font-size:14px;letter-spacing:2px;color:var(--ice);}
-
-/* Boussole */
-.compass-wrap{
-  width:200px;height:200px;border-radius:50%;
-  border:3px solid rgba(0,212,255,.3);
-  margin:16px auto;position:relative;
-  background:radial-gradient(circle,rgba(0,30,60,.8),rgba(0,10,30,.95));
-  display:flex;align-items:center;justify-content:center;
-}
-.compass-needle{
-  width:4px;height:80px;
-  background:linear-gradient(180deg,var(--red) 50%,#fff 50%);
-  border-radius:2px;transform-origin:50% 100%;
-  transition:transform .3s ease;
-  position:absolute;bottom:50%;
-}
+.compass-wrap{width:200px;height:200px;border-radius:50%;border:3px solid rgba(0,212,255,.3);margin:16px auto;position:relative;background:radial-gradient(circle,rgba(0,30,60,.8),rgba(0,10,30,.95));display:flex;align-items:center;justify-content:center;}
+.compass-needle{width:4px;height:80px;background:linear-gradient(180deg,var(--red) 50%,#fff 50%);border-radius:2px;transform-origin:50% 100%;transition:transform .3s ease;position:absolute;bottom:50%;}
 .compass-deg{font-family:var(--fd);font-size:28px;color:#fff;letter-spacing:2px;text-align:center;}
 .compass-dir{font-size:11px;color:var(--muted);letter-spacing:2px;text-align:center;}
 .compass-letters{position:absolute;inset:8px;}
@@ -403,115 +329,75 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .c-s{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-family:var(--fd);font-size:14px;color:var(--muted);}
 .c-e{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:var(--fd);font-size:14px;color:var(--muted);}
 .c-w{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:var(--fd);font-size:14px;color:var(--muted);}
-
-/* Gyroscope */
 .gyro-wrap{width:200px;height:200px;margin:16px auto;position:relative;display:flex;align-items:center;justify-content:center;}
-.gyro-circle{
-  width:160px;height:160px;border-radius:50%;
-  border:2px solid rgba(0,212,255,.2);
-  position:relative;background:rgba(0,20,40,.5);
-}
-.gyro-bubble{
-  width:24px;height:24px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#00ffcc,#00aa88);
-  position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  transition:top .1s,left .1s;
-  box-shadow:0 0 12px rgba(0,255,200,.5);
-}
+.gyro-circle{width:160px;height:160px;border-radius:50%;border:2px solid rgba(0,212,255,.2);position:relative;background:rgba(0,20,40,.5);}
+.gyro-bubble{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#00ffcc,#00aa88);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transition:top .1s,left .1s;box-shadow:0 0 12px rgba(0,255,200,.5);}
 .gyro-cross-h{position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,.1);}
 .gyro-cross-v{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.1);}
 .gyro-val{font-family:var(--fd);font-size:14px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:2px;}
 
-/* Micro panel */
-.micro-wave{
-  width:120px;height:120px;border-radius:50%;
-  border:3px solid var(--red);
-  margin:16px auto;
-  display:flex;align-items:center;justify-content:center;
-  font-size:48px;position:relative;
-}
-.micro-wave::before,.micro-wave::after{
-  content:'';position:absolute;border-radius:50%;
-  border:2px solid rgba(255,68,68,.3);
-  animation:microPulse 1.5s infinite;
-}
+/* Micro */
+.micro-wave{width:120px;height:120px;border-radius:50%;border:3px solid var(--red);margin:16px auto;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;}
+.micro-wave::before,.micro-wave::after{content:'';position:absolute;border-radius:50%;border:2px solid rgba(255,68,68,.3);animation:microPulse 1.5s infinite;}
 .micro-wave::before{inset:-10px;}
 .micro-wave::after{inset:-20px;animation-delay:.5s;}
 @keyframes microPulse{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.3)}}
 .micro-status{font-family:var(--fd);font-size:16px;letter-spacing:3px;text-align:center;color:var(--red);margin-top:8px;}
-.micro-result{
-  text-align:center;padding:14px;border-radius:12px;
-  background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);
-  color:var(--green);font-size:14px;margin-top:12px;display:none;
-}
+.micro-result{text-align:center;padding:14px;border-radius:12px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);color:var(--green);font-size:14px;margin-top:12px;display:none;}
 .micro-result.visible{display:block;}
 
-/* Scanner panel */
-.scanner-wrap{
-  width:100%;border-radius:14px;overflow:hidden;
-  background:#000;min-height:200px;
-  display:flex;align-items:center;justify-content:center;
-  position:relative;margin-top:12px;
-}
+/* Scanner */
+.scanner-wrap{width:100%;border-radius:14px;overflow:hidden;background:#000;min-height:200px;display:flex;align-items:center;justify-content:center;position:relative;margin-top:12px;}
 #scanner-video{width:100%;display:none;}
-.scanner-frame{
-  position:absolute;inset:20px;
-  border:2px solid var(--accent);border-radius:8px;
-  box-shadow:0 0 0 2000px rgba(0,0,0,.4);
-}
+.scanner-frame{position:absolute;inset:20px;border:2px solid var(--accent);border-radius:8px;box-shadow:0 0 0 2000px rgba(0,0,0,.4);}
 .scanner-corner{position:absolute;width:20px;height:20px;border-color:var(--accent);border-style:solid;}
 .sc-tl{top:18px;left:18px;border-width:3px 0 0 3px;}
 .sc-tr{top:18px;right:18px;border-width:3px 3px 0 0;}
 .sc-bl{bottom:18px;left:18px;border-width:0 0 3px 3px;}
 .sc-br{bottom:18px;right:18px;border-width:0 3px 3px 0;}
-.scanner-line{
-  position:absolute;left:20px;right:20px;height:2px;
-  background:linear-gradient(90deg,transparent,var(--accent),transparent);
-  animation:scanLine 2s infinite;top:20px;
-}
+.scanner-line{position:absolute;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanLine 2s infinite;top:20px;}
 @keyframes scanLine{0%{top:20px}100%{top:calc(100% - 20px)}}
 .scanner-ph{text-align:center;padding:30px 20px;color:var(--muted);font-size:13px;}
-.scanner-start-btn{
-  width:100%;padding:13px;border-radius:12px;border:none;
-  background:linear-gradient(135deg,#cc44ff,#8800cc);
-  color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px;
-}
-.scanner-result{
-  text-align:center;padding:14px;border-radius:12px;
-  background:rgba(200,0,255,.08);border:1px solid rgba(200,0,255,.2);
-  color:#cc88ff;font-size:13px;margin-top:12px;display:none;line-height:1.7;
-}
+.scanner-start-btn{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#cc44ff,#8800cc);color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px;}
+.scanner-result{text-align:center;padding:14px;border-radius:12px;background:rgba(200,0,255,.08);border:1px solid rgba(200,0,255,.2);color:#cc88ff;font-size:13px;margin-top:12px;display:none;line-height:1.7;}
 .scanner-result.visible{display:block;}
 
+/* ── LOUPE PANEL ── */
+.loupe-filter-wrap{width:100%;border-radius:14px;overflow:hidden;background:#000;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative;margin-top:12px;}
+#loupe-video{width:100%;display:none;}
+.loupe-ph{text-align:center;padding:30px 20px;color:var(--muted);font-size:13px;}
+.loupe-canvas{width:100%;display:none;border-radius:14px;}
+.loupe-start-btn{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#00b4ff,#0066cc);color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px;}
+.loupe-stop-btn{width:100%;padding:13px;border-radius:12px;border:none;background:rgba(0,180,255,.15);border:1px solid rgba(0,180,255,.3);color:#00d4ff;font-family:var(--fd);font-size:16px;letter-spacing:2px;cursor:pointer;margin-top:8px;display:none;}
+.loupe-info{text-align:center;padding:10px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);color:#00d4ff;font-size:12px;margin-top:10px;display:none;}
+.loupe-info.visible{display:block;}
+.loupe-step-badge{background:rgba(0,212,255,.2);border:1px solid rgba(0,212,255,.4);border-radius:8px;padding:4px 12px;font-size:11px;letter-spacing:2px;color:#00d4ff;text-align:center;margin-bottom:10px;display:none;}
+.loupe-step-badge.visible{display:block;}
+
+/* ── MORSE PANEL ── */
+.morse-player{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:14px;padding:18px;text-align:center;margin-top:12px;}
+.morse-icon{font-size:48px;display:block;margin-bottom:8px;}
+.morse-title{font-family:var(--fd);font-size:18px;letter-spacing:3px;color:var(--green);margin-bottom:12px;}
+.morse-play-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#007a42);color:#fff;font-family:var(--fd);font-size:20px;letter-spacing:3px;cursor:pointer;transition:all .2s;}
+.morse-play-btn:active{transform:scale(.97);}
+.morse-playing{font-size:11px;color:var(--green);letter-spacing:2px;margin-top:8px;display:none;}
+.morse-playing.visible{display:block;}
+
 /* ── BOTTOM BAR ── */
-.bottom-bar{
-  position:fixed;bottom:0;left:0;right:0;z-index:60;
-  display:flex;gap:8px;padding:10px 14px 20px;
-  background:linear-gradient(transparent,rgba(7,17,31,.98));
-}
-.pause-btn{
-  flex:1;padding:12px;border-radius:12px;border:1px solid var(--border2);
-  background:rgba(255,255,255,.06);color:var(--ice);
-  font-family:var(--fd);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all .2s;
-}
-.victory-btn{
-  flex:2;padding:12px;border-radius:12px;border:none;
-  background:linear-gradient(135deg,var(--green),#009944);
-  color:var(--bg);font-family:var(--fd);font-size:14px;letter-spacing:2px;
-  cursor:pointer;transition:all .2s;box-shadow:0 0 18px rgba(0,230,118,.22);
-}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;z-index:60;display:flex;gap:8px;padding:10px 14px 20px;background:linear-gradient(transparent,rgba(7,17,31,.98));}
+.pause-btn{flex:1;padding:12px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.06);color:var(--ice);font-family:var(--fd);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all .2s;}
+.victory-btn{flex:2;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#009944);color:var(--bg);font-family:var(--fd);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all .2s;box-shadow:0 0 18px rgba(0,230,118,.22);}
 .victory-btn:hover{transform:translateY(-1px);}
 
-/* ── PENALTY TOAST ── */
-.penalty-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-family:var(--fd);font-size:16px;letter-spacing:2px;padding:8px 20px;border-radius:28px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:200;white-space:nowrap;}
+/* Penalty toast */
+.penalty-toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-family:var(--fd);font-size:16px;letter-spacing:2px;padding:8px 20px;border-radius:28px;opacity:0;pointer-events:none;transition:opacity .3s;z-index:200;white-space:nowrap;}
 .penalty-toast.show{opacity:1;}
 
-/* ── OVERLAYS ── */
+/* Overlays */
 .overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.9);backdrop-filter:blur(8px);align-items:center;justify-content:center;flex-direction:column;gap:16px;text-align:center;padding:26px;}
 .overlay.show{display:flex;}
 
-/* ── VICTORY ── */
+/* Victory */
 #s-victory{align-items:center;justify-content:center;text-align:center;padding:32px 20px;gap:14px;position:relative;overflow:hidden;}
 .victory-emoji{font-size:68px;animation:bounceIn .6s ease;}
 @keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
@@ -531,14 +417,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .confetto{position:absolute;width:8px;height:8px;border-radius:2px;animation:confettiFall linear forwards;}
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
 
-/* ── TIMEUP ── */
+/* Timeup */
 #s-timeup{align-items:center;justify-content:center;text-align:center;padding:32px 20px;gap:14px;}
 .timeup-emoji{font-size:68px;}
 .timeup-title{font-family:var(--fd);font-size:clamp(40px,10vw,66px);letter-spacing:4px;color:var(--red);line-height:.92;}
 .timeup-quote{font-size:14px;color:var(--muted);font-style:italic;max-width:300px;line-height:1.6;padding:12px 16px;background:rgba(255,68,68,.06);border-radius:12px;border:1px solid rgba(255,68,68,.15);}
 .continue-btn{width:100%;max-width:340px;padding:13px;border-radius:12px;border:1px solid var(--orange);background:transparent;color:var(--orange);font-family:var(--fd);font-size:15px;letter-spacing:2px;cursor:pointer;}
 
-/* ── PHOTO SOUVENIR ── */
+/* Photo */
 #s-photo{align-items:center;justify-content:center;padding:20px 16px;gap:14px;}
 .photo-title{font-family:var(--fd);font-size:24px;letter-spacing:3px;color:var(--gold);text-align:center;}
 .photo-sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;}
@@ -546,7 +432,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .capture-btn{width:72px;height:72px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.15);font-size:28px;cursor:pointer;display:none;align-items:center;justify-content:center;}
 .capture-btn.visible{display:flex;}
 .capture-btn:active{transform:scale(.9);}
-#canvas-preview{border-radius:14px;max-width:100%;border:2px solid var(--border2);display:none;}
+#canvas-preview{border-radius:14px;max-width:100%;display:none;}
 .camera-btn{width:100%;max-width:340px;padding:14px;border-radius:13px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;}
 .share-btn{width:100%;max-width:340px;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#007a42);color:#fff;font-family:var(--fd);font-size:17px;letter-spacing:3px;cursor:pointer;display:none;}
 .share-btn.visible{display:block;}
@@ -575,7 +461,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="tuto-icon">📖</div>
     <div>
       <div class="tuto-text">TUTORIEL</div>
-      <div class="tuto-sub">Comment choisir votre mission ?</div>
+      <div class="tuto-sub">Comment jouer ?</div>
     </div>
   </button>
   <div class="missions-grid" id="missions-grid">
@@ -588,26 +474,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="tuto-box">
     <div class="tuto-box-title">📖 TUTORIEL</div>
     <div class="tuto-steps">
-      <div class="tuto-step">
-        <div class="tuto-step-num">1</div>
-        <div>Repérez le nom de votre mission sur la glacière que vous avez réservée</div>
-      </div>
-      <div class="tuto-step">
-        <div class="tuto-step-num">2</div>
-        <div>Sélectionnez la mission correspondante sur cet écran</div>
-      </div>
-      <div class="tuto-step">
-        <div class="tuto-step-num">3</div>
-        <div>Choisissez le nombre de joueurs et lancez votre aventure !</div>
-      </div>
-      <div class="tuto-step">
-        <div class="tuto-step-num">4</div>
-        <div>Utilisez les boutons 💡 INDICE, ⚙️ MÉCANISME, 🔐 CODE, 🎤 MICRO et 📷 SCANNER pendant la partie</div>
-      </div>
-      <div class="tuto-step">
-        <div class="tuto-step-num">5</div>
-        <div>Attention ! Chaque indice consulté vous coûte des minutes sur le chrono ⏱</div>
-      </div>
+      <div class="tuto-step"><div class="tuto-step-num">1</div><div>Repérez le nom de votre mission sur la glacière réservée</div></div>
+      <div class="tuto-step"><div class="tuto-step-num">2</div><div>Sélectionnez la mission correspondante</div></div>
+      <div class="tuto-step"><div class="tuto-step-num">3</div><div>Choisissez le nombre de joueurs et lancez l'aventure !</div></div>
+      <div class="tuto-step"><div class="tuto-step-num">4</div><div>Utilisez les boutons 💡 🔧 🔊 🎤 📷 🔍 pendant la partie</div></div>
+      <div class="tuto-step"><div class="tuto-step-num">5</div><div>Attention ! Chaque indice peut vous coûter des minutes ⏱</div></div>
     </div>
     <button class="tuto-close" onclick="closeTuto()">C'EST COMPRIS ! 🎯</button>
   </div>
@@ -649,11 +520,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 <!-- GAME -->
 <div id="s-game" class="screen">
+  <!-- V4: Topbar avec logo grand + indices + joueurs grand -->
   <div class="topbar">
-    <img class="topbar-logo" id="topbar-logo" src="" alt="">
-    <div>
-      <div class="timer" id="timer">60:00</div>
-      <div class="timer-sub" id="timer-sub">en cours</div>
+    <div id="topbar-lock-wrap">
+      <img class="topbar-logo" id="topbar-logo" src="" alt="">
+      <div class="topbar-lock" id="topbar-lock" style="display:block">🔒</div>
+    </div>
+    <div class="topbar-center">
+      <div class="topbar-indices">
+        <span id="topbar-ic-count" style="font-family:var(--fd);font-size:16px;color:var(--gold)">∞</span>
+        <span style="font-size:10px;color:var(--muted)">indice(s)</span>
+        <span class="topbar-pen" id="topbar-pen">— <span id="topbar-pen-val">2</span> min/indice</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="eye-btn" style="padding:3px 8px;font-size:13px" onclick="showLastHint()" title="Revoir dernier indice">👁️</button>
+      </div>
     </div>
     <div class="players-chip" id="players-chip">4 🧑</div>
   </div>
@@ -661,45 +542,68 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="heat-label" id="heat-label">❄️🔥 LA GLACIÈRE SE RÉCHAUFFE ! Plus que 10 min !</div>
 
   <div class="game-body">
-    <!-- Compteur indices -->
-    <div class="indice-counter">
-      <div>
-        <div class="ic-left">Indices restants</div>
-        <div class="ic-penalty" id="ic-penalty">−2 min par indice</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <button class="eye-btn" onclick="showLastHint()" title="Revoir dernier indice">👁️</button>
-        <div class="ic-count" id="ic-count">∞</div>
+    <!-- V4: layout cercle -->
+    <div class="game-circle-wrap">
+      <div class="circle-grid">
+        <!-- Haut gauche -->
+        <button class="action-btn indice btn-indice" onclick="openPanel('indice')">
+          <span class="action-emoji">💡</span>
+          <div class="action-label">INDICE</div>
+        </button>
+        <!-- Ligne haut -->
+        <div class="grid-line-h1"></div>
+        <!-- Haut droite -->
+        <button class="action-btn mecanisme btn-meca" onclick="openPanel('mecanisme')">
+          <span class="action-emoji">⚙️</span>
+          <div class="action-label">MÉCA</div>
+        </button>
+        <!-- Ligne gauche -->
+        <div class="grid-line-v1"></div>
+        <!-- CHRONO CENTRE -->
+        <div class="timer-center">
+          <div class="timer-ring">
+            <div class="timer" id="timer">60:00</div>
+            <div class="timer-sub" id="timer-sub">en cours</div>
+          </div>
+        </div>
+        <!-- Ligne droite -->
+        <div class="grid-line-v2"></div>
+        <!-- Bas gauche -->
+        <button class="action-btn code btn-code" onclick="openPanel('code')">
+          <span class="action-emoji" id="code-btn-emoji">🔊</span>
+          <div class="action-label">MORSE</div>
+        </button>
+        <!-- Ligne bas -->
+        <div class="grid-line-h2"></div>
+        <!-- Bas droite -->
+        <button class="action-btn micro btn-micro" onclick="openPanel('micro')">
+          <span class="action-emoji">🎤</span>
+          <div class="action-label">MICRO</div>
+        </button>
       </div>
     </div>
 
-    <!-- 5 boutons -->
-    <div class="action-grid">
-      <button class="action-btn indice" onclick="openPanel('indice')">
-        <span class="action-emoji">💡</span>
-        <div class="action-label">INDICE</div>
-        <div class="action-sub">Carte numérotée</div>
-      </button>
-      <button class="action-btn mecanisme" onclick="openPanel('mecanisme')">
-        <span class="action-emoji">⚙️</span>
-        <div class="action-label">MÉCANISME</div>
-        <div class="action-sub">Carte rouage</div>
-      </button>
-      <button class="action-btn code" onclick="openPanel('code')">
-        <span class="action-emoji">🔐</span>
-        <div class="action-label">CODE</div>
-        <div class="action-sub">Son morse</div>
-      </button>
-      <button class="action-btn micro" onclick="openPanel('micro')">
-        <span class="action-emoji">🎤</span>
-        <div class="action-label">MICRO</div>
-        <div class="action-sub">Commande vocale</div>
-      </button>
-      <button class="action-btn scanner full" onclick="openPanel('scanner')">
+    <!-- Scanner + Loupe en bas -->
+    <div class="scanner-row" style="display:flex;gap:10px;max-width:380px;width:100%;">
+      <button class="action-btn scanner" style="flex:1" onclick="openPanel('scanner')">
         <span class="action-emoji">📷</span>
-        <div class="action-label">SCANNER</div>
-        <div class="action-sub">QR code caché dans la glacière</div>
+        <div class="action-label">SCANNER QR</div>
       </button>
+      <button class="action-btn loupe" style="flex:1;height:58px;border-radius:40px;border:2px solid rgba(0,212,255,.4);background:rgba(0,212,255,.06);flex-direction:row;gap:8px;padding:0 16px;" onclick="openPanel('loupe')">
+        <span class="action-emoji">🔍</span>
+        <div class="action-label" style="color:#00d4ff;font-size:13px;letter-spacing:2px;">LOUPE</div>
+      </button>
+    </div>
+
+    <!-- Compteur indices -->
+    <div class="indice-counter">
+      <div>
+        <div class="ic-left">Indices consultés</div>
+        <div class="ic-penalty" id="ic-penalty" style="display:none">−<span id="ic-pen-val">2</span> min par indice</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="ic-count" id="ic-count">0</div>
+      </div>
     </div>
   </div>
 
@@ -709,7 +613,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
 
   <div class="penalty-toast" id="penalty-toast">−2 min ⏱</div>
-  <div class="heat-label" id="heat-label2" style="display:none"></div>
 
   <!-- PAUSE -->
   <div class="overlay" id="pause-overlay">
@@ -736,29 +639,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="panel-title" style="color:var(--gold)">💡 INDICE</div>
       <button class="panel-close" onclick="closePanel('indice')">Fermer</button>
     </div>
-    <div class="numdisp">
-      <div class="numdisp-val" id="nd-indice">—</div>
-      <div class="numdisp-cursor"></div>
-    </div>
+    <div class="numdisp"><div class="numdisp-val" id="nd-indice">—</div><div class="numdisp-cursor"></div></div>
     <div class="numpad">
-      <button class="npbtn" onclick="np('indice','1')">1</button>
-      <button class="npbtn" onclick="np('indice','2')">2</button>
-      <button class="npbtn" onclick="np('indice','3')">3</button>
-      <button class="npbtn" onclick="np('indice','4')">4</button>
-      <button class="npbtn" onclick="np('indice','5')">5</button>
-      <button class="npbtn" onclick="np('indice','6')">6</button>
-      <button class="npbtn" onclick="np('indice','7')">7</button>
-      <button class="npbtn" onclick="np('indice','8')">8</button>
-      <button class="npbtn" onclick="np('indice','9')">9</button>
-      <button class="npbtn del" onclick="npDel('indice')">⌫</button>
-      <button class="npbtn" onclick="np('indice','0')">0</button>
-      <button class="npbtn go" onclick="searchHint()">OK ✓</button>
+      <button class="npbtn" onclick="np('indice','1')">1</button><button class="npbtn" onclick="np('indice','2')">2</button><button class="npbtn" onclick="np('indice','3')">3</button>
+      <button class="npbtn" onclick="np('indice','4')">4</button><button class="npbtn" onclick="np('indice','5')">5</button><button class="npbtn" onclick="np('indice','6')">6</button>
+      <button class="npbtn" onclick="np('indice','7')">7</button><button class="npbtn" onclick="np('indice','8')">8</button><button class="npbtn" onclick="np('indice','9')">9</button>
+      <button class="npbtn del" onclick="npDel('indice')">⌫</button><button class="npbtn" onclick="np('indice','0')">0</button><button class="npbtn go" onclick="searchHint()">OK ✓</button>
     </div>
     <div class="hint-result" id="hint-result">
-      <div class="hint-header">
-        <div class="hint-badge" id="hint-badge">CARTE N°—</div>
-        <div class="penalty-badge" id="hint-penalty">−2 min</div>
-      </div>
+      <div class="hint-header"><div class="hint-badge" id="hint-badge">CARTE N°—</div><div class="penalty-badge" id="hint-penalty">−2 min</div></div>
       <div class="hint-img-wrap" id="hint-img-wrap">
         <div class="hint-ph" id="hint-ph"><span style="font-size:36px;display:block;margin-bottom:8px">🔍</span>Indice non configuré</div>
         <img id="hint-img" src="" alt="" style="display:none">
@@ -778,121 +667,88 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <!-- PANEL MÉCANISME -->
 <div class="panel-overlay" id="panel-mecanisme">
   <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title" style="color:#00d4ff">⚙️ MÉCANISME</div>
-      <button class="panel-close" onclick="closePanel('mecanisme')">Fermer</button>
-    </div>
+    <div class="panel-header"><div class="panel-title" style="color:#00d4ff">⚙️ MÉCANISME</div><button class="panel-close" onclick="closePanel('mecanisme')">Fermer</button></div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">Choisissez l'outil correspondant à votre carte rouage ⚙️</div>
     <div class="meca-grid">
-      <button class="meca-btn" onclick="showMeca('boussole')">
-        <span class="meca-emoji">🧭</span>
-        <div class="meca-label">BOUSSOLE</div>
-      </button>
-      <button class="meca-btn" onclick="showMeca('gyroscope')">
-        <span class="meca-emoji">⚖️</span>
-        <div class="meca-label">GYROSCOPE</div>
-      </button>
+      <button class="meca-btn" onclick="showMeca('boussole')"><span class="meca-emoji">🧭</span><div class="meca-label">BOUSSOLE</div></button>
+      <button class="meca-btn" onclick="showMeca('gyroscope')"><span class="meca-emoji">⚖️</span><div class="meca-label">GYROSCOPE</div></button>
     </div>
-    <!-- Boussole -->
     <div id="meca-boussole" style="display:none">
       <div class="compass-wrap">
-        <div class="compass-letters">
-          <div class="c-n">N</div><div class="c-s">S</div>
-          <div class="c-e">E</div><div class="c-w">O</div>
-        </div>
+        <div class="compass-letters"><div class="c-n">N</div><div class="c-s">S</div><div class="c-e">E</div><div class="c-w">O</div></div>
         <div class="compass-needle" id="compass-needle"></div>
-        <div>
-          <div class="compass-deg" id="compass-deg">0°</div>
-          <div class="compass-dir" id="compass-dir">NORD</div>
-        </div>
+        <div><div class="compass-deg" id="compass-deg">0°</div><div class="compass-dir" id="compass-dir">NORD</div></div>
       </div>
     </div>
-    <!-- Gyroscope -->
     <div id="meca-gyroscope" style="display:none">
-      <div class="gyro-wrap">
-        <div class="gyro-circle">
-          <div class="gyro-cross-h"></div>
-          <div class="gyro-cross-v"></div>
-          <div class="gyro-bubble" id="gyro-bubble"></div>
-        </div>
-      </div>
+      <div class="gyro-wrap"><div class="gyro-circle"><div class="gyro-cross-h"></div><div class="gyro-cross-v"></div><div class="gyro-bubble" id="gyro-bubble"></div></div></div>
       <div class="gyro-val" id="gyro-val">β: 0° | γ: 0°</div>
     </div>
   </div>
 </div>
 
-<!-- PANEL CODE -->
+<!-- PANEL CODE MORSE (V4: bouton play direct, pas de saisie) -->
 <div class="panel-overlay" id="panel-code">
   <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title" style="color:var(--green)">🔐 CODE</div>
-      <button class="panel-close" onclick="closePanel('code')">Fermer</button>
-    </div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Entrez le code trouvé dans la glacière</div>
-    <div class="numdisp">
-      <div class="numdisp-val" id="nd-code">—</div>
-      <div class="numdisp-cursor"></div>
-    </div>
-    <div class="numpad">
-      <button class="npbtn" onclick="np('code','1')">1</button>
-      <button class="npbtn" onclick="np('code','2')">2</button>
-      <button class="npbtn" onclick="np('code','3')">3</button>
-      <button class="npbtn" onclick="np('code','4')">4</button>
-      <button class="npbtn" onclick="np('code','5')">5</button>
-      <button class="npbtn" onclick="np('code','6')">6</button>
-      <button class="npbtn" onclick="np('code','7')">7</button>
-      <button class="npbtn" onclick="np('code','8')">8</button>
-      <button class="npbtn" onclick="np('code','9')">9</button>
-      <button class="npbtn del" onclick="npDel('code')">⌫</button>
-      <button class="npbtn" onclick="np('code','0')">0</button>
-      <button class="npbtn go" style="background:rgba(0,230,118,.15);border-color:var(--green);color:var(--green)" onclick="searchCode()">OK ✓</button>
-    </div>
-    <div id="code-result" style="display:none;margin-top:12px">
-      <div style="font-size:11px;letter-spacing:3px;color:var(--green);margin-bottom:8px">🔊 SON MORSE EN LECTURE...</div>
-      <audio id="morse-audio" controls style="width:100%;border-radius:8px"></audio>
-    </div>
-    <div id="code-error" style="display:none;text-align:center;padding:12px;border-radius:10px;background:rgba(255,68,68,.06);border:1px dashed rgba(255,68,68,.3);color:var(--red);font-size:12px;margin-top:10px">
-      ❓ Code non reconnu. Vérifie le code sur ta carte !
+    <div class="panel-header"><div class="panel-title" style="color:var(--green)">🔊 SON MORSE</div><button class="panel-close" onclick="closePanel('code')">Fermer</button></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">Écoutez le son morse et décodez le message avec votre feuille de traduction !</div>
+    <div class="morse-player">
+      <span class="morse-icon">🔊</span>
+      <div class="morse-title">SON MORSE</div>
+      <audio id="morse-audio" style="display:none"></audio>
+      <button class="morse-play-btn" id="morse-play-btn" onclick="playMorse()">▶ ÉCOUTER LE MORSE</button>
+      <div class="morse-playing" id="morse-playing">🔴 EN LECTURE...</div>
+      <div id="morse-nofile" style="display:none;font-size:12px;color:var(--muted);margin-top:8px">Aucun son morse configuré pour cette mission</div>
     </div>
   </div>
 </div>
 
-<!-- PANEL MICRO -->
+<!-- PANEL MICRO (V4: mot → affiche code auto) -->
 <div class="panel-overlay" id="panel-micro">
   <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title" style="color:var(--red)">🎤 MICRO</div>
-      <button class="panel-close" onclick="closePanel('micro')">Fermer</button>
-    </div>
+    <div class="panel-header"><div class="panel-title" style="color:var(--red)">🎤 MICRO</div><button class="panel-close" onclick="closePanel('micro')">Fermer</button></div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.6">Trouvez le mot de passe sur votre carte et prononcez-le à voix haute !</div>
     <div class="micro-wave" id="micro-wave">🎤</div>
     <div class="micro-status" id="micro-status">APPUYEZ POUR PARLER</div>
-    <button id="micro-btn" onclick="toggleMicro()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--red),#990000);color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px">🎤 PARLER</button>
+    <button onclick="toggleMicro()" id="micro-btn" style="width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--red),#aa0000);color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px">🎤 PARLER</button>
     <div class="micro-result" id="micro-result"></div>
+    <!-- V4: code révélé auto après mot reconnu -->
+    <div id="micro-code-reveal" style="display:none;margin-top:12px;text-align:center;padding:14px;border-radius:12px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);">
+      <div style="font-size:10px;letter-spacing:3px;color:var(--green);margin-bottom:6px">MOT VALIDÉ — VOTRE CODE :</div>
+      <div id="micro-code-val" style="font-family:var(--fd);font-size:48px;letter-spacing:8px;color:var(--green)">—</div>
+    </div>
   </div>
 </div>
 
 <!-- PANEL SCANNER -->
 <div class="panel-overlay" id="panel-scanner">
   <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title" style="color:#cc88ff">📷 SCANNER</div>
-      <button class="panel-close" onclick="closePanel('scanner')">Fermer</button>
-    </div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Scannez le QR code caché dans la glacière !</div>
+    <div class="panel-header"><div class="panel-title" style="color:#cc88ff">📷 SCANNER</div><button class="panel-close" onclick="closePanel('scanner')">Fermer</button></div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Scanner de QR code</div>
     <div class="scanner-wrap">
       <video id="scanner-video" autoplay playsinline></video>
-      <div class="scanner-frame">
-        <div class="scanner-corner sc-tl"></div>
-        <div class="scanner-corner sc-tr"></div>
-        <div class="scanner-corner sc-bl"></div>
-        <div class="scanner-corner sc-br"></div>
-        <div class="scanner-line"></div>
-      </div>
+      <div class="scanner-frame"><div class="scanner-corner sc-tl"></div><div class="scanner-corner sc-tr"></div><div class="scanner-corner sc-bl"></div><div class="scanner-corner sc-br"></div><div class="scanner-line"></div></div>
       <div class="scanner-ph" id="scanner-ph">📷 Appuyez sur le bouton pour activer la caméra</div>
     </div>
     <button class="scanner-start-btn" id="scanner-btn" onclick="startScanner()">📷 ACTIVER LE SCANNER</button>
     <div class="scanner-result" id="scanner-result"></div>
+  </div>
+</div>
+
+<!-- PANEL LOUPE (V4: filtres caméra) -->
+<div class="panel-overlay" id="panel-loupe">
+  <div class="panel">
+    <div class="panel-header"><div class="panel-title" style="color:#00d4ff">🔍 LOUPE</div><button class="panel-close" onclick="closePanel('loupe')">Fermer</button></div>
+    <div class="loupe-step-badge" id="loupe-step-badge">LOUPE 1 / 3</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.6">Pointez la caméra vers la carte indiquée — le filtre révèle les informations cachées !</div>
+    <div class="loupe-filter-wrap">
+      <video id="loupe-video" autoplay playsinline style="display:none;width:100%;"></video>
+      <canvas id="loupe-canvas" style="display:none;width:100%;border-radius:14px;"></canvas>
+      <div class="loupe-ph" id="loupe-ph">🔍 Activez la loupe pour révéler les secrets</div>
+    </div>
+    <button class="loupe-start-btn" id="loupe-start-btn" onclick="startLoupe()">🔍 ACTIVER LA LOUPE</button>
+    <button class="loupe-stop-btn" id="loupe-stop-btn" onclick="stopLoupe()">⏹ ARRÊTER</button>
+    <div class="loupe-info" id="loupe-info">Filtre actif — tenez la carte bien en face de la caméra</div>
   </div>
 </div>
 
@@ -960,12 +816,15 @@ let glaciere=null, cartes={}, codes={};
 let players=4, durMin=60, secsLeft=3600, secsUsed=0;
 let timerInt=null, paused=false, warmingShown=false;
 let npVals={indice:'',code:''};
-let history=[], penaltyMin=2, totalPen=0;
+let history=[], penaltyMin=2, penaltyActive=true, totalPen=0;
 let bgMusic=null, bipAudio=null, audioCtx=null;
 let currentCardNum=null, photoDataUrl=null;
 let compassActive=false, gyroActive=false, microActive=false;
-let scannerStream=null, recognition=null;
+let scannerStream=null, loupeStream=null, loupeAnimFrame=null;
+let recognition=null;
 let allGlacieres=[];
+let loupeStep=0, loupeConfigs=[];
+let morseAudio=null;
 
 async function supaFetch(path,opts={}){
   const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
@@ -982,36 +841,25 @@ async function init(){
     const gs=await supaFetch('glacieres?actif=eq.true&order=created_at.asc');
     allGlacieres=gs;
     if(!gs.length){showScreen('s-setup');return;}
-    if(gs.length===1){
-      // Une seule glacière → direct
-      await loadGlaciere(gs[0]);
-    } else {
-      // Plusieurs → écran sélection
-      renderMissions(gs);
-      showScreen('s-missions');
-    }
+    if(gs.length===1){await loadGlaciere(gs[0]);}
+    else{renderMissions(gs);showScreen('s-missions');}
   }catch(e){console.error(e);showScreen('s-setup');}
 }
 
 function renderMissions(gs){
   const grid=document.getElementById('missions-grid');
-  const bgMap={
-    'apero-ete':'linear-gradient(135deg,#ff6600,#ffaa00)',
-    'apero-hiver':'linear-gradient(135deg,#0088cc,#88ccff)',
-    'anniv':'linear-gradient(135deg,#cc00aa,#ff88ff)',
-  };
-  const emojiMap={'apero-ete':'☀️','apero-hiver':'⛷️','anniv':'🌺'};
   grid.innerHTML=gs.map(g=>{
     const isAnniv=g.nom_escape&&g.nom_escape.toLowerCase().includes('anniversaire');
     const typeClass=isAnniv?'anniv':'apero';
+    // V4: emoji 🍺 devant la barre
     const typeLabel=isAnniv?'🎂 Mission Anniversaire':'🍺 Mission Apéro';
-    const bg=g.mission_bg_url?`url(${g.mission_bg_url})`:(isAnniv?bgMap.anniv:bgMap['apero-ete']);
+    const bg=g.mission_bg_url?`url(${g.mission_bg_url})`:(isAnniv?'linear-gradient(135deg,#cc00aa,#ff88ff)':'linear-gradient(135deg,#ff6600,#ffaa00)');
     return `<div class="mission-card" onclick="selectMission('${g.id}')">
       <div class="mission-bg" style="background:${bg}"></div>
       <div class="mission-overlay"></div>
       <div class="mission-emoji">${isAnniv?'🌺':'🍺'}</div>
+      <div class="mission-bar"><span>🍺</span>${typeLabel}</div>
       <div class="mission-content">
-        <span class="mission-type ${typeClass}">${typeLabel}</span>
         <div class="mission-title">${g.nom_escape||'MISSION APÉRO'}</div>
         <div class="mission-name">${g.nom}</div>
       </div>
@@ -1028,10 +876,19 @@ async function selectMission(id){
 async function loadGlaciere(g){
   glaciere=g;
   penaltyMin=g.penalty_min||2;
+  penaltyActive=g.penalite_active!==false;
   const cs=await supaFetch('cartes?glaciere_id=eq.'+g.id);
   cs.forEach(c=>cartes[c.numero]=c);
-  // Codes morse (numéros > 200 = codes)
   cs.filter(c=>c.numero>200).forEach(c=>codes[c.numero]=c);
+  // Loupe configs depuis Supabase
+  loupeConfigs=[
+    {filtre:g.loupe1_filtre||'contraste', url:g.loupe1_url||''},
+    {filtre:g.loupe2_filtre||'contraste', url:g.loupe2_url||''},
+    {filtre:g.loupe3_filtre||'contraste', url:g.loupe3_url||''},
+  ].filter(l=>l.url);
+  loupeStep=0;
+  // Morse global
+  if(g.morse_url) morseAudio=new Audio(g.morse_url);
   applyBranding();
   if(g.music_url){bgMusic=new Audio(g.music_url);bgMusic.loop=true;bgMusic.volume=0.25;}
   if(g.bip_url){bipAudio=new Audio(g.bip_url);}
@@ -1048,6 +905,7 @@ function applyBranding(){
       if(el){el.src=glaciere.logo_url;el.style.display='block';}
     });
     document.getElementById('setup-ice').style.display='none';
+    document.getElementById('topbar-lock').style.display='none';
   }
   const missionName=glaciere.nom_escape||'MISSION APÉRO';
   document.getElementById('brand-name').innerHTML=missionName.toUpperCase().replace(' ','<br>');
@@ -1057,8 +915,14 @@ function applyBranding(){
     document.getElementById('brief-title').textContent=glaciere.nom_escape||'🧊 MISSION';
     document.getElementById('read-brief-btn').style.display='block';
   }
-  document.getElementById('ic-penalty').textContent='−'+penaltyMin+' min par indice';
-  document.getElementById('ans-pen').textContent=penaltyMin;
+  // Pénalité
+  if(penaltyActive){
+    document.getElementById('ic-penalty').style.display='block';
+    document.getElementById('ic-pen-val').textContent=penaltyMin;
+    document.getElementById('ans-pen').textContent=penaltyMin;
+    document.getElementById('topbar-pen').classList.add('visible');
+    document.getElementById('topbar-pen-val').textContent=penaltyMin;
+  }
 }
 
 // ── TUTORIEL ──
@@ -1074,8 +938,10 @@ function startGame(){
   secsLeft=60*60;secsUsed=0;totalPen=0;history=[];paused=false;warmingShown=false;
   npVals={indice:'',code:''};currentCardNum=null;
   document.getElementById('players-chip').textContent=players+' 🧑';
-  document.getElementById('ic-count').textContent='∞';
+  document.getElementById('topbar-ic-count').textContent='0';
+  document.getElementById('ic-count').textContent='0';
   document.getElementById('heat-fill').style.width='0%';
+  loupeStep=0;
   showScreen('s-game');
   updateTimer();
   clearInterval(timerInt);
@@ -1117,7 +983,7 @@ function updateHeat(){
 }
 
 function applyPenalty(min){
-  if(!min)return;
+  if(!penaltyActive||!min)return;
   secsLeft=Math.max(0,secsLeft-min*60);
   totalPen+=min;updateTimer();
   const t=document.getElementById('penalty-toast');
@@ -1162,15 +1028,14 @@ function continueGame(){
   document.getElementById('timer-sub').textContent='mode libre';
   showScreen('s-game');
 }
-function resetGame(){clearInterval(timerInt);if(bgMusic){bgMusic.pause();bgMusic.currentTime=0;}cartes={};codes={};glaciere=null;showScreen('s-missions');}
+function resetGame(){clearInterval(timerInt);if(bgMusic){bgMusic.pause();bgMusic.currentTime=0;}cartes={};codes={};glaciere=null;loupeStep=0;showScreen('s-missions');}
 
 // ── CONFETTI ──
 function launchConfetti(){
   const c=document.getElementById('confetti');c.innerHTML='';
   const colors=['#ff6600','#ffc84a','#00e676','#00d4ff','#ff4444','#ffffff','#ff88ff'];
   for(let i=0;i<80;i++){
-    const el=document.createElement('div');
-    el.className='confetto';
+    const el=document.createElement('div');el.className='confetto';
     el.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*1}s;border-radius:${Math.random()>0.5?'50%':'2px'}`;
     c.appendChild(el);
   }
@@ -1189,6 +1054,7 @@ function closePanel(id){
   if(id==='mecanisme'){stopCompass();stopGyro();}
   if(id==='micro'){stopMicro();}
   if(id==='scanner'){stopScanner();}
+  if(id==='loupe'){stopLoupe();}
 }
 
 // ── SEARCH HINT ──
@@ -1209,8 +1075,8 @@ function searchHint(){
   currentCardNum=num;
   const seen=history.find(h=>h.num===num);
   document.getElementById('hint-badge').textContent='CARTE N°'+num;
-  document.getElementById('hint-penalty').textContent=seen?'déjà consulté':'−'+penaltyMin+' min';
-  document.getElementById('hint-penalty').style.color=seen?'var(--muted)':'var(--red)';
+  document.getElementById('hint-penalty').textContent=seen?'déjà consulté':(penaltyActive?'−'+penaltyMin+' min':'sans pénalité');
+  document.getElementById('hint-penalty').style.color=seen?'var(--muted)':(penaltyActive?'var(--red)':'var(--green)');
   const imgEl=document.getElementById('hint-img');
   const ph=document.getElementById('hint-ph');
   if(card.image_url){imgEl.src=card.image_url;imgEl.style.display='block';ph.style.display='none';}
@@ -1219,7 +1085,14 @@ function searchHint(){
   if(card.caption){capEl.textContent=card.caption;capEl.style.display='block';}else{capEl.style.display='none';}
   if(cartes[num+100]) document.getElementById('hint-answer-btn').classList.add('visible');
   document.getElementById('hint-result').classList.add('visible');
-  if(!seen){applyPenalty(penaltyMin);history.unshift({num,label:card.caption||'Carte n°'+num});renderHistory();}
+  if(!seen){
+    applyPenalty(penaltyMin);
+    history.unshift({num,label:card.caption||'Carte n°'+num});
+    renderHistory();
+    const cnt=history.length;
+    document.getElementById('ic-count').textContent=cnt;
+    document.getElementById('topbar-ic-count').textContent=cnt;
+  }
   npVals.indice='';refreshND('indice');
 }
 
@@ -1252,24 +1125,34 @@ function renderHistory(){
 }
 function reloadHint(num){npVals.indice=String(num);searchHint();}
 
-// ── CODE MORSE ──
-function searchCode(){
-  const code=npVals.code;
-  document.getElementById('code-result').style.display='none';
-  document.getElementById('code-error').style.display='none';
-  if(!code)return;
-  const codeCard=cartes[parseInt('2'+code.padStart(2,'0'))];
-  if(codeCard&&codeCard.image_url){
-    const audio=document.getElementById('morse-audio');
-    audio.src=codeCard.image_url;
-    document.getElementById('code-result').style.display='block';
-    audio.play().catch(()=>{});
-  } else if(glaciere&&glaciere.music_url){
-    document.getElementById('code-error').style.display='block';
-  } else {
-    document.getElementById('code-error').style.display='block';
-  }
-  npVals.code='';refreshND('code');
+// ── MORSE (V4: play direct) ──
+function playMorse(){
+  const audio=document.getElementById('morse-audio');
+  const nofile=document.getElementById('morse-nofile');
+  const playing=document.getElementById('morse-playing');
+  const btn=document.getElementById('morse-play-btn');
+  // Cherche d'abord un morse lié à la glacière
+  const morseUrl=glaciere&&glaciere.morse_url?glaciere.morse_url:null;
+  if(!morseUrl){nofile.style.display='block';return;}
+  nofile.style.display='none';
+  audio.src=morseUrl;
+  audio.play().catch(()=>{});
+  playing.classList.add('visible');
+  btn.textContent='⏹ ARRÊTER';
+  btn.onclick=stopMorse;
+  audio.onended=()=>{
+    playing.classList.remove('visible');
+    btn.textContent='▶ RÉÉCOUTER';
+    btn.onclick=playMorse;
+  };
+}
+function stopMorse(){
+  const audio=document.getElementById('morse-audio');
+  audio.pause();audio.currentTime=0;
+  document.getElementById('morse-playing').classList.remove('visible');
+  const btn=document.getElementById('morse-play-btn');
+  btn.textContent='▶ ÉCOUTER LE MORSE';
+  btn.onclick=playMorse;
 }
 
 // ── MÉCANISME ──
@@ -1280,18 +1163,13 @@ function showMeca(type){
   if(type==='boussole'){document.getElementById('meca-boussole').style.display='block';startCompass();}
   if(type==='gyroscope'){document.getElementById('meca-gyroscope').style.display='block';startGyro();}
 }
-
 function startCompass(){
-  if(!window.DeviceOrientationEvent){return;}
+  if(!window.DeviceOrientationEvent)return;
   compassActive=true;
   window.addEventListener('deviceorientationabsolute',handleCompass,true);
   window.addEventListener('deviceorientation',handleCompass,true);
 }
-function stopCompass(){
-  compassActive=false;
-  window.removeEventListener('deviceorientationabsolute',handleCompass,true);
-  window.removeEventListener('deviceorientation',handleCompass,true);
-}
+function stopCompass(){compassActive=false;window.removeEventListener('deviceorientationabsolute',handleCompass,true);window.removeEventListener('deviceorientation',handleCompass,true);}
 function handleCompass(e){
   if(!compassActive)return;
   let deg=e.alpha||0;
@@ -1302,37 +1180,24 @@ function handleCompass(e){
   const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
   document.getElementById('compass-dir').textContent=dirs[Math.round(deg/22.5)%16];
 }
-
-function startGyro(){
-  if(!window.DeviceMotionEvent){return;}
-  gyroActive=true;
-  window.addEventListener('deviceorientation',handleGyro,true);
-}
-function stopGyro(){
-  gyroActive=false;
-  window.removeEventListener('deviceorientation',handleGyro,true);
-}
+function startGyro(){if(!window.DeviceMotionEvent)return;gyroActive=true;window.addEventListener('deviceorientation',handleGyro,true);}
+function stopGyro(){gyroActive=false;window.removeEventListener('deviceorientation',handleGyro,true);}
 function handleGyro(e){
   if(!gyroActive)return;
   const b=e.beta||0,g=e.gamma||0;
   const bx=Math.max(-45,Math.min(45,g));
   const by=Math.max(-45,Math.min(45,b));
-  const px=50+bx*(50/45);
-  const py=50+by*(50/45);
+  const px=50+bx*(50/45);const py=50+by*(50/45);
   document.getElementById('gyro-bubble').style.left=px+'%';
   document.getElementById('gyro-bubble').style.top=py+'%';
   document.getElementById('gyro-val').textContent='β: '+Math.round(b)+'° | γ: '+Math.round(g)+'°';
 }
 
-// ── MICRO ──
-function toggleMicro(){
-  if(microActive){stopMicro();}
-  else{startMicro();}
-}
+// ── MICRO (V4: mot → code auto) ──
+function toggleMicro(){if(microActive)stopMicro();else startMicro();}
 function startMicro(){
   if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
-    document.getElementById('micro-status').textContent='NON SUPPORTÉ SUR CE NAVIGATEUR';
-    return;
+    document.getElementById('micro-status').textContent='NON SUPPORTÉ SUR CE NAVIGATEUR';return;
   }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   recognition=new SR();
@@ -1340,8 +1205,14 @@ function startMicro(){
   recognition.onresult=e=>{
     const txt=e.results[0][0].transcript.toLowerCase().trim();
     const res=document.getElementById('micro-result');
-    res.textContent='🎤 Entendu : "'+txt+'" — Montrez ce mot à l\'organisateur pour valider !';
+    res.textContent='🎤 Entendu : "'+txt+'"';
     res.classList.add('visible');
+    // V4: cherche un code lié à ce mot dans Supabase
+    const matched=Object.values(cartes).find(c=>c.caption&&c.caption.toLowerCase()===txt&&c.numero>=200);
+    if(matched&&matched.caption_code){
+      document.getElementById('micro-code-val').textContent=matched.caption_code;
+      document.getElementById('micro-code-reveal').style.display='block';
+    }
     stopMicro();
   };
   recognition.onerror=()=>stopMicro();
@@ -1349,7 +1220,6 @@ function startMicro(){
   microActive=true;
   document.getElementById('micro-status').textContent='🔴 EN ÉCOUTE...';
   document.getElementById('micro-btn').textContent='⏹ ARRÊTER';
-  document.getElementById('micro-wave').style.borderColor='var(--red)';
 }
 function stopMicro(){
   if(recognition)recognition.stop();
@@ -1367,7 +1237,6 @@ async function startScanner(){
     document.getElementById('scanner-ph').style.display='none';
     document.getElementById('scanner-btn').textContent='⏹ ARRÊTER';
     document.getElementById('scanner-btn').onclick=stopScanner;
-    // Simple QR detection via intervalle (basic)
     scanQR();
   }catch(e){document.getElementById('scanner-ph').textContent='❌ Impossible d\'accéder à la caméra';}
 }
@@ -1379,20 +1248,96 @@ function stopScanner(){
   document.getElementById('scanner-btn').onclick=startScanner;
 }
 function scanQR(){
-  // Le scanning réel nécessite une lib externe - on affiche le résultat si trouvé
-  // Pour l'instant on utilise l'URL si le QR contient du texte
   const v=document.getElementById('scanner-video');
   if(!v.srcObject)return;
   const canvas=document.createElement('canvas');
-  canvas.width=v.videoWidth;canvas.height=v.videoHeight;
   const ctx=canvas.getContext('2d');
   const check=setInterval(()=>{
     if(!scannerStream){clearInterval(check);return;}
+    canvas.width=v.videoWidth;canvas.height=v.videoHeight;
     ctx.drawImage(v,0,0);
-    // Afficher message si caméra active
-    document.getElementById('scanner-result').textContent='📷 Caméra active — Pointez vers le QR code caché dans la glacière !';
+    document.getElementById('scanner-result').textContent='📷 Caméra active — Pointez vers le QR code !';
     document.getElementById('scanner-result').classList.add('visible');
   },1000);
+}
+
+// ── LOUPE V4 (filtres caméra) ──
+async function startLoupe(){
+  try{
+    loupeStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    const v=document.getElementById('loupe-video');
+    v.srcObject=loupeStream;v.style.display='block';
+    document.getElementById('loupe-ph').style.display='none';
+    document.getElementById('loupe-start-btn').style.display='none';
+    document.getElementById('loupe-stop-btn').style.display='block';
+    document.getElementById('loupe-info').classList.add('visible');
+    // Badge loupe N
+    if(loupeConfigs.length>1){
+      const badge=document.getElementById('loupe-step-badge');
+      badge.textContent='LOUPE '+(loupeStep+1)+' / '+loupeConfigs.length;
+      badge.classList.add('visible');
+    }
+    applyLoupeFilter();
+  }catch(e){document.getElementById('loupe-ph').textContent='❌ Impossible d\'accéder à la caméra';document.getElementById('loupe-ph').style.display='block';}
+}
+
+function applyLoupeFilter(){
+  const v=document.getElementById('loupe-video');
+  const canvas=document.getElementById('loupe-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.style.display='block';
+  const cfg=loupeConfigs[loupeStep]||{filtre:'contraste'};
+
+  function renderFrame(){
+    if(!loupeStream){return;}
+    canvas.width=v.videoWidth||320;
+    canvas.height=v.videoHeight||240;
+    ctx.drawImage(v,0,0,canvas.width,canvas.height);
+    const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
+    const data=imageData.data;
+
+    if(cfg.filtre==='rouge'){
+      // Supprime rouge → révèle texte rouge sur fond rouge
+      for(let i=0;i<data.length;i+=4){
+        const r=data[i],g=data[i+1],b=data[i+2];
+        if(r>150&&g<100&&b<100){data[i]=0;data[i+1]=0;data[i+2]=0;}
+        else{data[i]=255;data[i+1]=255;data[i+2]=255;}
+      }
+    } else if(cfg.filtre==='vert'){
+      // Supprime vert
+      for(let i=0;i<data.length;i+=4){
+        const r=data[i],g=data[i+1],b=data[i+2];
+        if(g>150&&r<100&&b<100){data[i]=0;data[i+1]=0;data[i+2]=0;}
+        else{data[i]=255;data[i+1]=255;data[i+2]=255;}
+      }
+    } else {
+      // Contraste extrême N&B (défaut)
+      for(let i=0;i<data.length;i+=4){
+        const avg=(data[i]+data[i+1]+data[i+2])/3;
+        const v2=avg<240?0:255;
+        data[i]=v2;data[i+1]=v2;data[i+2]=v2;
+      }
+    }
+    ctx.putImageData(imageData,0,0);
+    loupeAnimFrame=requestAnimationFrame(renderFrame);
+  }
+  renderFrame();
+}
+
+function stopLoupe(){
+  if(loupeAnimFrame)cancelAnimationFrame(loupeAnimFrame);
+  if(loupeStream)loupeStream.getTracks().forEach(t=>t.stop());
+  loupeStream=null;
+  document.getElementById('loupe-video').style.display='none';
+  document.getElementById('loupe-canvas').style.display='none';
+  document.getElementById('loupe-ph').style.display='block';
+  document.getElementById('loupe-ph').textContent='🔍 Activez la loupe pour révéler les secrets';
+  document.getElementById('loupe-start-btn').style.display='block';
+  document.getElementById('loupe-stop-btn').style.display='none';
+  document.getElementById('loupe-info').classList.remove('visible');
+  document.getElementById('loupe-step-badge').classList.remove('visible');
+  // Avance à la loupe suivante (linéaire)
+  if(loupeConfigs.length>0) loupeStep=Math.min(loupeStep+1,loupeConfigs.length-1);
 }
 
 // ── AUDIO ──
@@ -1420,7 +1365,7 @@ function playWarmingSound(){
   });
 }
 
-// ── PHOTO SOUVENIR ──
+// ── PHOTO SOUVENIR V4 ──
 function goPhoto(){showScreen('s-photo');}
 async function openCamera(){
   try{
@@ -1438,46 +1383,54 @@ function capturePhoto(){
   const canvas=document.getElementById('canvas-preview');
   const size=600;canvas.width=size;canvas.height=size;
   const ctx=canvas.getContext('2d');
-  // Carré centré
   const vw=video.videoWidth,vh=video.videoHeight;
   const side=Math.min(vw,vh);
   const sx=(vw-side)/2,sy=(vh-side)/2;
+  // Photo miroir
   ctx.save();ctx.scale(-1,1);ctx.drawImage(video,sx,sy,side,side,-size,0,size,size);ctx.restore();
+
+  // Gradient haut pour lisibilité du texte
+  const gradTop=ctx.createLinearGradient(0,0,0,size*0.38);
+  gradTop.addColorStop(0,'rgba(7,17,31,0.85)');
+  gradTop.addColorStop(1,'rgba(7,17,31,0)');
+  ctx.fillStyle=gradTop;ctx.fillRect(0,0,size,size*0.38);
+
   // Gradient bas
-  const grad=ctx.createLinearGradient(0,size*0.5,0,size);
-  grad.addColorStop(0,'rgba(7,17,31,0)');grad.addColorStop(1,'rgba(7,17,31,0.9)');
-  ctx.fillStyle=grad;ctx.fillRect(0,0,size,size);
-  // Bordure accent
-  const ac=glaciere?.couleur_accent||'#ff6600';
-  ctx.strokeStyle=ac;ctx.lineWidth=6;ctx.strokeRect(3,3,size-6,size-6);
-  // Coins
-  [[0,0],[size,0],[0,size],[size,size]].forEach(([x,y])=>{
-    ctx.beginPath();ctx.strokeStyle=ac;ctx.lineWidth=4;
-    const dx=x===0?24:-24,dy=y===0?24:-24;
-    const ox=x===0?6:-6,oy=y===0?6:-6;
-    ctx.moveTo(x+ox+dx,y+oy);ctx.lineTo(x+ox,y+oy);ctx.lineTo(x+ox,y+oy+dy);ctx.stroke();
-  });
-  // Texte mission
-  const mission=glaciere?.nom||'On a sauvé les Bronzés !';
-  ctx.fillStyle='#fff';ctx.font='bold 22px Outfit,sans-serif';ctx.textAlign='center';
-  ctx.shadowColor='rgba(0,0,0,.8)';ctx.shadowBlur=8;
-  ctx.fillText('On a sauvé les Bronzés ! 🍺',size/2,size-60);
-  // Stats
+  const gradBot=ctx.createLinearGradient(0,size*0.55,0,size);
+  gradBot.addColorStop(0,'rgba(7,17,31,0)');gradBot.addColorStop(1,'rgba(7,17,31,0.9)');
+  ctx.fillStyle=gradBot;ctx.fillRect(0,0,size,size);
+
+  // ── TEXTE HAUT V4 ──
+  ctx.textAlign='center';ctx.shadowColor='rgba(0,0,0,0.95)';ctx.shadowBlur=12;
+
+  // "MISSION APÉRO" en orange
+  ctx.fillStyle='#ff6600';
+  ctx.font='bold 66px "Bebas Neue",Impact,sans-serif';
+  ctx.fillText('MISSION APÉRO',size/2,70);
+
+  // "by Smart Escape Game" en blanc
+  ctx.fillStyle='#ffffff';
+  ctx.shadowBlur=8;
+  ctx.font='500 17px "Outfit",Arial,sans-serif';
+  ctx.fillText('by Smart Escape Game',size/2,97);
+
+  // ── TEXTE BAS ──
+  ctx.shadowColor='rgba(0,0,0,.9)';ctx.shadowBlur=10;
+  const missionNom=glaciere?.nom_escape||'Mission Apéro';
+  ctx.fillStyle='#fff';
+  ctx.font='bold 20px "Outfit",Arial,sans-serif';
+  ctx.fillText(missionNom+' 🍺',size/2,size-62);
+
   const tu=durMin*60-secsLeft;
   const mm=Math.floor(tu/60).toString().padStart(2,'0');
   const ss=(tu%60).toString().padStart(2,'0');
-  ctx.fillStyle=ac;ctx.font='bold 16px Outfit,sans-serif';
-  ctx.fillText('⏱ '+mm+':'+ss+'  🃏 '+history.length+' indice'+(history.length>1?'s':''),size/2,size-32);
-  // Logo
-  if(glaciere?.logo_url){
-    const logo=new Image();logo.crossOrigin='anonymous';
-    logo.onload=()=>{ctx.drawImage(logo,size/2-22,8,44,44);finalizePhoto(canvas);};
-    logo.onerror=()=>finalizePhoto(canvas);
-    logo.src=glaciere.logo_url;
-  } else {
-    ctx.font='32px serif';ctx.fillText('🧊',size/2,46);
-    finalizePhoto(canvas);
-  }
+  const ac=glaciere?.couleur_accent||'#ff6600';
+  ctx.fillStyle=ac;
+  ctx.font='bold 15px "Outfit",Arial,sans-serif';
+  ctx.fillText('⏱ '+mm+':'+ss+'  🃏 '+history.length+' indice'+(history.length>1?'s':''),size/2,size-34);
+
+  ctx.shadowBlur=0;
+  finalizePhoto(canvas);
   if(window._camStream)window._camStream.getTracks().forEach(t=>t.stop());
   video.style.display='none';
   document.getElementById('capture-btn').classList.remove('visible');
@@ -1495,7 +1448,7 @@ async function sharePhoto(){
   const blob=await(await fetch(photoDataUrl)).blob();
   const file=new File([blob],'mission-apero-souvenir.jpg',{type:'image/jpeg'});
   if(navigator.share&&navigator.canShare({files:[file]})){
-    try{await navigator.share({files:[file],title:'Mission Apéro 🧊',text:'On a sauvé les Bronzés ! 🎉🍺'});}catch(e){}
+    try{await navigator.share({files:[file],title:'Mission Apéro 🧊',text:'On a réussi la mission ! 🎉🍺'});}catch(e){}
   } else {
     const a=document.createElement('a');a.href=photoDataUrl;a.download='mission-apero-souvenir.jpg';a.click();
   }
