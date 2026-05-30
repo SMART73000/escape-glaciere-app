@@ -76,9 +76,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mission-type.anniv{background:rgba(200,0,200,.3);color:#ff88ff;border:1px solid rgba(200,0,200,.4);}
 .mission-title{font-family:var(--fd);font-size:26px;letter-spacing:3px;color:#fff;line-height:1;}
 .mission-name{font-size:13px;color:rgba(255,255,255,0.75);margin-top:4px;font-weight:500;}
-/* V4: emoji bière devant la barre orange */
-.mission-emoji{position:absolute;top:16px;right:16px;font-size:32px;}
-.mission-bar{position:absolute;top:12px;left:12px;background:rgba(255,102,0,.85);border-radius:6px;padding:3px 10px;font-size:11px;letter-spacing:1px;color:#fff;font-weight:700;display:flex;align-items:center;gap:5px;}
+/* V4: emoji bière + barre orange en bas sans superposition */
+.mission-emoji{position:absolute;top:14px;right:14px;font-size:28px;z-index:3;}
+.mission-bar{display:none;}
+.mission-badge{position:absolute;top:12px;left:12px;background:rgba(255,102,0,.9);border-radius:6px;padding:4px 10px;font-size:10px;letter-spacing:1px;color:#fff;font-weight:700;z-index:3;}
 
 /* ── TUTORIEL ── */
 .tuto-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.9);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px;}
@@ -187,18 +188,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
 .timer-sub{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:3px;}
 
-/* Cercle déco autour du chrono */
+/* Cercle déco autour du chrono - V4 agrandi */
 .timer-ring{
-  width:130px;height:130px;border-radius:50%;
-  border:2px solid rgba(255,102,0,.25);
+  width:175px;height:175px;border-radius:50%;
+  border:2px solid rgba(255,102,0,.3);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:radial-gradient(circle,rgba(255,102,0,.04),transparent);
+  background:radial-gradient(circle,rgba(255,102,0,.06),transparent);
   position:relative;
 }
 .timer-ring::before{
-  content:'';position:absolute;inset:-8px;border-radius:50%;
-  border:1px solid rgba(255,102,0,.1);
+  content:'';position:absolute;inset:-10px;border-radius:50%;
+  border:1px solid rgba(255,102,0,.12);
 }
+.timer{font-family:var(--fd);font-size:56px;letter-spacing:2px;color:#fff;line-height:1;transition:color .4s;}
 
 /* V4: boutons ronds */
 .action-btn{
@@ -428,7 +430,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #s-photo{align-items:center;justify-content:center;padding:20px 16px;gap:14px;}
 .photo-title{font-family:var(--fd);font-size:24px;letter-spacing:3px;color:var(--gold);text-align:center;}
 .photo-sub{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;}
-#video-preview{width:100%;max-width:340px;border-radius:14px;display:none;border:2px solid var(--accent);}
+#video-preview{width:100%;max-width:340px;border-radius:14px;display:none;}
 .capture-btn{width:72px;height:72px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,.15);font-size:28px;cursor:pointer;display:none;align-items:center;justify-content:center;}
 .capture-btn.visible{display:flex;}
 .capture-btn:active{transform:scale(.9);}
@@ -523,8 +525,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <!-- V4: Topbar avec logo grand + indices + joueurs grand -->
   <div class="topbar">
     <div id="topbar-lock-wrap">
-      <img class="topbar-logo" id="topbar-logo" src="" alt="">
-      <div class="topbar-lock" id="topbar-lock" style="display:block">🔒</div>
+      <img class="topbar-logo" id="topbar-logo" src="" alt="" style="display:none;">
+      <div class="topbar-lock" id="topbar-lock" style="display:block;font-size:32px;">🔒</div>
     </div>
     <div class="topbar-center">
       <div class="topbar-indices">
@@ -595,16 +597,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </button>
     </div>
 
-    <!-- Compteur indices -->
-    <div class="indice-counter">
-      <div>
-        <div class="ic-left">Indices consultés</div>
-        <div class="ic-penalty" id="ic-penalty" style="display:none">−<span id="ic-pen-val">2</span> min par indice</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <div class="ic-count" id="ic-count">0</div>
-      </div>
-    </div>
+    <!-- Compteur indices SUPPRIMÉ - visible uniquement dans le header -->
   </div>
 
   <div class="bottom-bar">
@@ -858,7 +851,7 @@ function renderMissions(gs){
       <div class="mission-bg" style="background:${bg}"></div>
       <div class="mission-overlay"></div>
       <div class="mission-emoji">${isAnniv?'🌺':'🍺'}</div>
-      <div class="mission-bar"><span>🍺</span>${typeLabel}</div>
+      <div class="mission-badge">🍺 ${typeLabel}</div>
       <div class="mission-content">
         <div class="mission-title">${g.nom_escape||'MISSION APÉRO'}</div>
         <div class="mission-name">${g.nom}</div>
@@ -906,6 +899,8 @@ function applyBranding(){
     });
     document.getElementById('setup-ice').style.display='none';
     document.getElementById('topbar-lock').style.display='none';
+  } else {
+    document.getElementById('topbar-lock').style.display='block';
   }
   const missionName=glaciere.nom_escape||'MISSION APÉRO';
   document.getElementById('brand-name').innerHTML=missionName.toUpperCase().replace(' ','<br>');
