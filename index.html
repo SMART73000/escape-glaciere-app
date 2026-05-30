@@ -1281,32 +1281,35 @@ function applyLoupeFilter(){
   const canvas=document.getElementById('loupe-canvas');
   const ctx=canvas.getContext('2d');
   canvas.style.display='block';
+  v.style.display='none';
   const cfg=loupeConfigs[loupeStep]||{filtre:'contraste'};
 
   function renderFrame(){
     if(!loupeStream){return;}
-    canvas.width=v.videoWidth||320;
-    canvas.height=v.videoHeight||240;
+    if(v.videoWidth>0&&v.videoHeight>0){
+      canvas.width=v.videoWidth;
+      canvas.height=v.videoHeight;
+    } else {
+      loupeAnimFrame=requestAnimationFrame(renderFrame);
+      return;
+    }
     ctx.drawImage(v,0,0,canvas.width,canvas.height);
     const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
     const data=imageData.data;
 
     if(cfg.filtre==='rouge'){
-      // Supprime rouge → révèle texte rouge sur fond rouge
       for(let i=0;i<data.length;i+=4){
         const r=data[i],g=data[i+1],b=data[i+2];
         if(r>150&&g<100&&b<100){data[i]=0;data[i+1]=0;data[i+2]=0;}
         else{data[i]=255;data[i+1]=255;data[i+2]=255;}
       }
     } else if(cfg.filtre==='vert'){
-      // Supprime vert
       for(let i=0;i<data.length;i+=4){
         const r=data[i],g=data[i+1],b=data[i+2];
         if(g>150&&r<100&&b<100){data[i]=0;data[i+1]=0;data[i+2]=0;}
         else{data[i]=255;data[i+1]=255;data[i+2]=255;}
       }
     } else {
-      // Contraste extrême N&B (défaut)
       for(let i=0;i<data.length;i+=4){
         const avg=(data[i]+data[i+1]+data[i+2])/3;
         const v2=avg<240?0:255;
@@ -1316,7 +1319,12 @@ function applyLoupeFilter(){
     ctx.putImageData(imageData,0,0);
     loupeAnimFrame=requestAnimationFrame(renderFrame);
   }
-  renderFrame();
+  v.onloadedmetadata=()=>{
+    canvas.width=v.videoWidth;
+    canvas.height=v.videoHeight;
+    renderFrame();
+  };
+  if(v.readyState>=2) renderFrame();
 }
 
 function stopLoupe(){
