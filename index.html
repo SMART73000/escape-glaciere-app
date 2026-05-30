@@ -936,7 +936,6 @@ function startGame(){
   npVals={indice:'',code:''};currentCardNum=null;
   document.getElementById('players-chip').textContent=players+' 🧑';
   document.getElementById('topbar-ic-count').textContent='0';
-  document.getElementById('ic-count').textContent='0';
   document.getElementById('heat-fill').style.width='0%';
   loupeStep=0;
   showScreen('s-game');
@@ -1087,7 +1086,6 @@ function searchHint(){
     history.unshift({num,label:card.caption||'Carte n°'+num});
     renderHistory();
     const cnt=history.length;
-    document.getElementById('ic-count').textContent=cnt;
     document.getElementById('topbar-ic-count').textContent=cnt;
   }
   npVals.indice='';refreshND('indice');
