@@ -912,8 +912,10 @@ function applyBranding(){
   }
   // Pénalité
   if(penaltyActive){
-    document.getElementById('ic-penalty').style.display='block';
-    document.getElementById('ic-pen-val').textContent=penaltyMin;
+    const icPen=document.getElementById('ic-penalty');
+    if(icPen){icPen.style.display='block';}
+    const icPenVal=document.getElementById('ic-pen-val');
+    if(icPenVal){icPenVal.textContent=penaltyMin;}
     document.getElementById('ans-pen').textContent=penaltyMin;
     document.getElementById('topbar-pen').classList.add('visible');
     document.getElementById('topbar-pen-val').textContent=penaltyMin;
