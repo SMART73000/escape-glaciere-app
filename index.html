@@ -202,23 +202,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .timer{font-family:var(--fd);font-size:56px;letter-spacing:2px;color:#fff;line-height:1;transition:color .4s;}
 
-/* V4: boutons ronds */
+/* V4: boutons ronds - taille réduite pour tout rentrer */
 .action-btn{
-  width:92px;height:92px;border-radius:50%;
+  width:82px;height:82px;border-radius:50%;
   border:2px solid var(--border2);background:var(--card);
   color:#fff;cursor:pointer;transition:all .2s;
   text-align:center;position:relative;overflow:hidden;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   flex-shrink:0;
 }
 .action-btn::before{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(circle at center,rgba(255,255,255,.1),transparent);transition:opacity .2s;border-radius:50%;}
 .action-btn:active::before{opacity:1;}
 .action-btn:active{transform:scale(.92);}
-.action-emoji{font-size:22px;display:block;}
-.action-label{font-family:var(--fd);font-size:11px;letter-spacing:1.5px;}
+.action-emoji{font-size:20px;display:block;}
+.action-label{font-family:var(--fd);font-size:10px;letter-spacing:1.5px;}
 .action-sub{font-size:8px;color:var(--muted);display:none;}
 
-/* V4: positions dans la grille */
+/* V4: positions dans la grille - rapprochées du chrono */
 .btn-indice{grid-column:1;grid-row:1;}
 .btn-meca{grid-column:3;grid-row:1;}
 .btn-code{grid-column:1;grid-row:3;}
@@ -235,10 +235,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .action-btn.micro .action-label{color:var(--red);}
 
 /* Lignes reliant les boutons (style Unlock) */
-.grid-line-h1,.grid-line-h2{grid-column:2;background:rgba(255,102,0,.15);height:1px;width:40px;}
+.grid-line-h1,.grid-line-h2{grid-column:2;background:rgba(255,102,0,.15);height:1px;width:24px;}
 .grid-line-h1{grid-row:1;align-self:center;}
 .grid-line-h2{grid-row:3;align-self:center;}
-.grid-line-v1,.grid-line-v2{grid-row:2;background:rgba(255,102,0,.15);width:1px;height:40px;}
+.grid-line-v1,.grid-line-v2{grid-row:2;background:rgba(255,102,0,.15);width:1px;height:24px;}
 .grid-line-v1{grid-column:1;justify-self:end;margin-right:-1px;}
 .grid-line-v2{grid-column:3;justify-self:start;margin-left:-1px;}
 
@@ -252,11 +252,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .action-btn.scanner .action-label{color:#cc88ff;font-size:14px;letter-spacing:2px;}
 .action-btn.scanner .action-emoji{font-size:20px;}
 
-/* Loupe */
+/* Loupe - blanc */
 .action-btn.loupe{
-  border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.06);
+  border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.06);
 }
-.action-btn.loupe .action-label{color:#00d4ff;}
+.action-btn.loupe .action-label{color:#ffffff;}
 
 /* Compteur indices compact sous le cercle */
 .indice-counter{
@@ -557,7 +557,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <!-- Haut droite -->
         <button class="action-btn mecanisme btn-meca" onclick="openPanel('mecanisme')">
           <span class="action-emoji">⚙️</span>
-          <div class="action-label">MÉCA</div>
+          <div class="action-label">MACHINE</div>
         </button>
         <!-- Ligne gauche -->
         <div class="grid-line-v1"></div>
@@ -660,7 +660,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <!-- PANEL MÉCANISME -->
 <div class="panel-overlay" id="panel-mecanisme">
   <div class="panel">
-    <div class="panel-header"><div class="panel-title" style="color:#00d4ff">⚙️ MÉCANISME</div><button class="panel-close" onclick="closePanel('mecanisme')">Fermer</button></div>
+    <div class="panel-header"><div class="panel-title" style="color:#00d4ff">⚙️ MACHINE</div><button class="panel-close" onclick="closePanel('mecanisme')">Fermer</button></div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">Choisissez l'outil correspondant à votre carte rouage ⚙️</div>
     <div class="meca-grid">
       <button class="meca-btn" onclick="showMeca('boussole')"><span class="meca-emoji">🧭</span><div class="meca-label">BOUSSOLE</div></button>
@@ -910,7 +910,22 @@ function applyBranding(){
     document.getElementById('brief-title').textContent=glaciere.nom_escape||'🧊 MISSION';
     document.getElementById('read-brief-btn').style.display='block';
   }
-  // Pénalité
+  // Fond écran de jeu
+  if(glaciere.game_bg_url){
+    document.getElementById('s-game').style.backgroundImage='url('+glaciere.game_bg_url+')';
+    document.getElementById('s-game').style.backgroundSize='cover';
+    document.getElementById('s-game').style.backgroundPosition='center';
+  }
+  // Fond écran pause
+  if(glaciere.pause_bg_url){
+    document.getElementById('pause-overlay').style.backgroundImage='url('+glaciere.pause_bg_url+')';
+    document.getElementById('pause-overlay').style.backgroundSize='cover';
+    document.getElementById('pause-overlay').style.backgroundPosition='center';
+  }
+  // Citation victoire
+  if(glaciere.citation_victoire){
+    document.getElementById('victory-quote').textContent='"'+glaciere.citation_victoire+'"';
+  }
   if(penaltyActive){
     const icPen=document.getElementById('ic-penalty');
     if(icPen){icPen.style.display='block';}
