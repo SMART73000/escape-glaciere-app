@@ -750,7 +750,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="confetti-container" id="confetti"></div>
   <div class="victory-emoji">🎉</div>
   <div class="victory-title">MISSION<br>ACCOMPLIE !</div>
-  <div class="victory-quote">"On sait jamais, sur un malentendu ça peut marcher !" 😄</div>
+  <div class="victory-quote" id="victory-quote"></div>
   <div class="stats-box">
     <div class="stat-row"><span class="stat-label">Joueurs</span><span class="stat-val" id="v-players">—</span></div>
     <div class="stat-row"><span class="stat-label">Temps réalisé</span><span class="stat-val" id="v-time">—</span></div>
@@ -938,11 +938,9 @@ function applyBranding(){
       document.getElementById('pause-overlay').style.backgroundImage='none';
     }
   }catch(e){}
-  // Citation victoire
   try{
-    if(glaciere.citation_victoire){
-      document.getElementById('victory-quote').textContent='"'+glaciere.citation_victoire+'"';
-    }
+    const citation=glaciere.citation_victoire||'On sait jamais, sur un malentendu ça peut marcher !';
+    document.getElementById('victory-quote').textContent='"'+citation+'"';
   }catch(e){}
   if(penaltyActive){
     const icPen=document.getElementById('ic-penalty');
