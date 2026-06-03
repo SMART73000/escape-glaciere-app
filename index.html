@@ -847,7 +847,7 @@ function renderMissions(gs){
     // V4: emoji 🍺 devant la barre
     const typeLabel=isAnniv?'🎂 Mission Anniversaire':'🍺 Mission Apéro';
     const bg=g.mission_bg_url?`url(${g.mission_bg_url})`:(isAnniv?'linear-gradient(135deg,#cc00aa,#ff88ff)':'linear-gradient(135deg,#ff6600,#ffaa00)');
-    return `<div class="mission-card" onclick="selectMission('${g.id}')">
+    return `<div class="mission-card" data-id="${g.id}" onclick="selectMissionById(this)">
       <div class="mission-bg" style="background:${bg}"></div>
       <div class="mission-overlay"></div>
       <div class="mission-emoji">${isAnniv?'🌺':'🍺'}</div>
@@ -858,6 +858,11 @@ function renderMissions(gs){
       </div>
     </div>`;
   }).join('');
+}
+
+function selectMissionById(el){
+  const id=el.dataset.id;
+  selectMission(id);
 }
 
 async function selectMission(id){
