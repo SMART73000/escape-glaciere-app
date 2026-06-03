@@ -67,9 +67,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .mission-card:active{transform:scale(.97);}
 .mission-card:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.4);}
-.mission-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(0.55);background-size:150% !important;transition:filter .3s;}
+.mission-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(0.55);background-size:150% !important;transition:filter .3s;pointer-events:none;}
 .mission-card:hover .mission-bg{filter:brightness(0.7);}
-.mission-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 100%);}
+.mission-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.1) 100%);pointer-events:none;}
 .mission-content{position:relative;z-index:2;padding:14px 18px;height:100%;display:flex;flex-direction:column;justify-content:flex-start;}
 .mission-type{font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;padding:3px 10px;border-radius:4px;display:inline-block;margin-bottom:8px;backdrop-filter:blur(4px);}
 .mission-type.apero{background:rgba(255,102,0,.3);color:#ffaa66;border:1px solid rgba(255,102,0,.4);}
