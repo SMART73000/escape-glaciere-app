@@ -230,7 +230,12 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           </div>
         </div>
 
-        <!-- SYNOPSIS -->
+        <!-- CITATION VICTOIRE -->
+        <div class="bo-sec">
+          <span class="bo-stitle">🏆 Citation Victoire</span>
+          <div class="info-box green">💬 Cette phrase s'affiche sur l'écran "Mission Accomplie" — personnalisez-la pour chaque mission !</div>
+          <div class="bo-field"><label>Citation de victoire</label><input type="text" class="bo-input" id="e-citation" placeholder="ex: On sait jamais, sur un malentendu ça peut marcher !"></div>
+        </div>
         <div class="bo-sec">
           <span class="bo-stitle">📖 Briefing & Synopsis</span>
           <div class="info-box">💡 Ce texte s'affiche quand les joueurs cliquent sur "Lire le briefing".</div>
@@ -245,7 +250,15 @@ textarea.bo-input{resize:vertical;min-height:90px;}
             <div class="upload-zone" id="logo-zone"><input type="file" accept="image/*" onchange="handleImg(event,'logo')"><img class="uz-preview-img" id="logo-preview"><div class="uz-label" id="logo-label"><span>🖼</span>Uploader votre logo</div></div>
           </div>
           <div class="bo-field">
-            <label>Image de fond (écran sélection de missions)</label>
+            <label>🎮 Image de fond écran de JEU</label>
+            <div class="info-box blue">🎨 S'affiche derrière les boutons pendant la partie</div>
+            <div class="upload-zone" id="gamebg-zone"><input type="file" accept="image/*" onchange="handleImg(event,'gamebg')"><img class="uz-preview-img" id="gamebg-preview" style="max-width:100%;max-height:80px;"><div class="uz-label" id="gamebg-label"><span>🎮</span>Image de fond écran de jeu</div></div>
+          </div>
+          <div class="bo-field">
+            <label>⏸ Image de fond écran PAUSE</label>
+            <div class="info-box blue">🎨 S'affiche quand le jeu est en pause</div>
+            <div class="upload-zone" id="pausebg-zone"><input type="file" accept="image/*" onchange="handleImg(event,'pausebg')"><img class="uz-preview-img" id="pausebg-preview" style="max-width:100%;max-height:80px;"><div class="uz-label" id="pausebg-label"><span>⏸</span>Image de fond écran pause</div></div>
+          </div>
             <div class="info-box blue">🎨 Image thématique 800x400px recommandée</div>
             <div class="upload-zone" id="bg-zone"><input type="file" accept="image/*" onchange="handleImg(event,'bg')"><img class="uz-preview-img" id="bg-preview" style="max-width:100%;max-height:80px;"><div class="uz-label" id="bg-label"><span>🖼</span>Image de fond thématique</div></div>
           </div>
@@ -412,9 +425,9 @@ const SUPABASE_KEY = 'sb_publishable_2TzK9VfplPjCRi_WhPj4nA_BooLFTQs';
 
 const PIN_KEY='bo_pin_v4';
 let editingId=null, cardCtr=0;
-let musicFile=null, bipFile=null, morseFile=null, logoFile=null, bgFile=null;
+let musicFile=null, bipFile=null, morseFile=null, logoFile=null, bgFile=null, gameBgFile=null, pauseBgFile=null;
 let loupeFiles={1:null,2:null,3:null};
-let existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:''};
+let existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:'',gamebg:'',pausebg:''};
 
 function getPin(){return localStorage.getItem(PIN_KEY)||'1234';}
 function checkPin(){
@@ -546,9 +559,11 @@ async function editGlaciere(id){
       b.classList.remove('on');
       if(b.textContent.includes(pm)) b.classList.add('on');
     });
+    document.getElementById('e-citation').value=g.citation_victoire||'';
     existingUrls={
       music:g.music_url||'',bip:g.bip_url||'',morse:g.morse_url||'',
       logo:g.logo_url||'',bg:g.mission_bg_url||'',
+      gamebg:g.game_bg_url||'',pausebg:g.pause_bg_url||'',
       loupe1:g.loupe1_url||'',loupe2:g.loupe2_url||'',loupe3:g.loupe3_url||''
     };
     // Filtres loupe
@@ -557,7 +572,7 @@ async function editGlaciere(id){
     if(g.loupe3_filtre) setFiltreById(3,g.loupe3_filtre);
     if(g.couleur_accent){syncColor('accent',g.couleur_accent);document.querySelector('#sw-accent input').value=g.couleur_accent;document.getElementById('hex-accent').value=g.couleur_accent.toUpperCase();}
     if(g.couleur_bg){syncColor('bg',g.couleur_bg);document.querySelector('#sw-bg input').value=g.couleur_bg;document.getElementById('hex-bg').value=g.couleur_bg.toUpperCase();}
-    ['logo','bg','music','bip','morse','loupe1','loupe2','loupe3'].forEach(k=>{
+    ['logo','bg','gamebg','pausebg','music','bip','morse','loupe1','loupe2','loupe3'].forEach(k=>{
       const url=existingUrls[k];
       if(url){
         const el=document.getElementById(k+'-preview');
@@ -600,12 +615,16 @@ async function saveGlaciere(){
   const loupe3Filtre=document.getElementById('loupe3-filtre').value;
   if(!nom||!slug){alert('Nom et slug obligatoires !');return;}
 
+  const citation=document.getElementById('e-citation').value.trim();
   let logoUrl=existingUrls.logo,bgUrl=existingUrls.bg,musicUrl=existingUrls.music,bipUrl=existingUrls.bip,morseUrl=existingUrls.morse;
   let loupe1Url=existingUrls.loupe1,loupe2Url=existingUrls.loupe2,loupe3Url=existingUrls.loupe3;
+  let gameBgUrl=existingUrls.gamebg,pauseBgUrl=existingUrls.pausebg;
 
   try{
     if(logoFile) logoUrl=await uploadFile(logoFile,'logo_'+slug);
     if(bgFile) bgUrl=await uploadFile(bgFile,'bg_'+slug);
+    if(gameBgFile) gameBgUrl=await uploadFile(gameBgFile,'gamebg_'+slug);
+    if(pauseBgFile) pauseBgUrl=await uploadFile(pauseBgFile,'pausebg_'+slug);
     if(musicFile) musicUrl=await uploadFile(musicFile,'music_'+slug);
     if(bipFile) bipUrl=await uploadFile(bipFile,'bip_'+slug);
     if(morseFile) morseUrl=await uploadFile(morseFile,'morse_'+slug);
@@ -634,8 +653,10 @@ async function saveGlaciere(){
       nom,slug,nom_escape:escape||null,telephone:tel||null,
       penalty_min:penalty,penalite_active:penaliteActive,
       couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,
+      citation_victoire:citation||null,
       music_url:musicUrl||null,bip_url:bipUrl||null,morse_url:morseUrl||null,
       mission_bg_url:bgUrl||null,
+      game_bg_url:gameBgUrl||null,pause_bg_url:pauseBgUrl||null,
       loupe1_filtre:loupe1Filtre,loupe1_url:loupe1Url||null,
       loupe2_filtre:loupe2Filtre,loupe2_url:loupe2Url||null,
       loupe3_filtre:loupe3Filtre,loupe3_url:loupe3Url||null,
@@ -751,6 +772,8 @@ function handleImg(event,type){
   const file=event.target.files[0];if(!file)return;
   if(type==='logo') logoFile=file;
   else if(type==='bg') bgFile=file;
+  else if(type==='gamebg') gameBgFile=file;
+  else if(type==='pausebg') pauseBgFile=file;
   else if(type==='loupe1') loupeFiles[1]=file;
   else if(type==='loupe2') loupeFiles[2]=file;
   else if(type==='loupe3') loupeFiles[3]=file;
