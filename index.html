@@ -872,25 +872,28 @@ async function selectMission(id){
 }
 
 async function loadGlaciere(g){
-  glaciere=g;
-  penaltyMin=g.penalty_min||2;
-  penaltyActive=g.penalite_active!==false;
-  const cs=await supaFetch('cartes?glaciere_id=eq.'+g.id);
-  cs.forEach(c=>cartes[c.numero]=c);
-  cs.filter(c=>c.numero>200).forEach(c=>codes[c.numero]=c);
-  // Loupe configs depuis Supabase
-  loupeConfigs=[
-    {filtre:g.loupe1_filtre||'contraste', url:g.loupe1_url||''},
-    {filtre:g.loupe2_filtre||'contraste', url:g.loupe2_url||''},
-    {filtre:g.loupe3_filtre||'contraste', url:g.loupe3_url||''},
-  ].filter(l=>l.url);
-  loupeStep=0;
-  // Morse global
-  if(g.morse_url) morseAudio=new Audio(g.morse_url);
-  applyBranding();
-  if(g.music_url){bgMusic=new Audio(g.music_url);bgMusic.loop=true;bgMusic.volume=0.25;}
-  if(g.bip_url){bipAudio=new Audio(g.bip_url);}
-  showScreen('s-setup');
+  try{
+    glaciere=g;
+    penaltyMin=g.penalty_min||2;
+    penaltyActive=g.penalite_active!==false;
+    const cs=await supaFetch('cartes?glaciere_id=eq.'+g.id);
+    cs.forEach(c=>cartes[c.numero]=c);
+    cs.filter(c=>c.numero>200).forEach(c=>codes[c.numero]=c);
+    loupeConfigs=[
+      {filtre:g.loupe1_filtre||'contraste', url:g.loupe1_url||''},
+      {filtre:g.loupe2_filtre||'contraste', url:g.loupe2_url||''},
+      {filtre:g.loupe3_filtre||'contraste', url:g.loupe3_url||''},
+    ].filter(l=>l.url);
+    loupeStep=0;
+    if(g.morse_url) morseAudio=new Audio(g.morse_url);
+    applyBranding();
+    if(g.music_url){bgMusic=new Audio(g.music_url);bgMusic.loop=true;bgMusic.volume=0.25;}
+    if(g.bip_url){bipAudio=new Audio(g.bip_url);}
+    showScreen('s-setup');
+  }catch(e){
+    console.error('Erreur loadGlaciere:',e);
+    showScreen('s-setup');
+  }
 }
 
 function applyBranding(){
@@ -916,21 +919,31 @@ function applyBranding(){
     document.getElementById('read-brief-btn').style.display='block';
   }
   // Fond écran de jeu
-  if(glaciere.game_bg_url){
-    document.getElementById('s-game').style.backgroundImage='url('+glaciere.game_bg_url+')';
-    document.getElementById('s-game').style.backgroundSize='cover';
-    document.getElementById('s-game').style.backgroundPosition='center';
-  }
+  try{
+    if(glaciere.game_bg_url){
+      document.getElementById('s-game').style.backgroundImage='url("'+glaciere.game_bg_url+'")';
+      document.getElementById('s-game').style.backgroundSize='cover';
+      document.getElementById('s-game').style.backgroundPosition='center';
+    } else {
+      document.getElementById('s-game').style.backgroundImage='none';
+    }
+  }catch(e){}
   // Fond écran pause
-  if(glaciere.pause_bg_url){
-    document.getElementById('pause-overlay').style.backgroundImage='url('+glaciere.pause_bg_url+')';
-    document.getElementById('pause-overlay').style.backgroundSize='cover';
-    document.getElementById('pause-overlay').style.backgroundPosition='center';
-  }
+  try{
+    if(glaciere.pause_bg_url){
+      document.getElementById('pause-overlay').style.backgroundImage='url("'+glaciere.pause_bg_url+'")';
+      document.getElementById('pause-overlay').style.backgroundSize='cover';
+      document.getElementById('pause-overlay').style.backgroundPosition='center';
+    } else {
+      document.getElementById('pause-overlay').style.backgroundImage='none';
+    }
+  }catch(e){}
   // Citation victoire
-  if(glaciere.citation_victoire){
-    document.getElementById('victory-quote').textContent='"'+glaciere.citation_victoire+'"';
-  }
+  try{
+    if(glaciere.citation_victoire){
+      document.getElementById('victory-quote').textContent='"'+glaciere.citation_victoire+'"';
+    }
+  }catch(e){}
   if(penaltyActive){
     const icPen=document.getElementById('ic-penalty');
     if(icPen){icPen.style.display='block';}
