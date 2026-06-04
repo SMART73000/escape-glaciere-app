@@ -37,31 +37,30 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* ── MISSION SELECT ── */
 #s-missions{padding:0;overflow-y:auto;}
 .ms-header{
-  padding:24px 18px 16px;text-align:center;
+  padding:12px 18px 8px;text-align:center;
   background:linear-gradient(180deg,rgba(7,17,31,1) 0%,rgba(7,17,31,0.8) 100%);
   position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);
 }
-.ms-logo{width:56px;height:56px;border-radius:12px;object-fit:contain;margin:0 auto 10px;display:none;}
-.ms-brand{font-family:var(--fd);font-size:28px;letter-spacing:5px;color:#fff;display:block;}
-.ms-sub{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+.ms-brand{font-family:var(--fd);font-size:24px;letter-spacing:5px;color:#fff;display:block;}
+.ms-sub{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
 
 .tuto-btn{
   display:flex;align-items:center;gap:10px;
-  margin:12px 18px;padding:12px 16px;
+  margin:6px 18px;padding:8px 16px;
   border-radius:12px;border:1px solid var(--border2);
   background:rgba(255,200,74,0.08);cursor:pointer;transition:all .2s;
   width:calc(100% - 36px);text-align:left;
 }
 .tuto-btn:hover{background:rgba(255,200,74,0.15);}
-.tuto-icon{font-size:22px;}
-.tuto-text{font-family:var(--fd);font-size:16px;letter-spacing:2px;color:var(--gold);}
-.tuto-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.tuto-icon{font-size:18px;}
+.tuto-text{font-family:var(--fd);font-size:14px;letter-spacing:2px;color:var(--gold);}
+.tuto-sub{font-size:9px;color:var(--muted);margin-top:1px;}
 
-.missions-grid{padding:12px 18px 40px;display:flex;flex-direction:column;gap:14px;}
+.missions-grid{padding:6px 18px 20px;display:flex;flex-direction:column;gap:8px;}
 
 .mission-card{
-  border-radius:20px;overflow:hidden;cursor:pointer;
-  position:relative;min-height:160px;
+  border-radius:16px;overflow:hidden;cursor:pointer;
+  position:relative;min-height:120px;
   transition:transform .2s,box-shadow .2s;
   border:1px solid var(--border2);
 }
@@ -155,21 +154,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .heat-label.show{display:block;}
 @keyframes pulse2{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.04)}}
 
-/* ── GAME BODY — LAYOUT CERCLE V4 ── */
-.game-body{flex:1;overflow-y:auto;padding:10px 14px 100px;display:flex;flex-direction:column;align-items:center;}
+/* ── GAME BODY — LAYOUT CERCLE V4 FINAL ── */
+.game-body{flex:1;overflow:hidden;padding:4px 10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 
 /* Cercle de jeu */
 .game-circle-wrap{
-  width:100%;max-width:380px;
+  width:100%;max-width:360px;
   position:relative;
-  padding:20px 0;
+  padding:0;
 }
 
-/* V4: boutons ronds en grille 2x2 avec chrono au centre */
+/* Grille boutons */
 .circle-grid{
   display:grid;
-  grid-template-columns:1fr auto 1fr;
-  grid-template-rows:1fr auto 1fr;
+  grid-template-columns:88px auto 88px;
+  grid-template-rows:88px auto 88px;
   gap:0;
   align-items:center;
   justify-items:center;
@@ -180,7 +179,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .timer-center{
   grid-column:2;grid-row:2;
   text-align:center;
-  padding:0 12px;
+  padding:0 6px;
 }
 .timer{font-family:var(--fd);font-size:44px;letter-spacing:3px;color:#fff;line-height:1;transition:color .4s;}
 .timer.warn{color:var(--orange);text-shadow:0 0 14px rgba(255,136,0,.5);}
@@ -188,35 +187,82 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
 .timer-sub{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:3px;}
 
-/* Cercle déco autour du chrono - V4 agrandi */
+/* Cercle chrono épais */
 .timer-ring{
-  width:175px;height:175px;border-radius:50%;
-  border:2px solid rgba(255,102,0,.3);
+  width:155px;height:155px;border-radius:50%;
+  border:4px solid rgba(255,102,0,.8);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:radial-gradient(circle,rgba(255,102,0,.06),transparent);
+  background:radial-gradient(circle,rgba(0,0,0,.5),rgba(0,0,0,.2));
   position:relative;
+  box-shadow:0 0 22px rgba(255,102,0,.3),inset 0 0 16px rgba(0,0,0,.4);
 }
 .timer-ring::before{
   content:'';position:absolute;inset:-10px;border-radius:50%;
-  border:1px solid rgba(255,102,0,.12);
+  border:2px solid rgba(255,102,0,.2);
 }
-.timer{font-family:var(--fd);font-size:56px;letter-spacing:2px;color:#fff;line-height:1;transition:color .4s;}
+.timer{font-family:var(--fd);font-size:50px;letter-spacing:2px;color:#fff;line-height:1;transition:color .4s;}
 
-/* V4: boutons ronds - taille réduite pour tout rentrer */
+/* Boutons 3D physiques */
 .action-btn{
-  width:82px;height:82px;border-radius:50%;
-  border:2px solid var(--border2);background:var(--card);
-  color:#fff;cursor:pointer;transition:all .2s;
-  text-align:center;position:relative;overflow:hidden;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  width:86px;height:86px;border-radius:50%;
+  color:#fff;cursor:pointer;transition:all .15s;
+  text-align:center;position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   flex-shrink:0;
+  box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(255,255,255,.05),inset 0 1px 0 rgba(255,255,255,.1),inset 0 -2px 4px rgba(0,0,0,.3);
 }
-.action-btn::before{content:'';position:absolute;inset:0;opacity:0;background:radial-gradient(circle at center,rgba(255,255,255,.1),transparent);transition:opacity .2s;border-radius:50%;}
-.action-btn:active::before{opacity:1;}
-.action-btn:active{transform:scale(.92);}
-.action-emoji{font-size:20px;display:block;}
+.action-btn:active{transform:scale(.95);}
+.action-emoji{font-size:22px;display:block;}
 .action-label{font-family:var(--fd);font-size:10px;letter-spacing:1.5px;}
 .action-sub{font-size:8px;color:var(--muted);display:none;}
+
+/* Positions */
+.btn-indice{grid-column:1;grid-row:1;}
+.btn-meca{grid-column:3;grid-row:1;}
+.btn-code{grid-column:1;grid-row:3;}
+.btn-micro{grid-column:3;grid-row:3;}
+
+/* Couleurs boutons 3D */
+.action-btn.indice{border:3px solid rgba(255,200,74,.8);background:linear-gradient(145deg,rgba(255,200,74,.25),rgba(255,200,74,.06));box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(255,200,74,.1),inset 0 1px 0 rgba(255,200,74,.2),inset 0 -2px 4px rgba(0,0,0,.3);}
+.action-btn.indice .action-label{color:var(--gold);}
+.action-btn.mecanisme{border:3px solid rgba(0,212,255,.8);background:linear-gradient(145deg,rgba(0,212,255,.25),rgba(0,212,255,.06));box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(0,212,255,.1),inset 0 1px 0 rgba(0,212,255,.2),inset 0 -2px 4px rgba(0,0,0,.3);}
+.action-btn.mecanisme .action-label{color:#00d4ff;}
+.action-btn.code{border:3px solid rgba(0,230,118,.8);background:linear-gradient(145deg,rgba(0,230,118,.25),rgba(0,230,118,.06));box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(0,230,118,.1),inset 0 1px 0 rgba(0,230,118,.2),inset 0 -2px 4px rgba(0,0,0,.3);}
+.action-btn.code .action-label{color:var(--green);}
+.action-btn.micro{border:3px solid rgba(255,68,68,.8);background:linear-gradient(145deg,rgba(255,68,68,.25),rgba(255,68,68,.06));box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(255,68,68,.1),inset 0 1px 0 rgba(255,68,68,.2),inset 0 -2px 4px rgba(0,0,0,.3);}
+.action-btn.micro .action-label{color:var(--red);}
+
+/* Lignes reliant les boutons */
+.grid-line-h1,.grid-line-h2{grid-column:2;background:rgba(255,102,0,.3);height:2px;width:16px;}
+.grid-line-h1{grid-row:1;align-self:center;}
+.grid-line-h2{grid-row:3;align-self:center;}
+.grid-line-v1,.grid-line-v2{grid-row:2;background:rgba(255,102,0,.3);width:2px;height:16px;}
+.grid-line-v1{grid-column:1;justify-self:end;}
+.grid-line-v2{grid-column:3;justify-self:start;}
+
+/* Scanner NORD + Loupe SUD */
+.scanner-nord,.scanner-sud{width:100%;max-width:360px;}
+.scanner-nord{margin-bottom:4px;}
+.scanner-sud{margin-top:4px;}
+
+/* Boutons scanner/loupe 3D allongés */
+.action-btn.scanner{
+  width:100%;height:50px;border-radius:40px;
+  border:3px solid rgba(200,0,255,.8);
+  background:linear-gradient(145deg,rgba(200,0,255,.25),rgba(200,0,255,.06));
+  box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(200,0,255,.1),inset 0 1px 0 rgba(200,0,255,.2),inset 0 -2px 4px rgba(0,0,0,.3);
+  flex-direction:row;gap:10px;padding:0 20px;
+}
+.action-btn.scanner .action-label{color:#cc88ff;font-size:13px;letter-spacing:2px;}
+.action-btn.scanner .action-emoji{font-size:20px;}
+.action-btn.loupe{
+  width:100%;height:50px;border-radius:40px;
+  border:3px solid rgba(255,255,255,.6);
+  background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.04));
+  box-shadow:4px 4px 10px rgba(0,0,0,.5),-2px -2px 6px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.15),inset 0 -2px 4px rgba(0,0,0,.3);
+  flex-direction:row;gap:10px;padding:0 20px;
+}
+.action-btn.loupe .action-label{color:#ffffff;font-size:13px;letter-spacing:2px;}
 
 /* V4: positions dans la grille - rapprochées du chrono */
 .btn-indice{grid-column:1;grid-row:1;}
@@ -544,40 +590,39 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="heat-label" id="heat-label">❄️🔥 LA GLACIÈRE SE RÉCHAUFFE ! Plus que 10 min !</div>
 
   <div class="game-body">
-    <!-- V4: layout cercle -->
+    <!-- Scanner NORD -->
+    <div class="scanner-nord">
+      <button class="action-btn scanner" onclick="openPanel('scanner')">
+        <span class="action-emoji">📷</span>
+        <div class="action-label">SCANNER QR</div>
+      </button>
+    </div>
+
+    <!-- Layout cercle -->
     <div class="game-circle-wrap">
       <div class="circle-grid">
-        <!-- Haut gauche -->
         <button class="action-btn indice btn-indice" onclick="openPanel('indice')">
           <span class="action-emoji">💡</span>
           <div class="action-label">INDICE</div>
         </button>
-        <!-- Ligne haut -->
         <div class="grid-line-h1"></div>
-        <!-- Haut droite -->
         <button class="action-btn mecanisme btn-meca" onclick="openPanel('mecanisme')">
           <span class="action-emoji">⚙️</span>
           <div class="action-label">MACHINE</div>
         </button>
-        <!-- Ligne gauche -->
         <div class="grid-line-v1"></div>
-        <!-- CHRONO CENTRE -->
         <div class="timer-center">
           <div class="timer-ring">
             <div class="timer" id="timer">60:00</div>
             <div class="timer-sub" id="timer-sub">en cours</div>
           </div>
         </div>
-        <!-- Ligne droite -->
         <div class="grid-line-v2"></div>
-        <!-- Bas gauche -->
         <button class="action-btn code btn-code" onclick="openPanel('code')">
           <span class="action-emoji" id="code-btn-emoji">🔊</span>
           <div class="action-label">MORSE</div>
         </button>
-        <!-- Ligne bas -->
         <div class="grid-line-h2"></div>
-        <!-- Bas droite -->
         <button class="action-btn micro btn-micro" onclick="openPanel('micro')">
           <span class="action-emoji">🎤</span>
           <div class="action-label">MICRO</div>
@@ -585,22 +630,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
 
-    <!-- Scanner + Loupe en bas -->
-    <div class="scanner-row" style="display:flex;gap:10px;max-width:380px;width:100%;">
-      <button class="action-btn scanner" style="flex:1" onclick="openPanel('scanner')">
-        <span class="action-emoji">📷</span>
-        <div class="action-label">SCANNER QR</div>
-      </button>
-      <button class="action-btn loupe" style="flex:1;height:58px;border-radius:40px;border:2px solid rgba(0,212,255,.4);background:rgba(0,212,255,.06);flex-direction:row;gap:8px;padding:0 16px;" onclick="openPanel('loupe')">
+    <!-- Loupe SUD -->
+    <div class="scanner-sud">
+      <button class="action-btn loupe" onclick="openPanel('loupe')">
         <span class="action-emoji">🔍</span>
-        <div class="action-label" style="color:#00d4ff;font-size:13px;letter-spacing:2px;">LOUPE</div>
+        <div class="action-label">LOUPE</div>
       </button>
     </div>
 
     <!-- Compteur indices SUPPRIMÉ - visible uniquement dans le header -->
   </div>
 
-  <div class="bottom-bar">
+  <div class="bottom-bar" style="padding:6px 14px 12px;">
     <button class="pause-btn" onclick="togglePause()">⏸ PAUSE</button>
     <button class="victory-btn" onclick="confirmVictory()">🏆 MISSION ACCOMPLIE !</button>
   </div>
