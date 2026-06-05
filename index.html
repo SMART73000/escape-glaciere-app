@@ -436,7 +436,8 @@ body::before{display:none;}
 .morse-playing.visible{display:block;}
 
 /* ── BOTTOM BAR ── */
-.bottom-bar{position:fixed;bottom:0;left:0;right:0;z-index:60;display:flex;gap:8px;padding:10px 14px 20px;background:linear-gradient(transparent,rgba(7,17,31,.98));}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;z-index:60;display:none;gap:8px;padding:10px 14px 20px;background:linear-gradient(transparent,rgba(7,17,31,.98));}
+#s-game.active .bottom-bar{display:flex;}
 .pause-btn{flex:1;padding:12px;border-radius:12px;border:1px solid var(--border2);background:rgba(255,255,255,.06);color:var(--ice);font-family:var(--fd);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all .2s;}
 .victory-btn{flex:2;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#009944);color:var(--bg);font-family:var(--fd);font-size:14px;letter-spacing:2px;cursor:pointer;transition:all .2s;box-shadow:0 0 18px rgba(0,230,118,.22);}
 .victory-btn:hover{transform:translateY(-1px);}
