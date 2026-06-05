@@ -24,7 +24,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
              radial-gradient(ellipse 50% 70% at 85% 100%,rgba(0,80,160,0.09) 0%,transparent 70%);}
 #root{position:relative;z-index:1;}
 .screen{display:none;min-height:100vh;flex-direction:column;}
-.screen.active{display:flex;}
+.screen.active{display:flex;visibility:visible;}
 
 /* ── LOADING ── */
 #s-loading{align-items:center;justify-content:center;text-align:center;gap:16px;}
@@ -928,7 +928,7 @@ async function loadGlaciere(g){
 function applyBranding(){
   if(!glaciere)return;
   if(glaciere.couleur_accent) document.documentElement.style.setProperty('--accent',glaciere.couleur_accent);
-  if(glaciere.couleur_bg) document.documentElement.style.setProperty('--bg',glaciere.couleur_bg);
+  // Ne pas appliquer couleur_bg globalement - ça rendrait tout noir
   if(glaciere.logo_url){
     ['brand-logo','topbar-logo','brief-logo','ms-logo'].forEach(id=>{
       const el=document.getElementById(id);
