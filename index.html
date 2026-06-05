@@ -33,7 +33,7 @@ body::before{display:none;}
 @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
 
 /* ── MISSION SELECT ── */
-#s-missions{padding:0;overflow-y:auto;justify-content:flex-start;background:var(--bg);}
+#s-missions{padding:0;overflow-y:auto;justify-content:flex-start;background:#07111f;background-image:none !important;}
 .ms-header{
   padding:12px 18px 8px;text-align:center;
   background:linear-gradient(180deg,rgba(7,17,31,1) 0%,rgba(7,17,31,0.8) 100%);
@@ -1096,9 +1096,11 @@ function resetGame(){
   document.documentElement.style.setProperty('--accent','#ff6600');
   document.documentElement.style.setProperty('--bg','#07111f');
   const sgame=document.getElementById('s-game');
-  sgame.style.backgroundImage='none';
-  sgame.style.backgroundColor='#07111f';
   sgame.removeAttribute('style');
+  sgame.style.padding='0';
+  const smissions=document.getElementById('s-missions');
+  smissions.style.backgroundImage='none';
+  smissions.scrollTop=0;
   showScreen('s-missions');
 }
 
