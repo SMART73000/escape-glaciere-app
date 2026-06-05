@@ -21,8 +21,8 @@
 body{background:var(--bg);color:var(--ice);font-family:var(--fb);overflow-x:hidden;}
 body::before{display:none;}
 #root{position:relative;z-index:1;overflow:hidden;}
-.screen{display:none;flex-direction:column;position:fixed;top:0;left:0;width:100%;height:100%;overflow-y:auto;background:#07111f;z-index:10;visibility:hidden;}
-.screen.active{display:flex;z-index:20;visibility:visible;}
+.screen{display:none;flex-direction:column;}
+.screen.active{display:flex;min-height:100vh;}
 
 /* ── LOADING ── */
 #s-loading{align-items:center;justify-content:center;text-align:center;gap:16px;}
@@ -1539,15 +1539,11 @@ async function sharePhoto(){
 
 // ── SCREENS ──
 function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>{
-    s.classList.remove('active');
-    s.scrollTop=0;
-    s.style.zIndex='10';
-  });
-  const el=document.getElementById(id);
-  el.scrollTop=0;
-  el.style.zIndex='20';
-  el.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.body.scrollTop=0;
+  document.documentElement.scrollTop=0;
+  window.scrollTo({top:0,behavior:'instant'});
 }
 
 init();
