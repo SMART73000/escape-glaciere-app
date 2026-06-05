@@ -1094,14 +1094,11 @@ function resetGame(){
   cartes={};codes={};glaciere=null;loupeStep=0;
   document.documentElement.style.setProperty('--accent','#ff6600');
   document.documentElement.style.setProperty('--bg','#07111f');
-  document.getElementById('s-game').style.backgroundImage='none';
+  const sgame=document.getElementById('s-game');
+  sgame.style.backgroundImage='none';
+  sgame.style.backgroundColor='#07111f';
+  sgame.removeAttribute('style');
   showScreen('s-missions');
-  setTimeout(()=>{
-    window.scrollTo(0,0);
-    document.body.scrollTop=0;
-    document.documentElement.scrollTop=0;
-    document.getElementById('s-missions').scrollTop=0;
-  },50);
 }
 
 // ── CONFETTI ──
