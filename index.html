@@ -35,7 +35,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
 
 /* ── MISSION SELECT ── */
-#s-missions{padding:0;overflow-y:auto;}
+#s-missions{padding:0;overflow-y:auto;justify-content:flex-start;}
 .ms-header{
   padding:12px 18px 8px;text-align:center;
   background:linear-gradient(180deg,rgba(7,17,31,1) 0%,rgba(7,17,31,0.8) 100%);
@@ -295,6 +295,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:linear-gradient(145deg,rgba(200,0,255,.25),rgba(200,0,255,.06));
   box-shadow:4px 4px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(200,0,255,.2),inset 0 -2px 4px rgba(0,0,0,.3);
   flex-direction:column;gap:3px;padding:0;
+  grid-column:2;grid-row:1;
 }
 .action-btn.scanner .action-label{color:#cc88ff;font-size:9px;letter-spacing:1.5px;}
 .action-btn.scanner .action-emoji{font-size:20px;}
@@ -305,6 +306,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.04));
   box-shadow:4px 4px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.15),inset 0 -2px 4px rgba(0,0,0,.3);
   flex-direction:column;gap:3px;padding:0;
+  grid-column:2;grid-row:3;
 }
 .action-btn.loupe .action-label{color:#ffffff;font-size:9px;letter-spacing:1.5px;}
 
@@ -600,9 +602,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
           <span class="action-emoji">💡</span>
           <div class="action-label">INDICE</div>
         </button>
-        <button class="action-btn scanner" style="grid-column:2;grid-row:1;border:3px solid rgba(200,0,255,.8);background:linear-gradient(145deg,rgba(200,0,255,.25),rgba(200,0,255,.06));box-shadow:4px 4px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(200,0,255,.2);" onclick="openPanel('scanner')">
+        <button class="action-btn scanner" onclick="openPanel('scanner')">
           <span class="action-emoji">📷</span>
-          <div class="action-label" style="color:#cc88ff">SCANNER</div>
+          <div class="action-label">SCANNER</div>
         </button>
         <button class="action-btn mecanisme btn-meca" onclick="openPanel('mecanisme')">
           <span class="action-emoji">⚙️</span>
@@ -620,9 +622,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
           <span class="action-emoji" id="code-btn-emoji">🔊</span>
           <div class="action-label">MORSE</div>
         </button>
-        <button class="action-btn loupe" style="grid-column:2;grid-row:3;border:3px solid rgba(255,255,255,.6);background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.04));box-shadow:4px 4px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.15);" onclick="openPanel('loupe')">
+        <button class="action-btn loupe" onclick="openPanel('loupe')">
           <span class="action-emoji">🔍</span>
-          <div class="action-label" style="color:#fff">LOUPE</div>
+          <div class="action-label">LOUPE</div>
         </button>
         <button class="action-btn micro btn-micro" onclick="openPanel('micro')">
           <span class="action-emoji">🎤</span>
@@ -1092,11 +1094,12 @@ function resetGame(){
   clearInterval(timerInt);
   if(bgMusic){bgMusic.pause();bgMusic.currentTime=0;}
   cartes={};codes={};glaciere=null;loupeStep=0;
-  // Réinitialiser les couleurs
   document.documentElement.style.setProperty('--accent','#ff6600');
   document.documentElement.style.setProperty('--bg','#07111f');
   document.getElementById('s-game').style.backgroundImage='none';
   showScreen('s-missions');
+  window.scrollTo(0,0);
+  document.getElementById('s-missions').scrollTop=0;
 }
 
 // ── CONFETTI ──
