@@ -195,18 +195,18 @@ body::before{display:none;}
 .timer-toggle.running{border-color:rgba(255,136,0,.7);color:var(--orange);}
 
 /* Couronne : 6 boutons autour de l'INDICE central */
-.crown{position:relative;width:300px;height:316px;margin:6px auto 0;}
+.crown{position:relative;width:300px;height:352px;margin:6px auto 0;}
 .crown-item{position:absolute;top:50%;left:50%;display:flex;flex-direction:column;align-items:center;gap:5px;}
 .crown-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;}
 .cr-label{font-family:var(--fd);font-size:13px;letter-spacing:2px;line-height:1;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.85);}
 
-/* positions autour du centre (rayon 100px) */
-.cr-pos-0{transform:translate(calc(-50% + 0px),  calc(-50% - 100px));}
-.cr-pos-1{transform:translate(calc(-50% + 87px), calc(-50% - 50px));}
-.cr-pos-2{transform:translate(calc(-50% + 87px), calc(-50% + 50px));}
-.cr-pos-3{transform:translate(calc(-50% + 0px),  calc(-50% + 100px));}
-.cr-pos-4{transform:translate(calc(-50% - 87px), calc(-50% + 50px));}
-.cr-pos-5{transform:translate(calc(-50% - 87px), calc(-50% - 50px));}
+/* positions autour du centre — ellipse (plus haute) pour dégager les libellés du haut/bas */
+.cr-pos-0{transform:translate(calc(-50% + 0px),  calc(-50% - 122px));}
+.cr-pos-1{transform:translate(calc(-50% + 92px), calc(-50% - 58px));}
+.cr-pos-2{transform:translate(calc(-50% + 92px), calc(-50% + 58px));}
+.cr-pos-3{transform:translate(calc(-50% + 0px),  calc(-50% + 122px));}
+.cr-pos-4{transform:translate(calc(-50% - 92px), calc(-50% + 58px));}
+.cr-pos-5{transform:translate(calc(-50% - 92px), calc(-50% - 58px));}
 
 /* "Vrais boutons" : pictogramme SEUL, fond sombre uni ~90% (laisse deviner l'image derrière) */
 .action-btn{
