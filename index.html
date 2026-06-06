@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.json">
 <title>Mission Apéro</title>
-<!-- BUILD v7 — bandeau mission personnalisable (badge_text) -->
-<meta name="app-build" content="v7-badge">
-<script>console.log('Mission Apéro build v7-badge');</script>
+<!-- BUILD v8 — emoji coin de carte personnalisable (mission_emoji) -->
+<meta name="app-build" content="v8-emoji">
+<script>console.log('Mission Apéro build v8-emoji');</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -785,12 +785,13 @@ function renderMissions(gs){
     const typeClass=isAnniv?'anniv':'apero';
     const defaultBadge=isAnniv?'🎂 Mission Anniversaire':'🍺 Mission Apéro';
     const badgeText=(g.badge_text&&g.badge_text.trim())?g.badge_text:defaultBadge;
+    const cornerEmoji=(g.mission_emoji&&g.mission_emoji.trim())?g.mission_emoji:(isAnniv?'🌺':'🍺');
     const bg=g.mission_bg_url?`url(${g.mission_bg_url})`:(isAnniv?'linear-gradient(135deg,#cc00aa,#ff88ff)':'linear-gradient(135deg,#ff6600,#ffaa00)');
     const locked=g.active===false; // Étape 4 : mission visible mais grisée
     return `<div class="mission-card${locked?' locked':''}" data-id="${g.id}"${locked?'':' onclick="selectMissionById(this)"'}>
       <div class="mission-bg" style="background:${bg}"></div>
       <div class="mission-overlay"></div>
-      <div class="mission-emoji">${isAnniv?'🌺':'🍺'}</div>
+      <div class="mission-emoji">${cornerEmoji}</div>
       <div class="mission-badge">${badgeText}</div>
       ${locked?'<div class="mission-soon">🔒 Bientôt disponible</div>':''}
       <div class="mission-content">
