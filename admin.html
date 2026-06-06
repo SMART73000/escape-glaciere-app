@@ -205,6 +205,22 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           <div class="bo-field"><label>📞 Numéro de téléphone de secours</label><input type="text" class="bo-input" id="e-tel" placeholder="ex: 06 12 34 56 78"></div>
         </div>
 
+        <!-- DISPONIBILITÉ (Étape 4) -->
+        <div class="bo-sec">
+          <span class="bo-stitle">🛒 Disponibilité</span>
+          <div class="info-box green">🛒 Activez la mission quand elle est prête à être jouée. Désactivée, elle reste <strong>visible mais grisée</strong> avec un badge « 🔒 Bientôt disponible » côté joueurs.</div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Mission active (jouable)</div>
+              <div class="toggle-sub">Décoché = visible mais grisée « Bientôt disponible »</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="e-active" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
         <!-- V4: PÉNALITÉ INDICES -->
         <div class="bo-sec">
           <span class="bo-stitle">⏱ Pénalité Indices</span>
@@ -490,6 +506,7 @@ async function loadGlacieres(){
       const codes=cs.filter(c=>c.numero>=200).length;
       const url='app.smartescapegame.fr/index.html?g='+g.slug;
       const badges=[
+        g.active===false?'🔒 Bientôt disponible':'',
         g.synopsis?'📖 Briefing':'',
         g.music_url?'🎵 Musique':'',
         g.bip_url?'🔔 Bip':'',
@@ -521,6 +538,7 @@ function newGlaciere(){
   ['e-nom','e-slug','e-escape','e-tel','e-synopsis'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('e-penalty').value='2';
   document.getElementById('e-penalite-active').checked=true;
+  document.getElementById('e-active').checked=true;
   setPen(2,document.querySelectorAll('.pen-btn')[1]);
   ['logo','bg','loupe1','loupe2','loupe3'].forEach(k=>{
     const p=document.getElementById(k+'-preview');
@@ -553,6 +571,7 @@ async function editGlaciere(id){
     document.getElementById('e-synopsis').value=g.synopsis||'';
     // Pénalité
     document.getElementById('e-penalite-active').checked=g.penalite_active!==false;
+    document.getElementById('e-active').checked=g.active!==false;
     updatePenToggle();
     const pm=g.penalty_min||2;
     document.querySelectorAll('.pen-btn').forEach(b=>{
@@ -607,6 +626,7 @@ async function saveGlaciere(){
   const tel=document.getElementById('e-tel').value.trim();
   const penalty=parseInt(document.getElementById('e-penalty').value)||2;
   const penaliteActive=document.getElementById('e-penalite-active').checked;
+  const active=document.getElementById('e-active').checked;
   const synopsis=document.getElementById('e-synopsis').value.trim();
   const accent=document.getElementById('hex-accent').value;
   const bg=document.getElementById('hex-bg').value;
@@ -651,7 +671,7 @@ async function saveGlaciere(){
     let gId=editingId;
     const payload={
       nom,slug,nom_escape:escape||null,telephone:tel||null,
-      penalty_min:penalty,penalite_active:penaliteActive,
+      penalty_min:penalty,penalite_active:penaliteActive,active:active,
       couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,
       citation_victoire:citation||null,
       music_url:musicUrl||null,bip_url:bipUrl||null,morse_url:morseUrl||null,
