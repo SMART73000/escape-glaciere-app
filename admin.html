@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Back-office V6 — Mission Apéro</title>
+<title>Back-office V7 — Mission Apéro</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -161,7 +161,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 <!-- GATE -->
 <div id="s-gate">
   <div class="gate-icon">🔑</div>
-  <div class="gate-title">Back-Office V6</div>
+  <div class="gate-title">Back-Office V7</div>
   <div class="gate-sub">Mission Apéro — Accès créateur</div>
   <input type="password" class="gate-pin" id="gate-pin" placeholder="····" maxlength="4" onkeydown="if(event.key==='Enter')checkPin()">
   <button class="gate-btn" onclick="checkPin()">ENTRER</button>
@@ -170,7 +170,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
 <!-- MAIN -->
 <div id="s-main">
   <div class="bo-top">
-    <div class="bo-title">⚙️ BACK-OFFICE V6</div>
+    <div class="bo-title">⚙️ BACK-OFFICE V7</div>
     <button class="bo-logout" onclick="logout()">Déconnexion</button>
   </div>
   <div class="bo-tabs">
@@ -203,6 +203,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           <div class="bo-field"><label>Slug (identifiant URL — minuscules, tirets)</label><input type="text" class="bo-input" id="e-slug" placeholder="ex: bronzes-ete"></div>
           <div class="bo-field"><label>Nom affiché aux joueurs</label><input type="text" class="bo-input" id="e-escape" placeholder="ex: Sauvez les Bronzés"></div>
           <div class="bo-field"><label>🏷️ Texte du bandeau orange (liste des missions — emojis autorisés)</label><input type="text" class="bo-input" id="e-badge" placeholder="ex: 🍺 Mission Apéro"></div>
+          <div class="bo-field"><label>😀 Emoji en haut à droite de la carte</label><input type="text" class="bo-input" id="e-emoji" placeholder="ex: 🍺 (vide = 🍺 / 🌺 selon le type)"></div>
           <div class="bo-field"><label>📞 Numéro de téléphone de secours</label><input type="text" class="bo-input" id="e-tel" placeholder="ex: 06 12 34 56 78"></div>
         </div>
 
@@ -538,7 +539,7 @@ function newGlaciere(){
   editingId=null;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;
   loupeFiles={1:null,2:null,3:null};
   existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:''};
-  ['e-nom','e-slug','e-escape','e-badge','e-tel','e-synopsis'].forEach(id=>document.getElementById(id).value='');
+  ['e-nom','e-slug','e-escape','e-badge','e-emoji','e-tel','e-synopsis'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('e-penalty').value='2';
   document.getElementById('e-penalite-active').checked=true;
   document.getElementById('e-active').checked=true;
@@ -570,6 +571,7 @@ async function editGlaciere(id){
     document.getElementById('e-slug').value=g.slug||'';
     document.getElementById('e-escape').value=g.nom_escape||'';
     document.getElementById('e-badge').value=g.badge_text||'';
+    document.getElementById('e-emoji').value=g.mission_emoji||'';
     document.getElementById('e-tel').value=g.telephone||'';
     document.getElementById('e-penalty').value=g.penalty_min||2;
     document.getElementById('e-synopsis').value=g.synopsis||'';
@@ -628,6 +630,7 @@ async function saveGlaciere(){
   const slug=document.getElementById('e-slug').value.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
   const escape=document.getElementById('e-escape').value.trim();
   const badge=document.getElementById('e-badge').value.trim();
+  const emoji=document.getElementById('e-emoji').value.trim();
   const tel=document.getElementById('e-tel').value.trim();
   const penalty=parseInt(document.getElementById('e-penalty').value)||2;
   const penaliteActive=document.getElementById('e-penalite-active').checked;
@@ -675,7 +678,7 @@ async function saveGlaciere(){
   try{
     let gId=editingId;
     const payload={
-      nom,slug,nom_escape:escape||null,telephone:tel||null,badge_text:badge||null,
+      nom,slug,nom_escape:escape||null,telephone:tel||null,badge_text:badge||null,mission_emoji:emoji||null,
       penalty_min:penalty,penalite_active:penaliteActive,active:active,
       couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,
       citation_victoire:citation||null,
