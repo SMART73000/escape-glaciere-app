@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.json">
 <title>Mission Apéro</title>
-<!-- BUILD v8 — emoji coin de carte personnalisable (mission_emoji) -->
-<meta name="app-build" content="v8-emoji">
-<script>console.log('Mission Apéro build v8-emoji');</script>
+<!-- BUILD v10 — boussole + gyroscope fonctionnels sous iOS (permission capteur) -->
+<meta name="app-build" content="v10-ios-sensors">
+<script>console.log('Mission Apéro build v10-ios-sensors');</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -342,6 +342,11 @@ body::before{display:none;}
 .loupe-info.visible{display:block;}
 .loupe-step-badge{background:rgba(0,212,255,.2);border:1px solid rgba(0,212,255,.4);border-radius:8px;padding:4px 12px;font-size:11px;letter-spacing:2px;color:#00d4ff;text-align:center;margin-bottom:10px;display:none;}
 .loupe-step-badge.visible{display:block;}
+.loupe-zoom{margin-top:12px;display:none;}
+.loupe-zoom.visible{display:block;}
+.loupe-zoom-row{display:flex;justify-content:space-between;align-items:center;font-family:var(--fd);font-size:13px;letter-spacing:2px;color:#00d4ff;margin-bottom:6px;}
+.loupe-zoom input[type=range]{width:100%;accent-color:#00d4ff;height:26px;}
+.loupe-zoom-hint{font-size:10px;color:var(--muted);text-align:center;margin-top:3px;letter-spacing:1px;}
 
 /* ── MORSE PANEL ── */
 .morse-player{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:14px;padding:18px;text-align:center;margin-top:12px;}
@@ -680,6 +685,11 @@ body::before{display:none;}
     </div>
     <button class="loupe-start-btn" id="loupe-start-btn" onclick="startLoupe()">🔍 ACTIVER LA LOUPE</button>
     <button class="loupe-stop-btn" id="loupe-stop-btn" onclick="stopLoupe()">⏹ ARRÊTER</button>
+    <div class="loupe-zoom" id="loupe-zoom">
+      <div class="loupe-zoom-row"><span>🔍 ZOOM</span><span id="loupe-zoom-val">1.0×</span></div>
+      <input type="range" id="loupe-zoom-range" min="1" max="4" step="0.1" value="1" oninput="onLoupeZoom(this.value)">
+      <div class="loupe-zoom-hint" id="loupe-zoom-hint"></div>
+    </div>
     <div class="loupe-info" id="loupe-info">Filtre actif — tenez la carte bien en face de la caméra</div>
   </div>
 </div>
@@ -753,6 +763,7 @@ let bgMusic=null, bipAudio=null, audioCtx=null;
 let currentCardNum=null, photoDataUrl=null;
 let compassActive=false, gyroActive=false, microActive=false;
 let scannerStream=null, loupeStream=null, loupeAnimFrame=null;
+let loupeTrack=null, loupeZoomNative=false, loupeDigital=1;
 let recognition=null;
 let allGlacieres=[];
 let loupeStep=0, loupeConfigs=[];
@@ -1181,24 +1192,47 @@ function showMeca(type){
   if(type==='gyroscope'){document.getElementById('meca-gyroscope').style.display='block';startGyro();}
   if(type==='scanner'){document.getElementById('meca-scanner').style.display='block';}
 }
+// iOS 13+ : l'accès aux capteurs d'orientation exige une permission, déclenchée par un appui utilisateur.
+// Sur Android / autres, requestPermission n'existe pas -> on autorise directement (comportement inchangé).
+function ensureOrientationPermission(){
+  try{
+    if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+      return DeviceOrientationEvent.requestPermission().then(s=>s==='granted').catch(()=>false);
+    }
+  }catch(_){}
+  return Promise.resolve(true);
+}
+
 function startCompass(){
-  if(!window.DeviceOrientationEvent)return;
+  if(!window.DeviceOrientationEvent){document.getElementById('compass-dir').textContent='NON SUPPORTÉ';return;}
   compassActive=true;
-  window.addEventListener('deviceorientationabsolute',handleCompass,true);
-  window.addEventListener('deviceorientation',handleCompass,true);
+  ensureOrientationPermission().then(ok=>{
+    if(!compassActive)return;               // l'utilisateur a pu changer d'outil entre-temps
+    if(!ok){document.getElementById('compass-dir').textContent='ACCÈS REFUSÉ';document.getElementById('compass-deg').textContent='—';return;}
+    window.addEventListener('deviceorientationabsolute',handleCompass,true);
+    window.addEventListener('deviceorientation',handleCompass,true);
+  });
 }
 function stopCompass(){compassActive=false;window.removeEventListener('deviceorientationabsolute',handleCompass,true);window.removeEventListener('deviceorientation',handleCompass,true);}
 function handleCompass(e){
   if(!compassActive)return;
   let deg=e.alpha||0;
-  if(e.webkitCompassHeading) deg=e.webkitCompassHeading;
+  if(e.webkitCompassHeading||e.webkitCompassHeading===0) deg=e.webkitCompassHeading; // iOS
   deg=Math.round(deg);
   document.getElementById('compass-needle').style.transform=`rotate(${deg}deg)`;
   document.getElementById('compass-deg').textContent=deg+'°';
   const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
   document.getElementById('compass-dir').textContent=dirs[Math.round(deg/22.5)%16];
 }
-function startGyro(){if(!window.DeviceMotionEvent)return;gyroActive=true;window.addEventListener('deviceorientation',handleGyro,true);}
+function startGyro(){
+  if(!window.DeviceOrientationEvent){document.getElementById('gyro-val').textContent='Capteur non supporté';return;}
+  gyroActive=true;
+  ensureOrientationPermission().then(ok=>{
+    if(!gyroActive)return;
+    if(!ok){document.getElementById('gyro-val').textContent='Accès au capteur refusé';return;}
+    window.addEventListener('deviceorientation',handleGyro,true);
+  });
+}
 function stopGyro(){gyroActive=false;window.removeEventListener('deviceorientation',handleGyro,true);}
 function handleGyro(e){
   if(!gyroActive)return;
@@ -1295,8 +1329,51 @@ async function startLoupe(){
       badge.textContent='LOUPE '+(loupeStep+1)+' / '+loupeConfigs.length;
       badge.classList.add('visible');
     }
+    // ── ZOOM / AUTOFOCUS (Étape 3) — tout en best-effort, repli = comportement actuel ──
+    setupLoupeZoom();
     applyLoupeFilter();
   }catch(e){document.getElementById('loupe-ph').textContent='❌ Impossible d\'accéder à la caméra';document.getElementById('loupe-ph').style.display='block';}
+}
+
+async function setupLoupeZoom(){
+  loupeDigital=1;loupeZoomNative=false;loupeTrack=null;
+  const range=document.getElementById('loupe-zoom-range');
+  const hint=document.getElementById('loupe-zoom-hint');
+  const val=document.getElementById('loupe-zoom-val');
+  const box=document.getElementById('loupe-zoom');
+  // valeurs par défaut sûres (zoom numérique) — garanties de marcher partout
+  range.min=1;range.max=4;range.step=0.1;range.value=1;val.textContent='1.0×';
+  hint.textContent='Zoom numérique';
+  try{
+    const track=loupeStream&&loupeStream.getVideoTracks?loupeStream.getVideoTracks()[0]:null;
+    loupeTrack=track||null;
+    // Autofocus continu — ignoré si non supporté
+    if(track){try{await track.applyConstraints({advanced:[{focusMode:'continuous'}]});}catch(_){}}
+    // Zoom optique/natif si l'appareil l'expose
+    let caps={};
+    try{caps=track&&track.getCapabilities?track.getCapabilities():{};}catch(_){caps={};}
+    if(caps&&caps.zoom&&typeof caps.zoom.max==='number'&&caps.zoom.max>caps.zoom.min){
+      loupeZoomNative=true;
+      const zmin=caps.zoom.min,zmax=caps.zoom.max,zstep=caps.zoom.step||0.1;
+      range.min=zmin;range.max=zmax;range.step=zstep;range.value=zmin;
+      val.textContent=(+zmin).toFixed(1)+'×';
+      hint.textContent='Zoom optique de l\'appareil';
+      try{await track.applyConstraints({advanced:[{zoom:zmin}]});}catch(_){}
+    }
+  }catch(_){ /* on garde le zoom numérique par défaut */ }
+  box.classList.add('visible');
+}
+
+function onLoupeZoom(value){
+  const val=parseFloat(value)||1;
+  document.getElementById('loupe-zoom-val').textContent=val.toFixed(1)+'×';
+  if(loupeZoomNative&&loupeTrack){
+    // vrai zoom caméra (net) — si ça échoue à chaud, on bascule en numérique
+    try{loupeTrack.applyConstraints({advanced:[{zoom:val}]});loupeDigital=1;}
+    catch(_){loupeDigital=val;}
+  }else{
+    loupeDigital=val; // zoom numérique (recadrage canvas)
+  }
 }
 
 function applyLoupeFilter(){
@@ -1316,7 +1393,15 @@ function applyLoupeFilter(){
       loupeAnimFrame=requestAnimationFrame(renderFrame);
       return;
     }
-    ctx.drawImage(v,0,0,canvas.width,canvas.height);
+    if(loupeDigital>1){
+      // zoom numérique : recadre le centre et l'étire pour remplir
+      const zc=loupeDigital;
+      const sw=v.videoWidth/zc, sh=v.videoHeight/zc;
+      const sx=(v.videoWidth-sw)/2, sy=(v.videoHeight-sh)/2;
+      ctx.drawImage(v,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
+    }else{
+      ctx.drawImage(v,0,0,canvas.width,canvas.height);
+    }
     const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
     const data=imageData.data;
 
@@ -1364,6 +1449,11 @@ function stopLoupe(){
   document.getElementById('loupe-stop-btn').style.display='none';
   document.getElementById('loupe-info').classList.remove('visible');
   document.getElementById('loupe-step-badge').classList.remove('visible');
+  // reset zoom
+  const lz=document.getElementById('loupe-zoom');if(lz)lz.classList.remove('visible');
+  const lr=document.getElementById('loupe-zoom-range');if(lr){lr.value=1;}
+  const lv=document.getElementById('loupe-zoom-val');if(lv)lv.textContent='1.0×';
+  loupeTrack=null;loupeZoomNative=false;loupeDigital=1;
   // Avance à la loupe suivante (linéaire)
   if(loupeConfigs.length>0) loupeStep=Math.min(loupeStep+1,loupeConfigs.length-1);
 }
