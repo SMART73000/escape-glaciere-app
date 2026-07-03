@@ -519,23 +519,23 @@ body::before{display:none;}
 
     <!-- COURONNE : 6 boutons autour de l'INDICE central -->
     <div class="crown">
-      <div class="crown-item cr-pos-5">
+      <div class="crown-item cr-pos-5" id="crown-item-machine">
         <div class="cr-label mecanisme">MACHINE</div>
         <button class="action-btn mecanisme" onclick="openPanel('mecanisme')"><span class="action-emoji">⚙️</span></button>
       </div>
-      <div class="crown-item cr-pos-1">
+      <div class="crown-item cr-pos-1" id="crown-item-morse">
         <div class="cr-label code">MORSE</div>
         <button class="action-btn code" onclick="openPanel('code')"><span class="action-emoji" id="code-btn-emoji">🔊</span></button>
       </div>
-      <div class="crown-item cr-pos-2">
+      <div class="crown-item cr-pos-2" id="crown-item-micro">
         <div class="cr-label micro">MICRO</div>
         <button class="action-btn micro" onclick="openPanel('micro')"><span class="action-emoji">🎤</span></button>
       </div>
-      <div class="crown-item cr-pos-3">
+      <div class="crown-item cr-pos-3" id="crown-item-revoir">
         <div class="cr-label eye">REVOIR</div>
         <button class="action-btn eye" onclick="showLastHint()"><span class="action-emoji">👁️</span></button>
       </div>
-      <div class="crown-item cr-pos-4">
+      <div class="crown-item cr-pos-4" id="crown-item-loupe">
         <div class="cr-label loupe">LOUPE</div>
         <button class="action-btn loupe" onclick="openPanel('loupe')"><span class="action-emoji">🔍</span></button>
       </div>
@@ -543,7 +543,7 @@ body::before{display:none;}
         <div class="cr-label" id="crown-toggle-label">DÉMARRER</div>
         <button class="action-btn pause" id="crown-toggle" onclick="toggleTimer()"><span class="action-emoji" id="crown-toggle-emoji">▶️</span></button>
       </div>
-      <div class="crown-center">
+      <div class="crown-center" id="crown-item-indice">
         <div class="cr-label indice">INDICE</div>
         <button class="action-btn indice" onclick="openPanel('indice')"><span class="action-emoji">💡</span></button>
       </div>
@@ -612,9 +612,9 @@ body::before{display:none;}
     <div class="panel-header"><div class="panel-title" style="color:#00d4ff">⚙️ MACHINE</div><button class="panel-close" onclick="closePanel('mecanisme')">Fermer</button></div>
     <div style="font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.6">Choisissez l'outil correspondant à votre carte rouage ⚙️</div>
     <div class="meca-grid" style="grid-template-columns:repeat(3,1fr)">
-      <button class="meca-btn" onclick="showMeca('boussole')"><span class="meca-emoji">🧭</span><div class="meca-label">BOUSSOLE</div></button>
-      <button class="meca-btn" onclick="showMeca('gyroscope')"><span class="meca-emoji">⚖️</span><div class="meca-label">GYROSCOPE</div></button>
-      <button class="meca-btn" onclick="showMeca('scanner')"><span class="meca-emoji">📷</span><div class="meca-label">SCANNER</div></button>
+      <button class="meca-btn" id="meca-btn-boussole" onclick="showMeca('boussole')"><span class="meca-emoji">🧭</span><div class="meca-label">BOUSSOLE</div></button>
+      <button class="meca-btn" id="meca-btn-gyroscope" onclick="showMeca('gyroscope')"><span class="meca-emoji">⚖️</span><div class="meca-label">GYROSCOPE</div></button>
+      <button class="meca-btn" id="meca-btn-scanner" onclick="showMeca('scanner')"><span class="meca-emoji">📷</span><div class="meca-label">SCANNER</div></button>
     </div>
     <div id="meca-boussole" style="display:none">
       <div class="compass-wrap">
@@ -745,6 +745,22 @@ const SUPABASE_URL = 'https://krqkqcnsmcmerwbfencb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_2TzK9VfplPjCRi_WhPj4nA_BooLFTQs';
 // ══════════════════════════════════════════
 
+function applyButtonVisibility(g){
+  const map={
+    machine:'crown-item-machine', morse:'crown-item-morse', micro:'crown-item-micro',
+    revoir:'crown-item-revoir', loupe:'crown-item-loupe', indice:'crown-item-indice'
+  };
+  Object.keys(map).forEach(k=>{
+    const el=document.getElementById(map[k]);
+    if(el) el.style.display=(g['btn_'+k]===false)?'none':'';
+  });
+  const mecaMap={boussole:'meca-btn-boussole', gyroscope:'meca-btn-gyroscope', scanner:'meca-btn-scanner'};
+  Object.keys(mecaMap).forEach(k=>{
+    const el=document.getElementById(mecaMap[k]);
+    if(el) el.style.display=(g['btn_'+k]===false)?'none':'';
+  });
+}
+
 const JC_MESSAGES = [
   "Si t'as le moindre pépin, je suis médecin !! 👨‍⚕️",
   "Essaie de pas me déranger pour des bricoles, je suis en vacances hein !! 😤",
@@ -852,6 +868,7 @@ async function loadGlaciere(g){
 
 function applyBranding(){
   if(!glaciere)return;
+  applyButtonVisibility(glaciere);
   if(glaciere.couleur_accent) document.documentElement.style.setProperty('--accent',glaciere.couleur_accent);
   // Ne pas appliquer couleur_bg globalement - ça rendrait tout noir
   if(glaciere.logo_url){
