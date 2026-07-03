@@ -609,7 +609,7 @@ async function editGlaciere(id){
     document.getElementById('cards-list').innerHTML='';
     cs.forEach(c=>{
       const type=c.numero>=200?'code':c.numero>=100?'answer':'hint';
-      addCardRow(c.numero,c.caption||'',c.image_url||'',type);
+      addCardRow(c.numero,c.caption||'',c.image_url||'',type,c.caption_code||'');
     });
     document.getElementById('edit-title').textContent=g.nom_escape||g.nom;
     showEdit();
@@ -667,12 +667,14 @@ async function saveGlaciere(){
   for(const row of rows){
     const num=parseInt(row.dataset.num);
     const caption=row.querySelector('.card-caption').value.trim();
+    const captionCodeInput=row.querySelector('.card-caption-code');
+    const captionCode=captionCodeInput?captionCodeInput.value.trim():'';
     const imgInput=row.querySelector('.img-input');
     const audioInput=row.querySelector('.audio-input');
     let imgUrl=row.dataset.img||'';
     if(imgInput&&imgInput.files[0]){try{imgUrl=await uploadFile(imgInput.files[0],'carte_'+slug+'_'+num);}catch(e){alert('Erreur carte '+num);return;}}
     if(audioInput&&audioInput.files[0]){try{imgUrl=await uploadFile(audioInput.files[0],'morse_'+slug+'_'+num);}catch(e){alert('Erreur audio '+num);return;}}
-    if(!isNaN(num)) cards.push({numero:num,caption,image_url:imgUrl});
+    if(!isNaN(num)) cards.push({numero:num,caption,image_url:imgUrl,caption_code:captionCode||null});
   }
 
   try{
@@ -747,7 +749,7 @@ function addCard(type){
   addCardRow(next,'','',type);
 }
 
-function addCardRow(num,caption,img,type='hint'){
+function addCardRow(num,caption,img,type='hint',captionCode=''){
   cardCtr++;
   const id='cr-'+cardCtr;
   const isAnswer=type==='answer'||(num>=100&&num<200);
@@ -778,7 +780,8 @@ function addCardRow(num,caption,img,type='hint'){
       </div>
       <button class="card-del" onclick="document.getElementById('${id}').remove()">🗑</button>
     </div>
-    <textarea class="card-caption" rows="2" placeholder="${isCode?'Mot de passe associé à ce son morse...':isAnswer?'Texte de la réponse/solution...':'Texte d\'indice optionnel...'}">${caption}</textarea>
+    <textarea class="card-caption" rows="2" placeholder="${isCode?'Mot déclencheur (reconnu par le micro)...':isAnswer?'Texte de la réponse/solution...':'Texte d\'indice optionnel...'}">${caption}</textarea>
+    ${isCode?`<input type="text" class="bo-input card-caption-code" style="margin-bottom:6px" placeholder="Code à afficher (ex: 4271)" value="${captionCode||''}">`:''}
     ${mediaZone}`;
   list.appendChild(div);
 }
