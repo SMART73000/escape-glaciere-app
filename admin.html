@@ -223,6 +223,54 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           </div>
         </div>
 
+        <!-- V5: BOUTONS DE JEU (activer/désactiver) -->
+        <div class="bo-sec">
+          <span class="bo-stitle">🎛️ Boutons de jeu</span>
+          <div class="info-box">🎛️ Désactivez les boutons non utilisés dans cette mission. Ils disparaissent de la couronne côté joueurs.</div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">⚙️ MACHINE</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-machine" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">🔊 MORSE</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-morse" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">🎤 MICRO</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-micro" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">🔍 LOUPE</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-loupe" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">💡 INDICE</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-indice" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">👁️ REVOIR</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-revoir" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+            <div>
+              <div class="toggle-label">Sous-outils de MACHINE</div>
+              <div class="toggle-sub">Visibles seulement si MACHINE est activé ci-dessus</div>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">🧭 Boussole</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-boussole" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">⚖️ Gyroscope</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-gyroscope" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">📷 Scanner</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-scanner" checked><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
         <!-- V4: PÉNALITÉ INDICES -->
         <div class="bo-sec">
           <span class="bo-stitle">⏱ Pénalité Indices</span>
@@ -543,6 +591,7 @@ function newGlaciere(){
   document.getElementById('e-penalty').value='2';
   document.getElementById('e-penalite-active').checked=true;
   document.getElementById('e-active').checked=true;
+  ['btn-machine','btn-morse','btn-micro','btn-loupe','btn-indice','btn-revoir','btn-boussole','btn-gyroscope','btn-scanner'].forEach(id=>{document.getElementById(id).checked=true;});
   setPen(2,document.querySelectorAll('.pen-btn')[1]);
   ['logo','bg','loupe1','loupe2','loupe3'].forEach(k=>{
     const p=document.getElementById(k+'-preview');
@@ -578,6 +627,9 @@ async function editGlaciere(id){
     // Pénalité
     document.getElementById('e-penalite-active').checked=g.penalite_active!==false;
     document.getElementById('e-active').checked=g.active!==false;
+    ['machine','morse','micro','loupe','indice','revoir','boussole','gyroscope','scanner'].forEach(k=>{
+      document.getElementById('btn-'+k).checked=g['btn_'+k]!==false;
+    });
     updatePenToggle();
     const pm=g.penalty_min||2;
     document.querySelectorAll('.pen-btn').forEach(b=>{
@@ -635,6 +687,10 @@ async function saveGlaciere(){
   const penalty=parseInt(document.getElementById('e-penalty').value)||2;
   const penaliteActive=document.getElementById('e-penalite-active').checked;
   const active=document.getElementById('e-active').checked;
+  const btnFlags={};
+  ['machine','morse','micro','loupe','indice','revoir','boussole','gyroscope','scanner'].forEach(k=>{
+    btnFlags['btn_'+k]=document.getElementById('btn-'+k).checked;
+  });
   const synopsis=document.getElementById('e-synopsis').value.trim();
   const accent=document.getElementById('hex-accent').value;
   const bg=document.getElementById('hex-bg').value;
@@ -681,7 +737,7 @@ async function saveGlaciere(){
     let gId=editingId;
     const payload={
       nom,slug,nom_escape:escape||null,telephone:tel||null,badge_text:badge||null,mission_emoji:emoji||null,
-      penalty_min:penalty,penalite_active:penaliteActive,active:active,
+      penalty_min:penalty,penalite_active:penaliteActive,active:active,...btnFlags,
       couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,
       citation_victoire:citation||null,
       music_url:musicUrl||null,bip_url:bipUrl||null,morse_url:morseUrl||null,
@@ -842,4 +898,3 @@ function boTab(id,btn){document.querySelectorAll('.tp').forEach(p=>p.classList.r
 </script>
 </body>
 </html>
-
