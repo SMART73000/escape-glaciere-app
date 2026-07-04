@@ -241,6 +241,7 @@ body::before{display:none;}
 
 /* ── PANELS ── */
 .panel-overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;}
+#panel-gate{z-index:250;}
 .panel-overlay.show{display:flex;}
 .panel{background:var(--card);border-radius:24px 24px 0 0;border-top:1px solid var(--border2);padding:20px 18px 40px;width:100%;max-width:500px;animation:slidePanel .3s ease;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .panel-fixed-top{position:sticky;top:0;background:var(--card);z-index:5;padding-bottom:6px;}
