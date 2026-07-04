@@ -418,7 +418,7 @@ body::before{display:none;}
 
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
 <body>
 <div id="root">
@@ -1523,6 +1523,11 @@ function scanQR(){
   qrDetected=false;
   const v=document.getElementById('scanner-video');
   if(!v.srcObject)return;
+  if(typeof jsQR==='undefined'){
+    document.getElementById('scanner-result').textContent='❌ Erreur technique : librairie de scan non chargée. Vérifiez la connexion internet et réessayez.';
+    document.getElementById('scanner-result').classList.add('visible');
+    return;
+  }
   const canvas=document.createElement('canvas');
   const ctx=canvas.getContext('2d');
   document.getElementById('scanner-result').textContent='📷 Caméra active — Pointez vers le QR code !';
@@ -1534,7 +1539,7 @@ function scanQR(){
     ctx.drawImage(v,0,0,canvas.width,canvas.height);
     try{
       const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
-      const code=(typeof jsQR!=='undefined')?jsQR(imgData.data,imgData.width,imgData.height):null;
+      const code=jsQR(imgData.data,imgData.width,imgData.height);
       if(code&&code.data){
         qrDetected=true;
         clearInterval(check);
