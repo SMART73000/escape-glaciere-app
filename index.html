@@ -1248,9 +1248,25 @@ function ensureOrientationPermission(){
   return Promise.resolve(true);
 }
 
+// ── Calcul de cap fiable (corrige l'inversion Android + le bruit du capteur) ──
+function computeHeadingFromEvent(e){
+  if(e.webkitCompassHeading!=null && !isNaN(e.webkitCompassHeading)){
+    return {heading:e.webkitCompassHeading, trustworthy:true}; // iOS : déjà un vrai cap
+  }
+  if(e.alpha==null) return null;
+  if(e.absolute===true){
+    return {heading:(360-e.alpha)%360, trustworthy:true}; // Android absolu : sens inversé à corriger
+  }
+  return {heading:(360-e.alpha)%360, trustworthy:false}; // relatif : dépannage seulement
+}
+function smoothAngle(newVal,prevVal,factor){
+  if(prevVal==null)return newVal;
+  const diff=((newVal-prevVal+540)%360)-180;
+  return (prevVal+diff*factor+360)%360;
+}
 function startCompass(){
   if(!window.DeviceOrientationEvent){document.getElementById('compass-dir').textContent='NON SUPPORTÉ';return;}
-  compassActive=true;
+  compassActive=true;compassHasAbsolute=false;compassSmooth=null;
   ensureOrientationPermission().then(ok=>{
     if(!compassActive)return;               // l'utilisateur a pu changer d'outil entre-temps
     if(!ok){document.getElementById('compass-dir').textContent='ACCÈS REFUSÉ';document.getElementById('compass-deg').textContent='—';return;}
@@ -1259,11 +1275,15 @@ function startCompass(){
   });
 }
 function stopCompass(){compassActive=false;window.removeEventListener('deviceorientationabsolute',handleCompass,true);window.removeEventListener('deviceorientation',handleCompass,true);}
+let compassHasAbsolute=false, compassSmooth=null;
 function handleCompass(e){
   if(!compassActive)return;
-  let deg=e.alpha||0;
-  if(e.webkitCompassHeading||e.webkitCompassHeading===0) deg=e.webkitCompassHeading; // iOS
-  deg=Math.round(deg);
+  const r=computeHeadingFromEvent(e);
+  if(!r)return;
+  if(!r.trustworthy && compassHasAbsolute)return; // ignore le signal bruité une fois qu'on a un vrai cap
+  if(r.trustworthy)compassHasAbsolute=true;
+  compassSmooth=smoothAngle(r.heading,compassSmooth,0.18);
+  const deg=Math.round(compassSmooth);
   document.getElementById('compass-needle').style.transform=`rotate(${deg}deg)`;
   document.getElementById('compass-deg').textContent=deg+'°';
   const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
@@ -1271,9 +1291,9 @@ function handleCompass(e){
 }
 // ── BOUSSOLE (défi : viser une direction et rester stable) ──
 let boussoleActive=false, boussoleHeading=0, boussoleHoldStart=null, boussoleWon=false, boussoleRAF=null;
-const BOUSSOLE_TOLERANCE=18;
+const BOUSSOLE_TOLERANCE=22;
 function startBoussoleChallenge(){
-  boussoleWon=false; boussoleHoldStart=null;
+  boussoleWon=false; boussoleHoldStart=null; boussoleHasAbsolute=false; boussoleSmooth=null;
   const res=document.getElementById('boussole-result');if(res){res.classList.remove('visible');res.textContent='';}
   const status=document.getElementById('boussole-status');if(status)status.textContent='Orientez-vous…';
   const fill=document.getElementById('boussole-progress');if(fill)fill.style.width='0%';
@@ -1294,11 +1314,15 @@ function stopBoussoleChallenge(){
   if(boussoleRAF)cancelAnimationFrame(boussoleRAF);
   boussoleRAF=null;
 }
+let boussoleHasAbsolute=false, boussoleSmooth=null;
 function handleBoussoleOrientation(e){
   if(!boussoleActive)return;
-  let deg=e.alpha||0;
-  if(e.webkitCompassHeading||e.webkitCompassHeading===0)deg=e.webkitCompassHeading;
-  boussoleHeading=Math.round(deg);
+  const r=computeHeadingFromEvent(e);
+  if(!r)return;
+  if(!r.trustworthy && boussoleHasAbsolute)return;
+  if(r.trustworthy)boussoleHasAbsolute=true;
+  boussoleSmooth=smoothAngle(r.heading,boussoleSmooth,0.18);
+  boussoleHeading=Math.round(boussoleSmooth);
 }
 function boussoleLoop(){
   if(!boussoleActive)return;
