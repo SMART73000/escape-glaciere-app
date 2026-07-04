@@ -187,6 +187,7 @@ body::before{display:none;}
 /* Couronne : 6 boutons autour de l'INDICE central */
 .crown{position:relative;width:300px;height:352px;margin:2px auto 0;}
 .crown-item{position:absolute;top:50%;left:50%;display:flex;flex-direction:column;align-items:center;gap:5px;}
+.btn-off{opacity:.3;filter:grayscale(1);pointer-events:none;}
 .crown-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:5px;}
 .cr-label{font-family:var(--fd);font-size:13px;letter-spacing:2px;line-height:1;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.85);}
 
@@ -614,18 +615,10 @@ body::before{display:none;}
   <div class="panel">
     <div class="panel-header"><div class="panel-title" style="color:#00d4ff">⚙️ MACHINE</div><button class="panel-close" onclick="closePanel('mecanisme')">Fermer</button></div>
     <div style="font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.6">Choisissez l'outil correspondant à votre carte rouage ⚙️</div>
-    <div class="meca-grid" style="grid-template-columns:repeat(4,1fr)">
-      <button class="meca-btn" id="meca-btn-boussole" onclick="showMeca('boussole')"><span class="meca-emoji">🧭</span><div class="meca-label">BOUSSOLE</div></button>
+    <div class="meca-grid" style="grid-template-columns:repeat(3,1fr)">
       <button class="meca-btn" id="meca-btn-gyroscope" onclick="showMeca('gyroscope')"><span class="meca-emoji">⚖️</span><div class="meca-label">GYROSCOPE</div></button>
       <button class="meca-btn" id="meca-btn-scanner" onclick="showMeca('scanner')"><span class="meca-emoji">📷</span><div class="meca-label">SCANNER</div></button>
       <button class="meca-btn" id="meca-btn-loupe" onclick="closePanel('mecanisme');openPanel('loupe')"><span class="meca-emoji">🔍</span><div class="meca-label">LOUPE</div></button>
-    </div>
-    <div id="meca-boussole" style="display:none">
-      <div class="compass-wrap">
-        <div class="compass-letters"><div class="c-n">N</div><div class="c-s">S</div><div class="c-e">E</div><div class="c-w">O</div></div>
-        <div class="compass-needle" id="compass-needle"></div>
-        <div><div class="compass-deg" id="compass-deg">0°</div><div class="compass-dir" id="compass-dir">NORD</div></div>
-      </div>
     </div>
     <div id="meca-gyroscope" style="display:none">
       <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
@@ -779,12 +772,12 @@ function applyButtonVisibility(g){
   };
   Object.keys(map).forEach(k=>{
     const el=document.getElementById(map[k]);
-    if(el) el.style.display=(g['btn_'+k]===false)?'none':'';
+    if(el) el.classList.toggle('btn-off',g['btn_'+k]===false);
   });
-  const mecaMap={boussole:'meca-btn-boussole', gyroscope:'meca-btn-gyroscope', scanner:'meca-btn-scanner', loupe:'meca-btn-loupe'};
+  const mecaMap={gyroscope:'meca-btn-gyroscope', scanner:'meca-btn-scanner', loupe:'meca-btn-loupe'};
   Object.keys(mecaMap).forEach(k=>{
     const el=document.getElementById(mecaMap[k]);
-    if(el) el.style.display=(g['btn_'+k]===false)?'none':'';
+    if(el) el.classList.toggle('btn-off',g['btn_'+k]===false);
   });
 }
 
@@ -1124,7 +1117,7 @@ function refreshND(type){document.getElementById('nd-'+type).textContent=npVals[
 function openPanel(id){document.getElementById('panel-'+id).classList.add('show');}
 function closePanel(id){
   document.getElementById('panel-'+id).classList.remove('show');
-  if(id==='mecanisme'){stopCompass();stopGyro();stopScanner();}
+  if(id==='mecanisme'){stopGyro();stopScanner();}
   if(id==='micro'){stopMicro();}
   if(id==='loupe'){stopLoupe();}
   if(id==='boussole'){stopBoussoleChallenge();}
@@ -1229,11 +1222,9 @@ function stopMorse(){
 
 // ── MÉCANISME ──
 function showMeca(type){
-  document.getElementById('meca-boussole').style.display='none';
   document.getElementById('meca-gyroscope').style.display='none';
   document.getElementById('meca-scanner').style.display='none';
-  stopCompass();stopGyro();stopScanner();
-  if(type==='boussole'){document.getElementById('meca-boussole').style.display='block';startCompass();}
+  stopGyro();stopScanner();
   if(type==='gyroscope'){document.getElementById('meca-gyroscope').style.display='block';startGyro();}
   if(type==='scanner'){document.getElementById('meca-scanner').style.display='block';}
 }
