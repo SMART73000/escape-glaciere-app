@@ -1144,6 +1144,7 @@ function closePanel(id){
   if(id==='micro'){stopMicro();}
   if(id==='loupe'){stopLoupe();}
   if(id==='boussole'){stopBoussoleChallenge();}
+  if(id==='code'){stopMorse();}
 }
 
 // ── VERROU PAR CODE (boussole / labyrinthe) ──
@@ -1257,6 +1258,7 @@ function playMorse(){
   const morseUrl=glaciere&&glaciere.morse_url?glaciere.morse_url:null;
   if(!morseUrl){nofile.style.display='block';return;}
   nofile.style.display='none';
+  if(bgMusic)bgMusic.pause();
   audio.src=morseUrl;
   audio.play().catch(()=>{});
   playing.classList.add('visible');
@@ -1266,6 +1268,7 @@ function playMorse(){
     playing.classList.remove('visible');
     btn.textContent='▶ RÉÉCOUTER';
     btn.onclick=playMorse;
+    if(bgMusic&&started&&!paused)bgMusic.play().catch(()=>{});
   };
 }
 function stopMorse(){
@@ -1275,6 +1278,7 @@ function stopMorse(){
   const btn=document.getElementById('morse-play-btn');
   btn.textContent='▶ ÉCOUTER LE MORSE';
   btn.onclick=playMorse;
+  if(bgMusic&&started&&!paused)bgMusic.play().catch(()=>{});
 }
 
 // ── MÉCANISME ──
