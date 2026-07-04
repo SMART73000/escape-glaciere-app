@@ -240,9 +240,27 @@ textarea.bo-input{resize:vertical;min-height:90px;}
             <label class="toggle-switch"><input type="checkbox" id="btn-micro" checked><span class="toggle-slider"></span></label>
           </div>
           <div class="toggle-row">
-            <div><div class="toggle-label">🔍 LOUPE</div></div>
-            <label class="toggle-switch"><input type="checkbox" id="btn-loupe" checked><span class="toggle-slider"></span></label>
+            <div>
+              <div class="toggle-label">🧭 BOUSSOLE</div>
+              <div class="toggle-sub">Bouton direct dans la couronne + outil dans MACHINE</div>
+            </div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-boussole" checked><span class="toggle-slider"></span></label>
           </div>
+          <div class="bo-field" style="margin-top:8px">
+            <label>🎯 Direction à viser</label>
+            <select class="bo-input" id="e-boussole-dir">
+              <option value="0">Nord</option>
+              <option value="45">Nord-Est</option>
+              <option value="90">Est</option>
+              <option value="135">Sud-Est</option>
+              <option value="180">Sud</option>
+              <option value="225">Sud-Ouest</option>
+              <option value="270">Ouest</option>
+              <option value="315">Nord-Ouest</option>
+            </select>
+          </div>
+          <div class="bo-field"><label>⏱️ Secondes à rester stable</label><input type="number" class="bo-input" id="e-boussole-seconds" placeholder="3" value="3" min="1" max="30"></div>
+          <div class="bo-field"><label>🔑 Code affiché quand la boussole est stable</label><input type="text" class="bo-input" id="e-boussole-code" placeholder="ex: 6529"></div>
           <div class="toggle-row">
             <div><div class="toggle-label">💡 INDICE</div></div>
             <label class="toggle-switch"><input type="checkbox" id="btn-indice" checked><span class="toggle-slider"></span></label>
@@ -258,19 +276,19 @@ textarea.bo-input{resize:vertical;min-height:90px;}
             </div>
           </div>
           <div class="toggle-row">
-            <div><div class="toggle-label">🧭 Boussole</div></div>
-            <label class="toggle-switch"><input type="checkbox" id="btn-boussole" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div><div class="toggle-label">⚖️ Gyroscope</div></div>
+            <div><div class="toggle-label">⚖️ Gyroscope (labyrinthe à bille)</div></div>
             <label class="toggle-switch"><input type="checkbox" id="btn-gyroscope" checked><span class="toggle-slider"></span></label>
           </div>
-          <div class="bo-field" style="margin-top:8px"><label>🎯 Code affiché quand le labyrinthe (gyroscope) est réussi</label><input type="text" class="bo-input" id="e-gyro-code" placeholder="ex: 4271"></div>
+          <div class="bo-field" style="margin-top:8px"><label>🎯 Code affiché quand le labyrinthe est réussi</label><input type="text" class="bo-input" id="e-gyro-code" placeholder="ex: 4271"></div>
           <div class="toggle-row">
-            <div><div class="toggle-label">📷 Scanner</div></div>
+            <div><div class="toggle-label">📷 Scanner (QR code)</div></div>
             <label class="toggle-switch"><input type="checkbox" id="btn-scanner" checked><span class="toggle-slider"></span></label>
           </div>
           <div class="bo-field" style="margin-top:8px"><label>🔗 Lien YouTube ouvert quand un QR code est scanné</label><input type="text" class="bo-input" id="e-scanner-youtube" placeholder="ex: https://youtube.com/watch?v=..."></div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">🔍 Loupe (filtres photo)</div></div>
+            <label class="toggle-switch"><input type="checkbox" id="btn-loupe" checked><span class="toggle-slider"></span></label>
+          </div>
         </div>
 
         <!-- V4: PÉNALITÉ INDICES -->
@@ -589,7 +607,9 @@ function newGlaciere(){
   editingId=null;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;
   loupeFiles={1:null,2:null,3:null};
   existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:''};
-  ['e-nom','e-slug','e-escape','e-badge','e-emoji','e-tel','e-synopsis','e-gyro-code','e-scanner-youtube'].forEach(id=>document.getElementById(id).value='');
+  ['e-nom','e-slug','e-escape','e-badge','e-emoji','e-tel','e-synopsis','e-gyro-code','e-scanner-youtube','e-boussole-code'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('e-boussole-dir').value='0';
+  document.getElementById('e-boussole-seconds').value='3';
   document.getElementById('e-penalty').value='2';
   document.getElementById('e-penalite-active').checked=true;
   document.getElementById('e-active').checked=true;
@@ -628,6 +648,9 @@ async function editGlaciere(id){
     document.getElementById('e-synopsis').value=g.synopsis||'';
     document.getElementById('e-gyro-code').value=g.gyro_code||'';
     document.getElementById('e-scanner-youtube').value=g.scanner_youtube_url||'';
+    document.getElementById('e-boussole-dir').value=(g.boussole_target_deg!=null)?String(g.boussole_target_deg):'0';
+    document.getElementById('e-boussole-seconds').value=g.boussole_hold_seconds||3;
+    document.getElementById('e-boussole-code').value=g.boussole_code||'';
     // Pénalité
     document.getElementById('e-penalite-active').checked=g.penalite_active!==false;
     document.getElementById('e-active').checked=g.active!==false;
@@ -698,6 +721,9 @@ async function saveGlaciere(){
   const synopsis=document.getElementById('e-synopsis').value.trim();
   const gyroCode=document.getElementById('e-gyro-code').value.trim();
   const scannerYoutube=document.getElementById('e-scanner-youtube').value.trim();
+  const boussoleDir=parseInt(document.getElementById('e-boussole-dir').value)||0;
+  const boussoleSeconds=parseInt(document.getElementById('e-boussole-seconds').value)||3;
+  const boussoleCode=document.getElementById('e-boussole-code').value.trim();
   const accent=document.getElementById('hex-accent').value;
   const bg=document.getElementById('hex-bg').value;
   const loupe1Filtre=document.getElementById('loupe1-filtre').value;
@@ -747,6 +773,7 @@ async function saveGlaciere(){
       couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,
       citation_victoire:citation||null,
       gyro_code:gyroCode||null,scanner_youtube_url:scannerYoutube||null,
+      boussole_target_deg:boussoleDir,boussole_hold_seconds:boussoleSeconds,boussole_code:boussoleCode||null,
       music_url:musicUrl||null,bip_url:bipUrl||null,morse_url:morseUrl||null,
       mission_bg_url:bgUrl||null,
       game_bg_url:gameBgUrl||null,pause_bg_url:pauseBgUrl||null,
