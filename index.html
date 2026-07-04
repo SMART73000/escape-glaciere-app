@@ -1235,7 +1235,7 @@ function renderHistory(){
   const l=document.getElementById('history-list');
   if(!history.length){s.style.display='none';return;}
   s.style.display='block';
-  l.innerHTML=history.map(h=>`<div class="history-item" onclick="reloadHint(${h.num})"><div class="history-num">${h.num}</div><div class="history-label">${h.label}</div><div class="history-arrow">↗</div></div>`).join('');
+  l.innerHTML=history.map(h=>`<div class="history-item" onclick="reloadHint(${h.num})"><div class="history-num">${h.num}</div><div class="history-label">${h.label}</div><div class="history-arrow">Retour</div></div>`).join('');
 }
 function reloadHint(num){npVals.indice=String(num);searchHint();}
 
