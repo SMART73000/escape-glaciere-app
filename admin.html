@@ -265,10 +265,12 @@ textarea.bo-input{resize:vertical;min-height:90px;}
             <div><div class="toggle-label">⚖️ Gyroscope</div></div>
             <label class="toggle-switch"><input type="checkbox" id="btn-gyroscope" checked><span class="toggle-slider"></span></label>
           </div>
+          <div class="bo-field" style="margin-top:8px"><label>🎯 Code affiché quand le labyrinthe (gyroscope) est réussi</label><input type="text" class="bo-input" id="e-gyro-code" placeholder="ex: 4271"></div>
           <div class="toggle-row">
             <div><div class="toggle-label">📷 Scanner</div></div>
             <label class="toggle-switch"><input type="checkbox" id="btn-scanner" checked><span class="toggle-slider"></span></label>
           </div>
+          <div class="bo-field" style="margin-top:8px"><label>🔗 Lien YouTube ouvert quand un QR code est scanné</label><input type="text" class="bo-input" id="e-scanner-youtube" placeholder="ex: https://youtube.com/watch?v=..."></div>
         </div>
 
         <!-- V4: PÉNALITÉ INDICES -->
@@ -587,7 +589,7 @@ function newGlaciere(){
   editingId=null;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;
   loupeFiles={1:null,2:null,3:null};
   existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:''};
-  ['e-nom','e-slug','e-escape','e-badge','e-emoji','e-tel','e-synopsis'].forEach(id=>document.getElementById(id).value='');
+  ['e-nom','e-slug','e-escape','e-badge','e-emoji','e-tel','e-synopsis','e-gyro-code','e-scanner-youtube'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('e-penalty').value='2';
   document.getElementById('e-penalite-active').checked=true;
   document.getElementById('e-active').checked=true;
@@ -624,6 +626,8 @@ async function editGlaciere(id){
     document.getElementById('e-tel').value=g.telephone||'';
     document.getElementById('e-penalty').value=g.penalty_min||2;
     document.getElementById('e-synopsis').value=g.synopsis||'';
+    document.getElementById('e-gyro-code').value=g.gyro_code||'';
+    document.getElementById('e-scanner-youtube').value=g.scanner_youtube_url||'';
     // Pénalité
     document.getElementById('e-penalite-active').checked=g.penalite_active!==false;
     document.getElementById('e-active').checked=g.active!==false;
@@ -692,6 +696,8 @@ async function saveGlaciere(){
     btnFlags['btn_'+k]=document.getElementById('btn-'+k).checked;
   });
   const synopsis=document.getElementById('e-synopsis').value.trim();
+  const gyroCode=document.getElementById('e-gyro-code').value.trim();
+  const scannerYoutube=document.getElementById('e-scanner-youtube').value.trim();
   const accent=document.getElementById('hex-accent').value;
   const bg=document.getElementById('hex-bg').value;
   const loupe1Filtre=document.getElementById('loupe1-filtre').value;
@@ -740,6 +746,7 @@ async function saveGlaciere(){
       penalty_min:penalty,penalite_active:penaliteActive,active:active,...btnFlags,
       couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,
       citation_victoire:citation||null,
+      gyro_code:gyroCode||null,scanner_youtube_url:scannerYoutube||null,
       music_url:musicUrl||null,bip_url:bipUrl||null,morse_url:morseUrl||null,
       mission_bg_url:bgUrl||null,
       game_bg_url:gameBgUrl||null,pause_bg_url:pauseBgUrl||null,
