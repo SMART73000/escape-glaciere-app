@@ -541,7 +541,7 @@ body::before{display:none;}
       </div>
       <div class="crown-item cr-pos-4" id="crown-item-boussole">
         <div class="cr-label loupe">BOUSSOLE</div>
-        <button class="action-btn loupe" onclick="openPanel('boussole');startBoussoleChallenge()"><span class="action-emoji">🧭</span></button>
+        <button class="action-btn loupe" onclick="requestAccessCode('boussole')"><span class="action-emoji">🧭</span></button>
       </div>
       <div class="crown-item cr-pos-0" id="crown-pause-item">
         <div class="cr-label" id="crown-toggle-label">DÉMARRER</div>
@@ -575,6 +575,25 @@ body::before{display:none;}
     <div style="font-size:14px;color:var(--muted);max-width:280px;line-height:1.6">Confirmez que vous avez résolu toutes les énigmes !</div>
     <button onclick="endVictory()" style="padding:13px 38px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#007a42);color:#fff;font-family:var(--fd);font-size:19px;letter-spacing:3px;cursor:pointer">OUI, ON A GAGNÉ ! 🎉</button>
     <button onclick="closeVC()" style="background:transparent;border:1px solid var(--border);color:var(--muted);padding:9px 22px;border-radius:8px;cursor:pointer;font-family:var(--fb);font-size:14px">Pas encore...</button>
+  </div>
+</div>
+
+<!-- PANEL CODE D'ACCÈS (verrou boussole/labyrinthe) -->
+<div class="panel-overlay" id="panel-gate">
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title" id="gate-title" style="color:#00d4ff">🔒 CODE D'ACCÈS</div>
+      <button class="panel-close" onclick="closeGate()">Fermer</button>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:6px;text-align:center">Entrez le code pour déverrouiller cet outil.</div>
+    <div class="numdisp"><div class="numdisp-val" id="nd-gate">—</div><div class="numdisp-cursor"></div></div>
+    <div class="numpad">
+      <button class="npbtn" onclick="np('gate','1')">1</button><button class="npbtn" onclick="np('gate','2')">2</button><button class="npbtn" onclick="np('gate','3')">3</button>
+      <button class="npbtn" onclick="np('gate','4')">4</button><button class="npbtn" onclick="np('gate','5')">5</button><button class="npbtn" onclick="np('gate','6')">6</button>
+      <button class="npbtn" onclick="np('gate','7')">7</button><button class="npbtn" onclick="np('gate','8')">8</button><button class="npbtn" onclick="np('gate','9')">9</button>
+      <button class="npbtn del" onclick="npDel('gate')">⌫</button><button class="npbtn" onclick="np('gate','0')">0</button><button class="npbtn go" onclick="submitGateCode()">OK ✓</button>
+    </div>
+    <div id="gate-error" class="hint-error" style="display:none">❌ Code incorrect, réessayez.</div>
   </div>
 </div>
 
@@ -616,8 +635,8 @@ body::before{display:none;}
     <div class="panel-header"><div class="panel-title" style="color:#00d4ff">⚙️ MACHINE</div><button class="panel-close" onclick="closePanel('mecanisme')">Fermer</button></div>
     <div style="font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.6">Choisissez l'outil correspondant à votre carte rouage ⚙️</div>
     <div class="meca-grid" style="grid-template-columns:repeat(3,1fr)">
-      <button class="meca-btn" id="meca-btn-gyroscope" onclick="showMeca('gyroscope')"><span class="meca-emoji">⚖️</span><div class="meca-label">GYROSCOPE</div></button>
-      <button class="meca-btn" id="meca-btn-scanner" onclick="showMeca('scanner')"><span class="meca-emoji">📷</span><div class="meca-label">SCANNER</div></button>
+      <button class="meca-btn" id="meca-btn-gyroscope" onclick="requestAccessCode('gyroscope')"><span class="meca-emoji">🕹️</span><div class="meca-label">JEU</div></button>
+      <button class="meca-btn" id="meca-btn-scanner" onclick="showMeca('scanner')"><span class="meca-emoji">📷</span><div class="meca-label">LECTEUR QR</div></button>
       <button class="meca-btn" id="meca-btn-loupe" onclick="closePanel('mecanisme');openPanel('loupe')"><span class="meca-emoji">🔍</span><div class="meca-label">LOUPE</div></button>
     </div>
     <div id="meca-gyroscope" style="display:none">
@@ -635,7 +654,7 @@ body::before{display:none;}
         <div class="scanner-frame"><div class="scanner-corner sc-tl"></div><div class="scanner-corner sc-tr"></div><div class="scanner-corner sc-bl"></div><div class="scanner-corner sc-br"></div><div class="scanner-line"></div></div>
         <div class="scanner-ph" id="scanner-ph">📷 Appuyez sur le bouton pour activer la caméra</div>
       </div>
-      <button class="scanner-start-btn" id="scanner-btn" onclick="startScanner()">📷 ACTIVER LE SCANNER</button>
+      <button class="scanner-start-btn" id="scanner-btn" onclick="startScanner()">📷 ACTIVER LE LECTEUR QR</button>
       <div class="scanner-result" id="scanner-result"></div>
     </div>
   </div>
@@ -793,7 +812,7 @@ const JC_MESSAGES = [
 let glaciere=null, cartes={}, codes={};
 let players=4, durMin=60, secsLeft=3600, secsUsed=0;
 let timerInt=null, paused=false, started=false, warmingShown=false;
-let npVals={indice:'',code:''};
+let npVals={indice:'',code:'',gate:''};
 let history=[], penaltyMin=2, penaltyActive=true, totalPen=0;
 let bgMusic=null, bipAudio=null, audioCtx=null;
 let currentCardNum=null, photoDataUrl=null;
@@ -955,7 +974,7 @@ function goSetup(){showScreen('s-setup');}
 // ── GAME ──
 function startGame(){
   secsLeft=60*60;secsUsed=0;totalPen=0;history=[];paused=false;started=false;warmingShown=false;
-  npVals={indice:'',code:''};currentCardNum=null;
+  npVals={indice:'',code:'',gate:''};currentCardNum=null;
   document.getElementById('players-chip').textContent=players+' 🧑';
   document.getElementById('topbar-ic-count').textContent='0';
   document.getElementById('heat-fill').style.width='0%';
@@ -1122,6 +1141,36 @@ function closePanel(id){
   if(id==='loupe'){stopLoupe();}
   if(id==='boussole'){stopBoussoleChallenge();}
 }
+
+// ── VERROU PAR CODE (boussole / labyrinthe) ──
+let pendingGateAction=null;
+function requestAccessCode(type){
+  const code=(type==='boussole')?(glaciere&&glaciere.boussole_access_code):(glaciere&&glaciere.gyro_access_code);
+  if(!code){ // aucun code configuré pour cette mission -> accès direct
+    if(type==='boussole'){openPanel('boussole');startBoussoleChallenge();}
+    if(type==='gyroscope'){showMeca('gyroscope');}
+    return;
+  }
+  pendingGateAction=type;
+  npVals.gate='';refreshND('gate');
+  document.getElementById('gate-error').style.display='none';
+  document.getElementById('gate-title').textContent=(type==='boussole')?'🔒 CODE — BOUSSOLE':'🔒 CODE — LABYRINTHE';
+  openPanel('gate');
+}
+function submitGateCode(){
+  if(!pendingGateAction)return;
+  const expected=(pendingGateAction==='boussole')?(glaciere.boussole_access_code||''):(glaciere.gyro_access_code||'');
+  if(npVals.gate && npVals.gate===String(expected).trim()){
+    closePanel('gate');
+    const action=pendingGateAction;pendingGateAction=null;
+    if(action==='boussole'){openPanel('boussole');startBoussoleChallenge();}
+    if(action==='gyroscope'){showMeca('gyroscope');}
+  }else{
+    document.getElementById('gate-error').style.display='block';
+    npVals.gate='';refreshND('gate');
+  }
+}
+function closeGate(){closePanel('gate');pendingGateAction=null;}
 
 // ── SEARCH HINT ──
 function searchHint(){
@@ -1515,7 +1564,7 @@ function stopScanner(){
   if(scannerStream)scannerStream.getTracks().forEach(t=>t.stop());
   document.getElementById('scanner-video').style.display='none';
   document.getElementById('scanner-ph').style.display='block';
-  document.getElementById('scanner-btn').textContent='📷 ACTIVER LE SCANNER';
+  document.getElementById('scanner-btn').textContent='📷 ACTIVER LE LECTEUR QR';
   document.getElementById('scanner-btn').onclick=startScanner;
 }
 let qrDetected=false;
