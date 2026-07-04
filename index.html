@@ -415,6 +415,7 @@ body::before{display:none;}
 
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
 </head>
 <body>
 <div id="root">
@@ -624,8 +625,13 @@ body::before{display:none;}
       </div>
     </div>
     <div id="meca-gyroscope" style="display:none">
-      <div class="gyro-wrap"><div class="gyro-circle"><div class="gyro-cross-h"></div><div class="gyro-cross-v"></div><div class="gyro-bubble" id="gyro-bubble"></div></div></div>
-      <div class="gyro-val" id="gyro-val">β: 0° | γ: 0°</div>
+      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
+      <div class="maze-wrap" style="width:100%;max-width:280px;margin:0 auto;position:relative">
+        <canvas id="maze-canvas" width="280" height="280" style="width:100%;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
+      </div>
+      <div class="gyro-val" id="gyro-val">Basculez le téléphone doucement…</div>
+      <button id="maze-reset-btn" onclick="resetMaze()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">↺ Recommencer le labyrinthe</button>
+      <div class="scanner-result" id="maze-result"></div>
     </div>
     <div id="meca-scanner" style="display:none">
       <div class="scanner-wrap">
@@ -1241,25 +1247,106 @@ function handleCompass(e){
   const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
   document.getElementById('compass-dir').textContent=dirs[Math.round(deg/22.5)%16];
 }
+// ── LABYRINTHE À BILLE (gyroscope) ──
+let gyroBeta=0, gyroGamma=0, mazeRAF=null, mazeWon=false;
+const MAZE_R=10;
+let mazeBall={x:20,y:20,vx:0,vy:0};
+const mazeStart={x:20,y:20};
+const mazeGoal={x:250,y:250,r:18};
+const mazeWalls=[
+  {x:0,y:70,w:200,h:16},
+  {x:80,y:140,w:200,h:16},
+  {x:0,y:210,w:200,h:16}
+];
+function resetMaze(){
+  mazeBall.x=mazeStart.x;mazeBall.y=mazeStart.y;mazeBall.vx=0;mazeBall.vy=0;mazeWon=false;
+  const res=document.getElementById('maze-result');
+  if(res){res.classList.remove('visible');res.textContent='';}
+  const gv=document.getElementById('gyro-val');
+  if(gv)gv.textContent='Basculez le téléphone doucement…';
+  drawMaze();
+}
 function startGyro(){
   if(!window.DeviceOrientationEvent){document.getElementById('gyro-val').textContent='Capteur non supporté';return;}
   gyroActive=true;
+  resetMaze();
   ensureOrientationPermission().then(ok=>{
     if(!gyroActive)return;
     if(!ok){document.getElementById('gyro-val').textContent='Accès au capteur refusé';return;}
     window.addEventListener('deviceorientation',handleGyro,true);
+    mazeLoop();
   });
 }
-function stopGyro(){gyroActive=false;window.removeEventListener('deviceorientation',handleGyro,true);}
+function stopGyro(){
+  gyroActive=false;
+  window.removeEventListener('deviceorientation',handleGyro,true);
+  if(mazeRAF)cancelAnimationFrame(mazeRAF);
+  mazeRAF=null;
+}
 function handleGyro(e){
   if(!gyroActive)return;
-  const b=e.beta||0,g=e.gamma||0;
-  const bx=Math.max(-45,Math.min(45,g));
-  const by=Math.max(-45,Math.min(45,b));
-  const px=50+bx*(50/45);const py=50+by*(50/45);
-  document.getElementById('gyro-bubble').style.left=px+'%';
-  document.getElementById('gyro-bubble').style.top=py+'%';
-  document.getElementById('gyro-val').textContent='β: '+Math.round(b)+'° | γ: '+Math.round(g)+'°';
+  gyroBeta=e.beta||0; gyroGamma=e.gamma||0;
+}
+function mazeLoop(){
+  if(!gyroActive)return;
+  updateMazePhysics();
+  drawMaze();
+  mazeRAF=requestAnimationFrame(mazeLoop);
+}
+function updateMazePhysics(){
+  if(mazeWon)return;
+  const gx=Math.max(-30,Math.min(30,gyroGamma));
+  const gy=Math.max(-30,Math.min(30,gyroBeta-30));
+  mazeBall.vx+=gx*0.012; mazeBall.vy+=gy*0.012;
+  mazeBall.vx*=0.92; mazeBall.vy*=0.92;
+  mazeBall.x+=mazeBall.vx; mazeBall.y+=mazeBall.vy;
+  if(mazeBall.x<MAZE_R){mazeBall.x=MAZE_R;mazeBall.vx=0;}
+  if(mazeBall.x>280-MAZE_R){mazeBall.x=280-MAZE_R;mazeBall.vx=0;}
+  if(mazeBall.y<MAZE_R){mazeBall.y=MAZE_R;mazeBall.vy=0;}
+  if(mazeBall.y>280-MAZE_R){mazeBall.y=280-MAZE_R;mazeBall.vy=0;}
+  mazeWalls.forEach(w=>{
+    const cx=Math.max(w.x,Math.min(mazeBall.x,w.x+w.w));
+    const cy=Math.max(w.y,Math.min(mazeBall.y,w.y+w.h));
+    const dx=mazeBall.x-cx,dy=mazeBall.y-cy;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<MAZE_R){
+      const overlap=MAZE_R-dist;
+      const nx=dist===0?0:dx/dist, ny=dist===0?1:dy/dist;
+      mazeBall.x+=nx*overlap; mazeBall.y+=ny*overlap;
+      const vn=mazeBall.vx*nx+mazeBall.vy*ny;
+      mazeBall.vx-=vn*nx; mazeBall.vy-=vn*ny;
+    }
+  });
+  const gdx=mazeBall.x-mazeGoal.x, gdy=mazeBall.y-mazeGoal.y;
+  if(Math.sqrt(gdx*gdx+gdy*gdy)<mazeGoal.r){mazeWon=true;onMazeWin();}
+}
+function drawMaze(){
+  const cv=document.getElementById('maze-canvas');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,280,280);
+  ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,280,280);
+  ctx.beginPath();ctx.arc(mazeGoal.x,mazeGoal.y,mazeGoal.r,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,204,0,.85)';ctx.fill();
+  ctx.strokeStyle='#ffcc00';ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='rgba(0,212,255,.35)';
+  mazeWalls.forEach(w=>ctx.fillRect(w.x,w.y,w.w,w.h));
+  ctx.strokeStyle='rgba(0,212,255,.7)';ctx.lineWidth=1;
+  mazeWalls.forEach(w=>ctx.strokeRect(w.x,w.y,w.w,w.h));
+  ctx.beginPath();ctx.arc(mazeBall.x,mazeBall.y,MAZE_R,0,Math.PI*2);
+  const grad=ctx.createRadialGradient(mazeBall.x-3,mazeBall.y-3,2,mazeBall.x,mazeBall.y,MAZE_R);
+  grad.addColorStop(0,'#ffffff');grad.addColorStop(1,'#00d4ff');
+  ctx.fillStyle=grad;ctx.fill();
+}
+function onMazeWin(){
+  const code=(glaciere&&glaciere.gyro_code)?glaciere.gyro_code:'';
+  const el=document.getElementById('maze-result');
+  if(el){
+    el.classList.add('visible');
+    el.innerHTML='🎉 Labyrinthe réussi !'+(code?'<br><span style="font-family:var(--fd);font-size:26px;letter-spacing:4px;color:var(--gold)">'+code+'</span>':'<br>Aucun code configuré pour cette mission.');
+  }
+  const gv=document.getElementById('gyro-val');
+  if(gv)gv.textContent='Bravo !';
 }
 
 // ── MICRO (V4: mot → code auto) ──
@@ -1310,24 +1397,47 @@ async function startScanner(){
   }catch(e){document.getElementById('scanner-ph').textContent='❌ Impossible d\'accéder à la caméra';}
 }
 function stopScanner(){
+  qrDetected=true;
   if(scannerStream)scannerStream.getTracks().forEach(t=>t.stop());
   document.getElementById('scanner-video').style.display='none';
   document.getElementById('scanner-ph').style.display='block';
   document.getElementById('scanner-btn').textContent='📷 ACTIVER LE SCANNER';
   document.getElementById('scanner-btn').onclick=startScanner;
 }
+let qrDetected=false;
 function scanQR(){
+  qrDetected=false;
   const v=document.getElementById('scanner-video');
   if(!v.srcObject)return;
   const canvas=document.createElement('canvas');
   const ctx=canvas.getContext('2d');
+  document.getElementById('scanner-result').textContent='📷 Caméra active — Pointez vers le QR code !';
+  document.getElementById('scanner-result').classList.add('visible');
   const check=setInterval(()=>{
-    if(!scannerStream){clearInterval(check);return;}
+    if(!scannerStream||qrDetected){clearInterval(check);return;}
+    if(!v.videoWidth){return;}
     canvas.width=v.videoWidth;canvas.height=v.videoHeight;
-    ctx.drawImage(v,0,0);
-    document.getElementById('scanner-result').textContent='📷 Caméra active — Pointez vers le QR code !';
-    document.getElementById('scanner-result').classList.add('visible');
-  },1000);
+    ctx.drawImage(v,0,0,canvas.width,canvas.height);
+    try{
+      const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+      const code=(typeof jsQR!=='undefined')?jsQR(imgData.data,imgData.width,imgData.height):null;
+      if(code&&code.data){
+        qrDetected=true;
+        clearInterval(check);
+        onQRDetected(code.data);
+      }
+    }catch(e){}
+  },350);
+}
+function onQRDetected(content){
+  const el=document.getElementById('scanner-result');
+  const ytUrl=(glaciere&&glaciere.scanner_youtube_url)?glaciere.scanner_youtube_url:'';
+  if(ytUrl){
+    el.innerHTML='✅ QR code détecté !<br>Ouverture de la vidéo…';
+    window.open(ytUrl,'_blank');
+  }else{
+    el.innerHTML='✅ QR code détecté !<br><span style="font-size:12px;word-break:break-all">'+content+'</span><br><span style="font-size:11px;opacity:.7">Aucune vidéo configurée pour cette mission.</span>';
+  }
 }
 
 // ── LOUPE V4 (filtres caméra) ──
