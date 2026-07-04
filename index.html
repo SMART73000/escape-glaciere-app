@@ -242,7 +242,8 @@ body::before{display:none;}
 /* ── PANELS ── */
 .panel-overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;}
 .panel-overlay.show{display:flex;}
-.panel{background:var(--card);border-radius:24px 24px 0 0;border-top:1px solid var(--border2);padding:20px 18px 40px;width:100%;max-width:500px;animation:slidePanel .3s ease;}
+.panel{background:var(--card);border-radius:24px 24px 0 0;border-top:1px solid var(--border2);padding:20px 18px 40px;width:100%;max-width:500px;animation:slidePanel .3s ease;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.panel-fixed-top{position:sticky;top:0;background:var(--card);z-index:5;padding-bottom:6px;}
 @keyframes slidePanel{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .panel-title{font-family:var(--fd);font-size:25px;letter-spacing:3px;}
@@ -600,16 +601,18 @@ body::before{display:none;}
 <!-- PANEL INDICE -->
 <div class="panel-overlay" id="panel-indice">
   <div class="panel">
-    <div class="panel-header">
-      <div class="panel-title" style="color:var(--gold)">💡 INDICE</div>
-      <button class="panel-close" onclick="closePanel('indice')">Fermer</button>
-    </div>
-    <div class="numdisp"><div class="numdisp-val" id="nd-indice">—</div><div class="numdisp-cursor"></div></div>
-    <div class="numpad">
-      <button class="npbtn" onclick="np('indice','1')">1</button><button class="npbtn" onclick="np('indice','2')">2</button><button class="npbtn" onclick="np('indice','3')">3</button>
-      <button class="npbtn" onclick="np('indice','4')">4</button><button class="npbtn" onclick="np('indice','5')">5</button><button class="npbtn" onclick="np('indice','6')">6</button>
-      <button class="npbtn" onclick="np('indice','7')">7</button><button class="npbtn" onclick="np('indice','8')">8</button><button class="npbtn" onclick="np('indice','9')">9</button>
-      <button class="npbtn del" onclick="npDel('indice')">⌫</button><button class="npbtn" onclick="np('indice','0')">0</button><button class="npbtn go" onclick="searchHint()">OK ✓</button>
+    <div class="panel-fixed-top">
+      <div class="panel-header">
+        <div class="panel-title" style="color:var(--gold)">💡 INDICE</div>
+        <button class="panel-close" onclick="closePanel('indice')">Fermer</button>
+      </div>
+      <div class="numdisp"><div class="numdisp-val" id="nd-indice">—</div><div class="numdisp-cursor"></div></div>
+      <div class="numpad">
+        <button class="npbtn" onclick="np('indice','1')">1</button><button class="npbtn" onclick="np('indice','2')">2</button><button class="npbtn" onclick="np('indice','3')">3</button>
+        <button class="npbtn" onclick="np('indice','4')">4</button><button class="npbtn" onclick="np('indice','5')">5</button><button class="npbtn" onclick="np('indice','6')">6</button>
+        <button class="npbtn" onclick="np('indice','7')">7</button><button class="npbtn" onclick="np('indice','8')">8</button><button class="npbtn" onclick="np('indice','9')">9</button>
+        <button class="npbtn del" onclick="npDel('indice')">⌫</button><button class="npbtn" onclick="np('indice','0')">0</button><button class="npbtn go" onclick="searchHint()">OK ✓</button>
+      </div>
     </div>
     <div class="hint-result" id="hint-result">
       <div class="hint-header"><div class="hint-badge" id="hint-badge">CARTE N°—</div><div class="penalty-badge" id="hint-penalty">−2 min</div></div>
@@ -1237,7 +1240,11 @@ function renderHistory(){
   s.style.display='block';
   l.innerHTML=history.map(h=>`<div class="history-item" onclick="reloadHint(${h.num})"><div class="history-num">${h.num}</div><div class="history-label">${h.label}</div><div class="history-arrow">Retour</div></div>`).join('');
 }
-function reloadHint(num){npVals.indice=String(num);searchHint();}
+function reloadHint(num){
+  npVals.indice=String(num);searchHint();
+  const p=document.querySelector('#panel-indice .panel');
+  if(p)p.scrollTo({top:0,behavior:'smooth'});
+}
 
 // ── MORSE (V4: play direct) ──
 function playMorse(){
