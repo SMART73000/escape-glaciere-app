@@ -304,6 +304,8 @@ body::before{display:none;}
 .gyro-cross-h{position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,.1);}
 .gyro-cross-v{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.1);}
 .gyro-val{font-family:var(--fd);font-size:14px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:2px;}
+.hold-progress-bar{width:100%;height:14px;border-radius:8px;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.25);overflow:hidden;}
+.hold-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#00ffcc);transition:width .1s linear;}
 
 /* Micro */
 .micro-wave{width:120px;height:120px;border-radius:50%;border:3px solid var(--red);margin:16px auto;display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;}
@@ -536,9 +538,9 @@ body::before{display:none;}
         <div class="cr-label eye">REVOIR</div>
         <button class="action-btn eye" onclick="showLastHint()"><span class="action-emoji">👁️</span></button>
       </div>
-      <div class="crown-item cr-pos-4" id="crown-item-loupe">
-        <div class="cr-label loupe">LOUPE</div>
-        <button class="action-btn loupe" onclick="openPanel('loupe')"><span class="action-emoji">🔍</span></button>
+      <div class="crown-item cr-pos-4" id="crown-item-boussole">
+        <div class="cr-label loupe">BOUSSOLE</div>
+        <button class="action-btn loupe" onclick="openPanel('boussole');startBoussoleChallenge()"><span class="action-emoji">🧭</span></button>
       </div>
       <div class="crown-item cr-pos-0" id="crown-pause-item">
         <div class="cr-label" id="crown-toggle-label">DÉMARRER</div>
@@ -612,10 +614,11 @@ body::before{display:none;}
   <div class="panel">
     <div class="panel-header"><div class="panel-title" style="color:#00d4ff">⚙️ MACHINE</div><button class="panel-close" onclick="closePanel('mecanisme')">Fermer</button></div>
     <div style="font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.6">Choisissez l'outil correspondant à votre carte rouage ⚙️</div>
-    <div class="meca-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="meca-grid" style="grid-template-columns:repeat(4,1fr)">
       <button class="meca-btn" id="meca-btn-boussole" onclick="showMeca('boussole')"><span class="meca-emoji">🧭</span><div class="meca-label">BOUSSOLE</div></button>
       <button class="meca-btn" id="meca-btn-gyroscope" onclick="showMeca('gyroscope')"><span class="meca-emoji">⚖️</span><div class="meca-label">GYROSCOPE</div></button>
       <button class="meca-btn" id="meca-btn-scanner" onclick="showMeca('scanner')"><span class="meca-emoji">📷</span><div class="meca-label">SCANNER</div></button>
+      <button class="meca-btn" id="meca-btn-loupe" onclick="closePanel('mecanisme');openPanel('loupe')"><span class="meca-emoji">🔍</span><div class="meca-label">LOUPE</div></button>
     </div>
     <div id="meca-boussole" style="display:none">
       <div class="compass-wrap">
@@ -626,8 +629,8 @@ body::before{display:none;}
     </div>
     <div id="meca-gyroscope" style="display:none">
       <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
-      <div class="maze-wrap" style="width:100%;max-width:280px;margin:0 auto;position:relative">
-        <canvas id="maze-canvas" width="280" height="280" style="width:100%;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
+      <div class="maze-wrap" style="width:100%;max-width:300px;margin:0 auto;position:relative">
+        <canvas id="maze-canvas" width="300" height="300" style="width:100%;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
       </div>
       <div class="gyro-val" id="gyro-val">Basculez le téléphone doucement…</div>
       <button id="maze-reset-btn" onclick="resetMaze()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">↺ Recommencer le labyrinthe</button>
@@ -642,6 +645,24 @@ body::before{display:none;}
       <button class="scanner-start-btn" id="scanner-btn" onclick="startScanner()">📷 ACTIVER LE SCANNER</button>
       <div class="scanner-result" id="scanner-result"></div>
     </div>
+  </div>
+</div>
+
+<!-- PANEL BOUSSOLE (défi : viser une direction et rester stable) -->
+<div class="panel-overlay" id="panel-boussole">
+  <div class="panel">
+    <div class="panel-header"><div class="panel-title" style="color:#00d4ff">🧭 BOUSSOLE</div><button class="panel-close" onclick="closePanel('boussole')">Fermer</button></div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px;line-height:1.6">Orientez le téléphone dans la direction indiquée sur votre carte, et restez stable.</div>
+    <div class="compass-wrap">
+      <div class="compass-letters"><div class="c-n">N</div><div class="c-s">S</div><div class="c-e">E</div><div class="c-w">O</div></div>
+      <div class="compass-needle" id="boussole-needle"></div>
+      <div><div class="compass-deg" id="boussole-deg">0°</div><div class="compass-dir" id="boussole-dir-label">—</div></div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="hold-progress-bar"><div class="hold-progress-fill" id="boussole-progress"></div></div>
+      <div class="gyro-val" id="boussole-status">Orientez-vous…</div>
+    </div>
+    <div class="scanner-result" id="boussole-result"></div>
   </div>
 </div>
 
@@ -754,13 +775,13 @@ const SUPABASE_KEY = 'sb_publishable_2TzK9VfplPjCRi_WhPj4nA_BooLFTQs';
 function applyButtonVisibility(g){
   const map={
     machine:'crown-item-machine', morse:'crown-item-morse', micro:'crown-item-micro',
-    revoir:'crown-item-revoir', loupe:'crown-item-loupe', indice:'crown-item-indice'
+    revoir:'crown-item-revoir', boussole:'crown-item-boussole', indice:'crown-item-indice'
   };
   Object.keys(map).forEach(k=>{
     const el=document.getElementById(map[k]);
     if(el) el.style.display=(g['btn_'+k]===false)?'none':'';
   });
-  const mecaMap={boussole:'meca-btn-boussole', gyroscope:'meca-btn-gyroscope', scanner:'meca-btn-scanner'};
+  const mecaMap={boussole:'meca-btn-boussole', gyroscope:'meca-btn-gyroscope', scanner:'meca-btn-scanner', loupe:'meca-btn-loupe'};
   Object.keys(mecaMap).forEach(k=>{
     const el=document.getElementById(mecaMap[k]);
     if(el) el.style.display=(g['btn_'+k]===false)?'none':'';
@@ -1106,6 +1127,7 @@ function closePanel(id){
   if(id==='mecanisme'){stopCompass();stopGyro();stopScanner();}
   if(id==='micro'){stopMicro();}
   if(id==='loupe'){stopLoupe();}
+  if(id==='boussole'){stopBoussoleChallenge();}
 }
 
 // ── SEARCH HINT ──
@@ -1247,16 +1269,93 @@ function handleCompass(e){
   const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
   document.getElementById('compass-dir').textContent=dirs[Math.round(deg/22.5)%16];
 }
+// ── BOUSSOLE (défi : viser une direction et rester stable) ──
+let boussoleActive=false, boussoleHeading=0, boussoleHoldStart=null, boussoleWon=false, boussoleRAF=null;
+const BOUSSOLE_TOLERANCE=18;
+function startBoussoleChallenge(){
+  boussoleWon=false; boussoleHoldStart=null;
+  const res=document.getElementById('boussole-result');if(res){res.classList.remove('visible');res.textContent='';}
+  const status=document.getElementById('boussole-status');if(status)status.textContent='Orientez-vous…';
+  const fill=document.getElementById('boussole-progress');if(fill)fill.style.width='0%';
+  if(!window.DeviceOrientationEvent){if(status)status.textContent='Capteur non supporté';return;}
+  boussoleActive=true;
+  ensureOrientationPermission().then(ok=>{
+    if(!boussoleActive)return;
+    if(!ok){if(status)status.textContent='Accès au capteur refusé';return;}
+    window.addEventListener('deviceorientationabsolute',handleBoussoleOrientation,true);
+    window.addEventListener('deviceorientation',handleBoussoleOrientation,true);
+    boussoleLoop();
+  });
+}
+function stopBoussoleChallenge(){
+  boussoleActive=false;
+  window.removeEventListener('deviceorientationabsolute',handleBoussoleOrientation,true);
+  window.removeEventListener('deviceorientation',handleBoussoleOrientation,true);
+  if(boussoleRAF)cancelAnimationFrame(boussoleRAF);
+  boussoleRAF=null;
+}
+function handleBoussoleOrientation(e){
+  if(!boussoleActive)return;
+  let deg=e.alpha||0;
+  if(e.webkitCompassHeading||e.webkitCompassHeading===0)deg=e.webkitCompassHeading;
+  boussoleHeading=Math.round(deg);
+}
+function boussoleLoop(){
+  if(!boussoleActive)return;
+  updateBoussoleChallenge();
+  boussoleRAF=requestAnimationFrame(boussoleLoop);
+}
+function angDiff(a,b){const d=Math.abs(a-b)%360;return d>180?360-d:d;}
+function updateBoussoleChallenge(){
+  if(boussoleWon)return;
+  const needle=document.getElementById('boussole-needle');
+  const degEl=document.getElementById('boussole-deg');
+  const dirEl=document.getElementById('boussole-dir-label');
+  if(needle)needle.style.transform='rotate('+boussoleHeading+'deg)';
+  if(degEl)degEl.textContent=boussoleHeading+'°';
+  const dirs=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO'];
+  if(dirEl)dirEl.textContent=dirs[Math.round(((boussoleHeading%360+360)%360)/22.5)%16];
+  const target=(glaciere&&glaciere.boussole_target_deg!=null)?parseFloat(glaciere.boussole_target_deg):0;
+  const holdSeconds=(glaciere&&glaciere.boussole_hold_seconds)?parseFloat(glaciere.boussole_hold_seconds):3;
+  const diff=angDiff(boussoleHeading,target);
+  const status=document.getElementById('boussole-status');
+  const fill=document.getElementById('boussole-progress');
+  if(diff<=BOUSSOLE_TOLERANCE){
+    if(!boussoleHoldStart)boussoleHoldStart=Date.now();
+    const elapsed=(Date.now()-boussoleHoldStart)/1000;
+    const pct=Math.min(100,(elapsed/holdSeconds)*100);
+    if(fill)fill.style.width=pct+'%';
+    if(status)status.textContent='Restez stable… '+Math.max(0,holdSeconds-elapsed).toFixed(1)+'s';
+    if(elapsed>=holdSeconds){boussoleWon=true;onBoussoleWin();}
+  }else{
+    boussoleHoldStart=null;
+    if(fill)fill.style.width='0%';
+    if(status)status.textContent='Orientez-vous… ('+Math.round(diff)+'° d\'écart)';
+  }
+}
+function onBoussoleWin(){
+  const code=(glaciere&&glaciere.boussole_code)?glaciere.boussole_code:'';
+  const el=document.getElementById('boussole-result');
+  if(el){
+    el.classList.add('visible');
+    el.innerHTML='🎉 Direction trouvée !'+(code?'<br><span style="font-family:var(--fd);font-size:26px;letter-spacing:4px;color:var(--gold)">'+code+'</span>':'<br>Aucun code configuré pour cette mission.');
+  }
+  const status=document.getElementById('boussole-status');if(status)status.textContent='Bravo !';
+}
+
 // ── LABYRINTHE À BILLE (gyroscope) ──
 let gyroBeta=0, gyroGamma=0, mazeRAF=null, mazeWon=false;
-const MAZE_R=10;
-let mazeBall={x:20,y:20,vx:0,vy:0};
-const mazeStart={x:20,y:20};
-const mazeGoal={x:250,y:250,r:18};
+const MAZE_R=9;
+const MAZE_SIZE=300;
+let mazeBall={x:22,y:25,vx:0,vy:0};
+const mazeStart={x:22,y:25};
+const mazeGoal={x:278,y:275,r:16};
 const mazeWalls=[
-  {x:0,y:70,w:200,h:16},
-  {x:80,y:140,w:200,h:16},
-  {x:0,y:210,w:200,h:16}
+  {x:0,y:50,w:250,h:14},
+  {x:50,y:100,w:250,h:14},
+  {x:0,y:150,w:250,h:14},
+  {x:50,y:200,w:250,h:14},
+  {x:0,y:250,w:250,h:14}
 ];
 function resetMaze(){
   mazeBall.x=mazeStart.x;mazeBall.y=mazeStart.y;mazeBall.vx=0;mazeBall.vy=0;mazeWon=false;
@@ -1301,9 +1400,9 @@ function updateMazePhysics(){
   mazeBall.vx*=0.92; mazeBall.vy*=0.92;
   mazeBall.x+=mazeBall.vx; mazeBall.y+=mazeBall.vy;
   if(mazeBall.x<MAZE_R){mazeBall.x=MAZE_R;mazeBall.vx=0;}
-  if(mazeBall.x>280-MAZE_R){mazeBall.x=280-MAZE_R;mazeBall.vx=0;}
+  if(mazeBall.x>MAZE_SIZE-MAZE_R){mazeBall.x=MAZE_SIZE-MAZE_R;mazeBall.vx=0;}
   if(mazeBall.y<MAZE_R){mazeBall.y=MAZE_R;mazeBall.vy=0;}
-  if(mazeBall.y>280-MAZE_R){mazeBall.y=280-MAZE_R;mazeBall.vy=0;}
+  if(mazeBall.y>MAZE_SIZE-MAZE_R){mazeBall.y=MAZE_SIZE-MAZE_R;mazeBall.vy=0;}
   mazeWalls.forEach(w=>{
     const cx=Math.max(w.x,Math.min(mazeBall.x,w.x+w.w));
     const cy=Math.max(w.y,Math.min(mazeBall.y,w.y+w.h));
@@ -1324,8 +1423,8 @@ function drawMaze(){
   const cv=document.getElementById('maze-canvas');
   if(!cv)return;
   const ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,280,280);
-  ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,280,280);
+  ctx.clearRect(0,0,MAZE_SIZE,MAZE_SIZE);
+  ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,MAZE_SIZE,MAZE_SIZE);
   ctx.beginPath();ctx.arc(mazeGoal.x,mazeGoal.y,mazeGoal.r,0,Math.PI*2);
   ctx.fillStyle='rgba(255,204,0,.85)';ctx.fill();
   ctx.strokeStyle='#ffcc00';ctx.lineWidth=2;ctx.stroke();
