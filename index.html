@@ -972,7 +972,7 @@ function showTuto(){document.getElementById('tuto-overlay').classList.add('show'
 function closeTuto(){document.getElementById('tuto-overlay').classList.remove('show');}
 
 // ── SETUP ──
-function adj(d){players=Math.max(1,Math.min(7,players+d));document.getElementById('pcount').textContent=players;}
+function adj(d){players=Math.max(2,Math.min(7,players+d));document.getElementById('pcount').textContent=players;}
 function goSetup(){showScreen('s-setup');}
 
 // ── GAME ──
@@ -1526,6 +1526,22 @@ function onMazeWin(){
 
 // ── MICRO (V4: mot → code auto) ──
 function toggleMicro(){if(microActive)stopMicro();else startMicro();}
+function normalizeSpeech(str){
+  return str
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // enlève les accents
+    .toLowerCase()
+    .replace(/[.,!?;:'"’‘«»]/g,' ')                   // enlève la ponctuation courante
+    .replace(/\s+/g,' ')                              // espaces multiples -> un seul
+    .trim();
+}
+function wordOverlapRatio(captionNorm,spokenNorm){
+  const capWords=captionNorm.split(' ').filter(Boolean);
+  if(!capWords.length)return 0;
+  const spokenWords=new Set(spokenNorm.split(' ').filter(Boolean));
+  let hits=0;
+  capWords.forEach(w=>{if(spokenWords.has(w))hits++;});
+  return hits/capWords.length;
+}
 function startMicro(){
   if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
     document.getElementById('micro-status').textContent='NON SUPPORTÉ SUR CE NAVIGATEUR';return;
@@ -1534,12 +1550,19 @@ function startMicro(){
   recognition=new SR();
   recognition.lang='fr-FR';recognition.continuous=false;recognition.interimResults=false;
   recognition.onresult=e=>{
-    const txt=e.results[0][0].transcript.toLowerCase().trim();
+    const rawTxt=e.results[0][0].transcript.trim();
+    const txt=normalizeSpeech(rawTxt);
     const res=document.getElementById('micro-result');
-    res.textContent='🎤 Entendu : "'+txt+'"';
+    res.textContent='🎤 Entendu : "'+rawTxt+'"';
     res.classList.add('visible');
-    // V4: cherche un code lié à ce mot dans Supabase
-    const matched=Object.values(cartes).find(c=>c.caption&&c.caption.toLowerCase()===txt&&c.numero>=200);
+    // V5: comparaison tolérante par recouvrement de mots (accents/ponctuation ignorés, quelques mots peuvent être mal reconnus)
+    let best=null,bestScore=0;
+    Object.values(cartes).forEach(c=>{
+      if(!c.caption||c.numero<200)return;
+      const score=wordOverlapRatio(normalizeSpeech(c.caption),txt);
+      if(score>bestScore){bestScore=score;best=c;}
+    });
+    const matched=(bestScore>=0.7)?best:null;
     if(matched&&matched.caption_code){
       document.getElementById('micro-code-val').textContent=matched.caption_code;
       document.getElementById('micro-code-reveal').style.display='block';
