@@ -458,12 +458,12 @@ textarea.bo-input{resize:vertical;min-height:90px;}
             💡 <strong>3 types de cartes :</strong><br>
             • <strong>💡 INDICE N°1-99</strong> — Indice visuel<br>
             • <strong>🔓 RÉPONSE N°101-199</strong> — Réponse de l'énigme N°(X-100)<br>
-            • <strong>🔐 CODE MORSE N°201-299</strong> — Upload MP3 du morse (le son global est configuré dans Sons)
+            • <strong>🔐 CODE MORSE / MICRO N°201-299</strong> — Upload MP3 du morse + mot déclencheur pour le micro (le son global est configuré dans Sons)
           </div>
           <div class="cards-list" id="cards-list"></div>
           <button class="add-btn" onclick="addCard('hint')" style="margin-top:10px">💡 Ajouter carte INDICE</button>
           <button class="add-btn orange" onclick="addCard('answer')" style="margin-top:7px">🔓 Ajouter carte RÉPONSE</button>
-          <button class="add-btn green" onclick="addCard('code')" style="margin-top:7px">🔐 Ajouter carte CODE MORSE</button>
+          <button class="add-btn green" onclick="addCard('code')" style="margin-top:7px">🔐 Ajouter carte CODE MORSE / MICRO</button>
         </div>
 
         <button class="save-btn" onclick="saveGlaciere()">💾 SAUVEGARDER LA MISSION</button>
@@ -856,7 +856,7 @@ function addCardRow(num,caption,img,type='hint',captionCode=''){
   const div=document.createElement('div');
   div.className='card-row';div.id=id;div.dataset.num=num;div.dataset.img=img;
   const badgeClass=isCode?'ctb-code':isAnswer?'ctb-answer':'ctb-hint';
-  const badgeLabel=isCode?'🔐 CODE MORSE':isAnswer?'🔓 RÉPONSE':'💡 INDICE';
+  const badgeLabel=isCode?'🔐 CODE MORSE / MICRO':isAnswer?'🔓 RÉPONSE':'💡 INDICE';
   const mediaZone=isCode?`
     <div class="audio-zone">
       <input type="file" accept="audio/*" class="audio-input" onchange="handleCardAudio(event,'${id}')">
