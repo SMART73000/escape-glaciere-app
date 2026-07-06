@@ -568,6 +568,13 @@ async function uploadFile(file,name){
   return SUPABASE_URL+'/storage/v1/object/public/indices/'+path;
 }
 
+async function toggleGlaciereActive(id,wasActive){
+  try{
+    await supaFetch('glacieres?id=eq.'+id,{method:'PATCH',body:JSON.stringify({active:!wasActive})});
+    loadGlacieres();
+  }catch(e){alert('Erreur : '+e.message);loadGlacieres();}
+}
+
 async function loadGlacieres(){
   const list=document.getElementById('glacieres-list');
   try{
@@ -593,6 +600,10 @@ async function loadGlacieres(){
         <div class="gl-header">
           <div class="gl-name">${g.nom_escape||g.nom}</div>
           <div class="gl-actions">
+            <label class="toggle-switch" title="Mission active / bientôt disponible" style="margin-right:4px">
+              <input type="checkbox" ${g.active!==false?'checked':''} onchange="toggleGlaciereActive('${g.id}',${g.active!==false})">
+              <span class="toggle-slider"></span>
+            </label>
             <button class="gl-btn edit" onclick="editGlaciere('${g.id}')">✏️ Modifier</button>
             <button class="gl-btn del" onclick="delGlaciere('${g.id}','${g.nom}')">🗑</button>
           </div>
