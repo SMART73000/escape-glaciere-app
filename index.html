@@ -645,8 +645,8 @@ body::before{display:none;}
     </div>
     <div id="meca-gyroscope" style="display:none">
       <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
-      <div class="maze-wrap" style="width:100%;max-width:300px;margin:0 auto;position:relative">
-        <canvas id="maze-canvas" width="300" height="300" style="width:100%;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
+      <div class="maze-wrap" style="width:100%;display:flex;justify-content:center;margin:0 auto;position:relative">
+        <canvas id="maze-canvas" width="290" height="480" style="max-width:100%;max-height:48vh;width:auto;height:auto;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
       </div>
       <div class="gyro-val" id="gyro-val">Basculez le téléphone doucement…</div>
       <button id="maze-reset-btn" onclick="resetMaze()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">↺ Recommencer le labyrinthe</button>
@@ -1419,20 +1419,55 @@ function onBoussoleWin(){
   const status=document.getElementById('boussole-status');if(status)status.textContent='Bravo !';
 }
 
-// ── LABYRINTHE À BILLE (gyroscope) ──
+// ── LABYRINTHE À BILLE (gyroscope) : vrai labyrinthe à parois fines, généré et garanti solvable ──
 let gyroBeta=0, gyroGamma=0, mazeRAF=null, mazeWon=false;
-const MAZE_R=9;
-const MAZE_SIZE=300;
-let mazeBall={x:22,y:25,vx:0,vy:0};
-const mazeStart={x:22,y:25};
-const mazeGoal={x:278,y:275,r:16};
-const mazeWalls=[
-  {x:0,y:50,w:250,h:14},
-  {x:50,y:100,w:250,h:14},
-  {x:0,y:150,w:250,h:14},
-  {x:50,y:200,w:250,h:14},
-  {x:0,y:250,w:250,h:14}
-];
+const MAZE_R=6;
+const MAZE_COLS=7, MAZE_ROWS=12, MAZE_CELL=38, MAZE_WT=5;
+const MAZE_OX=12, MAZE_OY=12;
+const MAZE_W=MAZE_OX*2+MAZE_COLS*MAZE_CELL, MAZE_H=MAZE_OY*2+MAZE_ROWS*MAZE_CELL;
+function mulberry32(seed){
+  return function(){
+    seed|=0;seed=(seed+0x6D2B79F5)|0;
+    let t=Math.imul(seed^(seed>>>15),1|seed);
+    t=(t+Math.imul(t^(t>>>7),61|t))^t;
+    return ((t^(t>>>14))>>>0)/4294967296;
+  };
+}
+function generateMazeGrid(cols,rows,rng){
+  const grid=[];
+  for(let r=0;r<rows;r++){const row=[];for(let c=0;c<cols;c++)row.push({n:true,e:true,s:true,w:true,visited:false});grid.push(row);}
+  const stack=[];let cur={r:0,c:0};grid[0][0].visited=true;let visited=1;const total=cols*rows;
+  while(visited<total){
+    const {r,c}=cur;const nb=[];
+    if(r>0&&!grid[r-1][c].visited)nb.push({r:r-1,c,dir:'n'});
+    if(r<rows-1&&!grid[r+1][c].visited)nb.push({r:r+1,c,dir:'s'});
+    if(c>0&&!grid[r][c-1].visited)nb.push({r,c:c-1,dir:'w'});
+    if(c<cols-1&&!grid[r][c+1].visited)nb.push({r,c:c+1,dir:'e'});
+    if(nb.length){
+      const nx=nb[Math.floor(rng()*nb.length)];
+      const opp={n:'s',s:'n',e:'w',w:'e'};
+      grid[r][c][nx.dir]=false;grid[nx.r][nx.c][opp[nx.dir]]=false;
+      grid[nx.r][nx.c].visited=true;visited++;stack.push(cur);cur={r:nx.r,c:nx.c};
+    }else if(stack.length){cur=stack.pop();}else{break;}
+  }
+  return grid;
+}
+function gridToWalls(grid,cols,rows,cell,ox,oy,t){
+  const walls=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const cel=grid[r][c],x=ox+c*cell,y=oy+r*cell;
+    if(cel.n)walls.push({x:x-t/2,y:y-t/2,w:cell+t,h:t});
+    if(cel.w)walls.push({x:x-t/2,y:y-t/2,w:t,h:cell+t});
+  }
+  for(let c=0;c<cols;c++){const x=ox+c*cell,y=oy+rows*cell;walls.push({x:x-t/2,y:y-t/2,w:cell+t,h:t});}
+  for(let r=0;r<rows;r++){const x=ox+cols*cell,y=oy+r*cell;walls.push({x:x-t/2,y:y-t/2,w:t,h:cell+t});}
+  return walls;
+}
+const mazeGrid=generateMazeGrid(MAZE_COLS,MAZE_ROWS,mulberry32(1422));
+const mazeWalls=gridToWalls(mazeGrid,MAZE_COLS,MAZE_ROWS,MAZE_CELL,MAZE_OX,MAZE_OY,MAZE_WT);
+let mazeBall={x:MAZE_OX+MAZE_CELL/2,y:MAZE_OY+MAZE_CELL/2,vx:0,vy:0};
+const mazeStart={x:MAZE_OX+MAZE_CELL/2,y:MAZE_OY+MAZE_CELL/2};
+const mazeGoal={x:MAZE_OX+(MAZE_COLS-0.5)*MAZE_CELL,y:MAZE_OY+(MAZE_ROWS-0.5)*MAZE_CELL,r:14};
 function resetMaze(){
   mazeBall.x=mazeStart.x;mazeBall.y=mazeStart.y;mazeBall.vx=0;mazeBall.vy=0;mazeWon=false;
   const res=document.getElementById('maze-result');
@@ -1474,11 +1509,14 @@ function updateMazePhysics(){
   const gy=Math.max(-30,Math.min(30,gyroBeta-30));
   mazeBall.vx+=gx*0.012; mazeBall.vy+=gy*0.012;
   mazeBall.vx*=0.92; mazeBall.vy*=0.92;
+  const MAZE_MAXV=3.5;
+  mazeBall.vx=Math.max(-MAZE_MAXV,Math.min(MAZE_MAXV,mazeBall.vx));
+  mazeBall.vy=Math.max(-MAZE_MAXV,Math.min(MAZE_MAXV,mazeBall.vy));
   mazeBall.x+=mazeBall.vx; mazeBall.y+=mazeBall.vy;
   if(mazeBall.x<MAZE_R){mazeBall.x=MAZE_R;mazeBall.vx=0;}
-  if(mazeBall.x>MAZE_SIZE-MAZE_R){mazeBall.x=MAZE_SIZE-MAZE_R;mazeBall.vx=0;}
+  if(mazeBall.x>MAZE_W-MAZE_R){mazeBall.x=MAZE_W-MAZE_R;mazeBall.vx=0;}
   if(mazeBall.y<MAZE_R){mazeBall.y=MAZE_R;mazeBall.vy=0;}
-  if(mazeBall.y>MAZE_SIZE-MAZE_R){mazeBall.y=MAZE_SIZE-MAZE_R;mazeBall.vy=0;}
+  if(mazeBall.y>MAZE_H-MAZE_R){mazeBall.y=MAZE_H-MAZE_R;mazeBall.vy=0;}
   mazeWalls.forEach(w=>{
     const cx=Math.max(w.x,Math.min(mazeBall.x,w.x+w.w));
     const cy=Math.max(w.y,Math.min(mazeBall.y,w.y+w.h));
@@ -1499,8 +1537,8 @@ function drawMaze(){
   const cv=document.getElementById('maze-canvas');
   if(!cv)return;
   const ctx=cv.getContext('2d');
-  ctx.clearRect(0,0,MAZE_SIZE,MAZE_SIZE);
-  ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,MAZE_SIZE,MAZE_SIZE);
+  ctx.clearRect(0,0,MAZE_W,MAZE_H);
+  ctx.fillStyle='#0a0a1a';ctx.fillRect(0,0,MAZE_W,MAZE_H);
   ctx.beginPath();ctx.arc(mazeGoal.x,mazeGoal.y,mazeGoal.r,0,Math.PI*2);
   ctx.fillStyle='rgba(255,204,0,.85)';ctx.fill();
   ctx.strokeStyle='#ffcc00';ctx.lineWidth=2;ctx.stroke();
