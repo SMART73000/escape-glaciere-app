@@ -307,13 +307,6 @@ body::before{display:none;}
 .gyro-cross-h{position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,.1);}
 .gyro-cross-v{position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.1);}
 .gyro-val{font-family:var(--fd);font-size:14px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:2px;}
-.maze-win-overlay{display:none;position:absolute;inset:0;background:rgba(5,10,25,.94);border-radius:12px;align-items:center;justify-content:center;z-index:5;backdrop-filter:blur(3px);animation:slidePanel .25s ease;}
-.maze-win-overlay.show{display:flex;}
-.maze-win-content{text-align:center;padding:24px 20px;}
-.maze-win-title{font-family:var(--fd);font-size:17px;letter-spacing:2px;color:var(--ice);margin:8px 0 14px;}
-.maze-win-code{font-family:var(--fd);font-size:32px;letter-spacing:6px;color:var(--gold);margin-bottom:22px;word-break:break-word;}
-.maze-win-img{max-width:180px;max-height:180px;border-radius:12px;display:block;margin:0 auto 14px;box-shadow:0 0 0 2px rgba(255,204,74,.3);}
-.maze-win-close{padding:11px 28px;border-radius:12px;border:1px solid var(--border2);background:rgba(0,212,255,.12);color:var(--ice);font-family:var(--fb);font-size:14px;font-weight:600;cursor:pointer;}
 .hold-progress-bar{width:100%;height:14px;border-radius:8px;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.25);overflow:hidden;}
 .hold-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#00ffcc);transition:width .1s linear;}
 
@@ -342,6 +335,8 @@ body::before{display:none;}
 .scanner-start-btn{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#cc44ff,#8800cc);color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px;}
 .scanner-result{text-align:center;padding:14px;border-radius:12px;background:rgba(200,0,255,.08);border:1px solid rgba(200,0,255,.2);color:#cc88ff;font-size:13px;margin-top:12px;display:none;line-height:1.7;}
 .scanner-result.visible{display:block;}
+#maze-result.visible{padding:6px;}
+#maze-result img{width:100%!important;height:auto!important;max-width:100%!important;display:block;border-radius:10px;}
 
 /* ── LOUPE PANEL ── */
 .loupe-filter-wrap{width:100%;border-radius:14px;overflow:hidden;background:#000;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative;margin-top:12px;}
@@ -654,18 +649,10 @@ body::before{display:none;}
       <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
       <div class="maze-wrap" style="width:100%;display:flex;justify-content:center;margin:0 auto;position:relative">
         <canvas id="maze-canvas" width="290" height="480" style="max-width:100%;max-height:48vh;width:auto;height:auto;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
-        <div id="maze-win-overlay" class="maze-win-overlay">
-          <div class="maze-win-content">
-            <div style="font-size:42px">🎉</div>
-            <div class="maze-win-title">LABYRINTHE RÉUSSI !</div>
-            <img id="maze-win-img" class="maze-win-img" style="display:none">
-            <div id="maze-win-code" class="maze-win-code"></div>
-            <button class="maze-win-close" onclick="closeMazeWinOverlay()">Fermer</button>
-          </div>
-        </div>
       </div>
       <div class="gyro-val" id="gyro-val">Basculez le téléphone doucement…</div>
       <button id="maze-reset-btn" onclick="resetMaze()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">↺ Recommencer le labyrinthe</button>
+      <div class="scanner-result" id="maze-result"></div>
     </div>
     <div id="meca-scanner" style="display:none">
       <div class="scanner-wrap">
@@ -1485,8 +1472,8 @@ const mazeStart={x:MAZE_OX+MAZE_CELL/2,y:MAZE_OY+MAZE_CELL/2};
 const mazeGoal={x:MAZE_OX+(MAZE_COLS-0.5)*MAZE_CELL,y:MAZE_OY+(MAZE_ROWS-0.5)*MAZE_CELL,r:14};
 function resetMaze(){
   mazeBall.x=mazeStart.x;mazeBall.y=mazeStart.y;mazeBall.vx=0;mazeBall.vy=0;mazeWon=false;
-  const ov=document.getElementById('maze-win-overlay');
-  if(ov)ov.classList.remove('show');
+  const res=document.getElementById('maze-result');
+  if(res){res.classList.remove('visible');res.textContent='';}
   const gv=document.getElementById('gyro-val');
   if(gv)gv.textContent='Basculez le téléphone doucement…';
   drawMaze();
@@ -1568,22 +1555,13 @@ function drawMaze(){
 }
 function onMazeWin(){
   const code=(glaciere&&glaciere.gyro_code)?glaciere.gyro_code:'';
-  const imgUrl=(glaciere&&glaciere.gyro_image_url)?glaciere.gyro_image_url:'';
-  const codeEl=document.getElementById('maze-win-code');
-  if(codeEl)codeEl.textContent=code||(imgUrl?'':'Aucun code configuré pour cette mission.');
-  const imgEl=document.getElementById('maze-win-img');
-  if(imgEl){
-    if(imgUrl){imgEl.src=imgUrl;imgEl.style.display='block';}
-    else{imgEl.style.display='none';}
+  const el=document.getElementById('maze-result');
+  if(el){
+    el.classList.add('visible');
+    el.innerHTML=code?code:'Aucun code configuré pour cette mission.';
   }
-  const ov=document.getElementById('maze-win-overlay');
-  if(ov)ov.classList.add('show');
   const gv=document.getElementById('gyro-val');
   if(gv)gv.textContent='Bravo !';
-}
-function closeMazeWinOverlay(){
-  const ov=document.getElementById('maze-win-overlay');
-  if(ov)ov.classList.remove('show');
 }
 
 // ── MICRO (V4: mot → code auto) ──
