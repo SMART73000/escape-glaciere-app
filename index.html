@@ -335,8 +335,10 @@ body::before{display:none;}
 .scanner-start-btn{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#cc44ff,#8800cc);color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px;}
 .scanner-result{text-align:center;padding:14px;border-radius:12px;background:rgba(200,0,255,.08);border:1px solid rgba(200,0,255,.2);color:#cc88ff;font-size:13px;margin-top:12px;display:none;line-height:1.7;}
 .scanner-result.visible{display:block;}
-#maze-result.visible{padding:6px;}
-#maze-result img{width:100%!important;height:auto!important;max-width:100%!important;display:block;border-radius:10px;}
+#maze-result{position:absolute;inset:0;margin:0;padding:0;border-radius:12px;background:rgba(5,5,15,.96);display:none;align-items:center;justify-content:center;z-index:3;overflow:hidden;}
+#maze-result.visible{display:flex;}
+#maze-result-content img{width:100%;height:100%;object-fit:contain;display:block;border-radius:12px;}
+#maze-result-content{color:#cc88ff;font-size:13px;text-align:center;padding:20px;}
 
 /* ── LOUPE PANEL ── */
 .loupe-filter-wrap{width:100%;border-radius:14px;overflow:hidden;background:#000;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative;margin-top:12px;}
@@ -649,10 +651,13 @@ body::before{display:none;}
       <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
       <div class="maze-wrap" style="width:100%;display:flex;justify-content:center;margin:0 auto;position:relative">
         <canvas id="maze-canvas" width="290" height="480" style="max-width:100%;max-height:48vh;width:auto;height:auto;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
+        <div class="scanner-result" id="maze-result">
+          <button onclick="closeMazeResult()" style="position:absolute;top:10px;left:10px;padding:8px 16px;border-radius:10px;border:none;background:rgba(0,0,0,.6);color:#fff;font-family:var(--fb);font-size:13px;cursor:pointer;z-index:2">← Retour</button>
+          <div id="maze-result-content" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
+        </div>
       </div>
       <div class="gyro-val" id="gyro-val">Basculez le téléphone doucement…</div>
       <button id="maze-reset-btn" onclick="resetMaze()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">↺ Recommencer le labyrinthe</button>
-      <div class="scanner-result" id="maze-result"></div>
     </div>
     <div id="meca-scanner" style="display:none">
       <div class="scanner-wrap">
@@ -1557,12 +1562,17 @@ function onMazeWin(){
   const imgUrl=(glaciere&&glaciere.gyro_image_url)?glaciere.gyro_image_url:'';
   const code=(glaciere&&glaciere.gyro_code)?glaciere.gyro_code:'';
   const el=document.getElementById('maze-result');
-  if(el){
+  const content=document.getElementById('maze-result-content');
+  if(el&&content){
     el.classList.add('visible');
-    el.innerHTML=imgUrl?'<img src="'+imgUrl+'">':(code?code:'Aucun code configuré pour cette mission.');
+    content.innerHTML=imgUrl?'<img src="'+imgUrl+'">':(code?code:'Aucun code configuré pour cette mission.');
   }
   const gv=document.getElementById('gyro-val');
   if(gv)gv.textContent='Bravo !';
+}
+function closeMazeResult(){
+  const el=document.getElementById('maze-result');
+  if(el)el.classList.remove('visible');
 }
 
 // ── MICRO (V4: mot → code auto) ──
