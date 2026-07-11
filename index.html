@@ -1554,11 +1554,12 @@ function drawMaze(){
   ctx.fillStyle=grad;ctx.fill();
 }
 function onMazeWin(){
+  const imgUrl=(glaciere&&glaciere.gyro_image_url)?glaciere.gyro_image_url:'';
   const code=(glaciere&&glaciere.gyro_code)?glaciere.gyro_code:'';
   const el=document.getElementById('maze-result');
   if(el){
     el.classList.add('visible');
-    el.innerHTML=code?code:'Aucun code configuré pour cette mission.';
+    el.innerHTML=imgUrl?'<img src="'+imgUrl+'">':(code?code:'Aucun code configuré pour cette mission.');
   }
   const gv=document.getElementById('gyro-val');
   if(gv)gv.textContent='Bravo !';
