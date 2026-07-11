@@ -1478,7 +1478,9 @@ const mazeGoal={x:MAZE_OX+(MAZE_COLS-0.5)*MAZE_CELL,y:MAZE_OY+(MAZE_ROWS-0.5)*MA
 function resetMaze(){
   mazeBall.x=mazeStart.x;mazeBall.y=mazeStart.y;mazeBall.vx=0;mazeBall.vy=0;mazeWon=false;
   const res=document.getElementById('maze-result');
-  if(res){res.classList.remove('visible');res.textContent='';}
+  if(res)res.classList.remove('visible');
+  const content=document.getElementById('maze-result-content');
+  if(content)content.innerHTML='';
   const gv=document.getElementById('gyro-val');
   if(gv)gv.textContent='Basculez le téléphone doucement…';
   drawMaze();
