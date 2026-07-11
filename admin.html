@@ -282,6 +282,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           </div>
           <div class="bo-field" style="margin-top:8px"><label>🔒 Code d'accès requis pour lancer le labyrinthe (laisser vide = accès libre)</label><input type="text" class="bo-input" id="e-gyro-access-code" placeholder="ex: 1234"></div>
           <div class="bo-field"><label>🎯 Code affiché quand le labyrinthe est réussi</label><input type="text" class="bo-input" id="e-gyro-code" placeholder="ex: 4271"></div>
+          <div class="upload-zone" id="gyroimg-zone" style="margin-top:8px"><input type="file" accept="image/*" onchange="handleImg(event,'gyroimg')"><img class="uz-preview-img" id="gyroimg-preview"><div class="uz-label" id="gyroimg-label"><span>🖼</span>Image affichée quand le labyrinthe est réussi (optionnel)</div></div>
           <div class="toggle-row">
             <div><div class="toggle-label">📷 Lecteur QR</div></div>
             <label class="toggle-switch"><input type="checkbox" id="btn-scanner" checked><span class="toggle-slider"></span></label>
@@ -515,9 +516,9 @@ const SUPABASE_KEY = 'sb_publishable_2TzK9VfplPjCRi_WhPj4nA_BooLFTQs';
 
 const PIN_KEY='bo_pin_v4';
 let editingId=null, cardCtr=0;
-let musicFile=null, bipFile=null, morseFile=null, logoFile=null, bgFile=null, gameBgFile=null, pauseBgFile=null;
+let musicFile=null, bipFile=null, morseFile=null, logoFile=null, bgFile=null, gameBgFile=null, pauseBgFile=null, gyroImgFile=null;
 let loupeFiles={1:null,2:null,3:null};
-let existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:'',gamebg:'',pausebg:''};
+let existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:'',gamebg:'',pausebg:'',gyroimg:''};
 
 function getPin(){return localStorage.getItem(PIN_KEY)||'1234';}
 function checkPin(){
@@ -617,9 +618,9 @@ async function loadGlacieres(){
 }
 
 function newGlaciere(){
-  editingId=null;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;
+  editingId=null;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;gyroImgFile=null;
   loupeFiles={1:null,2:null,3:null};
-  existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:''};
+  existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:'',gyroimg:''};
   ['e-nom','e-slug','e-escape','e-badge','e-emoji','e-tel','e-synopsis','e-gyro-code','e-scanner-youtube','e-boussole-code','e-boussole-access-code','e-gyro-access-code'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('e-boussole-dir').value='0';
   document.getElementById('e-boussole-seconds').value='3';
@@ -628,7 +629,7 @@ function newGlaciere(){
   document.getElementById('e-active').checked=true;
   ['btn-machine','btn-morse','btn-micro','btn-loupe','btn-indice','btn-revoir','btn-boussole','btn-gyroscope','btn-scanner'].forEach(id=>{document.getElementById(id).checked=true;});
   setPen(2,document.querySelectorAll('.pen-btn')[1]);
-  ['logo','bg','loupe1','loupe2','loupe3'].forEach(k=>{
+  ['logo','bg','loupe1','loupe2','loupe3','gyroimg'].forEach(k=>{
     const p=document.getElementById(k+'-preview');
     if(p){p.style.display='none';}
     const l=document.getElementById(k+'-label');
@@ -646,7 +647,7 @@ function newGlaciere(){
 }
 
 async function editGlaciere(id){
-  editingId=id;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;
+  editingId=id;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;gyroImgFile=null;
   loupeFiles={1:null,2:null,3:null};
   try{
     const [g]=await supaFetch('glacieres?id=eq.'+id);
@@ -683,7 +684,8 @@ async function editGlaciere(id){
       music:g.music_url||'',bip:g.bip_url||'',morse:g.morse_url||'',
       logo:g.logo_url||'',bg:g.mission_bg_url||'',
       gamebg:g.game_bg_url||'',pausebg:g.pause_bg_url||'',
-      loupe1:g.loupe1_url||'',loupe2:g.loupe2_url||'',loupe3:g.loupe3_url||''
+      loupe1:g.loupe1_url||'',loupe2:g.loupe2_url||'',loupe3:g.loupe3_url||'',
+      gyroimg:g.gyro_image_url||''
     };
     // Filtres loupe
     if(g.loupe1_filtre) setFiltreById(1,g.loupe1_filtre);
@@ -691,7 +693,7 @@ async function editGlaciere(id){
     if(g.loupe3_filtre) setFiltreById(3,g.loupe3_filtre);
     if(g.couleur_accent){syncColor('accent',g.couleur_accent);document.querySelector('#sw-accent input').value=g.couleur_accent;document.getElementById('hex-accent').value=g.couleur_accent.toUpperCase();}
     if(g.couleur_bg){syncColor('bg',g.couleur_bg);document.querySelector('#sw-bg input').value=g.couleur_bg;document.getElementById('hex-bg').value=g.couleur_bg.toUpperCase();}
-    ['logo','bg','gamebg','pausebg','music','bip','morse','loupe1','loupe2','loupe3'].forEach(k=>{
+    ['logo','bg','gamebg','pausebg','music','bip','morse','loupe1','loupe2','loupe3','gyroimg'].forEach(k=>{
       const url=existingUrls[k];
       if(url){
         const el=document.getElementById(k+'-preview');
@@ -752,6 +754,7 @@ async function saveGlaciere(){
   let logoUrl=existingUrls.logo,bgUrl=existingUrls.bg,musicUrl=existingUrls.music,bipUrl=existingUrls.bip,morseUrl=existingUrls.morse;
   let loupe1Url=existingUrls.loupe1,loupe2Url=existingUrls.loupe2,loupe3Url=existingUrls.loupe3;
   let gameBgUrl=existingUrls.gamebg,pauseBgUrl=existingUrls.pausebg;
+  let gyroImgUrl=existingUrls.gyroimg;
 
   try{
     if(logoFile) logoUrl=await uploadFile(logoFile,'logo_'+slug);
@@ -764,6 +767,7 @@ async function saveGlaciere(){
     if(loupeFiles[1]) loupe1Url=await uploadFile(loupeFiles[1],'loupe1_'+slug);
     if(loupeFiles[2]) loupe2Url=await uploadFile(loupeFiles[2],'loupe2_'+slug);
     if(loupeFiles[3]) loupe3Url=await uploadFile(loupeFiles[3],'loupe3_'+slug);
+    if(gyroImgFile) gyroImgUrl=await uploadFile(gyroImgFile,'gyroimg_'+slug);
   }catch(e){alert('Erreur upload : '+e.message);return;}
 
   // Cartes
@@ -798,6 +802,7 @@ async function saveGlaciere(){
       loupe1_filtre:loupe1Filtre,loupe1_url:loupe1Url||null,
       loupe2_filtre:loupe2Filtre,loupe2_url:loupe2Url||null,
       loupe3_filtre:loupe3Filtre,loupe3_url:loupe3Url||null,
+      gyro_image_url:gyroImgUrl||null,
     };
     if(logoUrl) payload.logo_url=logoUrl;
     if(editingId){
@@ -916,6 +921,7 @@ function handleImg(event,type){
   else if(type==='loupe1') loupeFiles[1]=file;
   else if(type==='loupe2') loupeFiles[2]=file;
   else if(type==='loupe3') loupeFiles[3]=file;
+  else if(type==='gyroimg') gyroImgFile=file;
   const reader=new FileReader();
   reader.onload=e=>{
     const prev=document.getElementById(type+'-preview');
