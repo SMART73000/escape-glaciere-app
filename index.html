@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.json">
 <title>Mission Apéro</title>
-<!-- BUILD v10 — boussole + gyroscope fonctionnels sous iOS (permission capteur) -->
-<meta name="app-build" content="v10-ios-sensors">
-<script>console.log('Mission Apéro build v10-ios-sensors');</script>
+<!-- BUILD v11 — P0: chrono horodaté + Wake Lock, reprise de partie (localStorage), anti-XSS -->
+<meta name="app-build" content="v11-p0-fixes">
+<script>console.log('Mission Apéro build v11-p0-fixes');</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -335,10 +335,8 @@ body::before{display:none;}
 .scanner-start-btn{width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#cc44ff,#8800cc);color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px;}
 .scanner-result{text-align:center;padding:14px;border-radius:12px;background:rgba(200,0,255,.08);border:1px solid rgba(200,0,255,.2);color:#cc88ff;font-size:13px;margin-top:12px;display:none;line-height:1.7;}
 .scanner-result.visible{display:block;}
-#maze-result{position:absolute;inset:0;margin:0;padding:0;border-radius:12px;background:rgba(5,5,15,.96);display:none;align-items:center;justify-content:center;z-index:3;overflow:hidden;}
-#maze-result.visible{display:flex;}
-#maze-result-content img{width:100%;height:100%;object-fit:contain;display:block;border-radius:12px;}
-#maze-result-content{color:#cc88ff;font-size:13px;text-align:center;padding:20px;}
+#maze-result.visible{padding:6px;}
+#maze-result img{width:100%!important;height:auto!important;max-width:100%!important;display:block;border-radius:10px;}
 
 /* ── LOUPE PANEL ── */
 .loupe-filter-wrap{width:100%;border-radius:14px;overflow:hidden;background:#000;min-height:260px;display:flex;align-items:center;justify-content:center;position:relative;margin-top:12px;}
@@ -651,13 +649,10 @@ body::before{display:none;}
       <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
       <div class="maze-wrap" style="width:100%;display:flex;justify-content:center;margin:0 auto;position:relative">
         <canvas id="maze-canvas" width="290" height="480" style="max-width:100%;max-height:48vh;width:auto;height:auto;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
-        <div class="scanner-result" id="maze-result">
-          <button onclick="closeMazeResult()" style="position:absolute;top:10px;left:10px;padding:8px 16px;border-radius:10px;border:none;background:rgba(0,0,0,.6);color:#fff;font-family:var(--fb);font-size:13px;cursor:pointer;z-index:2">← Retour</button>
-          <div id="maze-result-content" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
-        </div>
       </div>
       <div class="gyro-val" id="gyro-val">Basculez le téléphone doucement…</div>
       <button id="maze-reset-btn" onclick="resetMaze()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">↺ Recommencer le labyrinthe</button>
+      <div class="scanner-result" id="maze-result"></div>
     </div>
     <div id="meca-scanner" style="display:none">
       <div class="scanner-wrap">
@@ -834,6 +829,33 @@ let recognition=null;
 let allGlacieres=[];
 let loupeStep=0, loupeConfigs=[];
 let morseAudio=null;
+let elapsedMs=0, lastTs=0, wakeLock=null; // P0: chrono par horodatage
+
+// ── P0: échappement HTML (anti-XSS) ──
+function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+// ── P0: sauvegarde / reprise de partie (localStorage) ──
+const SAVE_KEY='ma_game_state_v1';
+const SAVE_MAX_AGE=3*3600*1000; // 3 h
+function saveState(){
+  if(!glaciere||!started)return;
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify({
+    gid:glaciere.id,players,elapsedMs,totalPen,history,warmingShown,loupeStep,paused,savedAt:Date.now()
+  }));}catch(_){}
+}
+function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(_){}}
+
+// ── P0: Wake Lock (empêche la mise en veille pendant la partie) ──
+async function requestWakeLock(){
+  try{if('wakeLock' in navigator){wakeLock=await navigator.wakeLock.request('screen');}}catch(_){}
+}
+function releaseWakeLock(){
+  try{if(wakeLock){wakeLock.release();wakeLock=null;}}catch(_){}
+}
+// Au retour au premier plan : rattrape le temps écoulé + ré-acquiert le wake lock
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&started&&!paused){tick();requestWakeLock();}
+});
 
 async function supaFetch(path,opts={}){
   const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
@@ -850,6 +872,14 @@ async function init(){
     const gs=await supaFetch('glacieres?actif=eq.true&order=created_at.asc');
     allGlacieres=gs;
     if(!gs.length){showScreen('s-setup');return;}
+    // P0: reprise d'une partie interrompue (rechargement / onglet tué par l'OS)
+    let saved=null;
+    try{saved=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch(_){}
+    if(saved&&saved.savedAt&&Date.now()-saved.savedAt<SAVE_MAX_AGE){
+      const g=gs.find(x=>x.id===saved.gid);
+      if(g){await loadGlaciere(g);resumeGame(saved);return;}
+    }
+    clearSave();
     if(gs.length===1&&gs[0].active!==false){await loadGlaciere(gs[0]);}
     else{renderMissions(gs);showScreen('s-missions');}
   }catch(e){console.error(e);showScreen('s-setup');}
@@ -863,17 +893,19 @@ function renderMissions(gs){
     const defaultBadge=isAnniv?'🎂 Mission Anniversaire':'🍺 Mission Apéro';
     const badgeText=(g.badge_text&&g.badge_text.trim())?g.badge_text:defaultBadge;
     const cornerEmoji=(g.mission_emoji&&g.mission_emoji.trim())?g.mission_emoji:(isAnniv?'🌺':'🍺');
-    const bg=g.mission_bg_url?`url(${g.mission_bg_url})`:(isAnniv?'linear-gradient(135deg,#cc00aa,#ff88ff)':'linear-gradient(135deg,#ff6600,#ffaa00)');
+    // P0 anti-XSS : URL nettoyée (guillemets/chevrons) avant injection dans le style
+    const bgUrl=g.mission_bg_url?String(g.mission_bg_url).replace(/["'<>\\]/g,''):'';
+    const bg=bgUrl?`url("${bgUrl}")`:(isAnniv?'linear-gradient(135deg,#cc00aa,#ff88ff)':'linear-gradient(135deg,#ff6600,#ffaa00)');
     const locked=g.active===false; // Étape 4 : mission visible mais grisée
-    return `<div class="mission-card${locked?' locked':''}" data-id="${g.id}"${locked?'':' onclick="selectMissionById(this)"'}>
+    return `<div class="mission-card${locked?' locked':''}" data-id="${escapeHtml(g.id)}"${locked?'':' onclick="selectMissionById(this)"'}>
       <div class="mission-bg" style="background:${bg}"></div>
       <div class="mission-overlay"></div>
-      <div class="mission-emoji">${cornerEmoji}</div>
-      <div class="mission-badge">${badgeText}</div>
+      <div class="mission-emoji">${escapeHtml(cornerEmoji)}</div>
+      <div class="mission-badge">${escapeHtml(badgeText)}</div>
       ${locked?'<div class="mission-soon">🔒 Bientôt disponible</div>':''}
       <div class="mission-content">
-        <div class="mission-title">${g.nom_escape||'MISSION APÉRO'}</div>
-        <div class="mission-name">${g.nom}</div>
+        <div class="mission-title">${escapeHtml(g.nom_escape||'MISSION APÉRO')}</div>
+        <div class="mission-name">${escapeHtml(g.nom)}</div>
       </div>
     </div>`;
   }).join('');
@@ -985,6 +1017,7 @@ function goSetup(){showScreen('s-setup');}
 // ── GAME ──
 function startGame(){
   secsLeft=60*60;secsUsed=0;totalPen=0;history=[];paused=false;started=false;warmingShown=false;
+  elapsedMs=0;lastTs=0;clearSave();
   npVals={indice:'',code:'',gate:''};currentCardNum=null;
   document.getElementById('players-chip').textContent=players+' 🧑';
   document.getElementById('topbar-ic-count').textContent='0';
@@ -999,11 +1032,41 @@ function startGame(){
   if(bgMusic){bgMusic.currentTime=0;}
 }
 
+// P0: reprise d'une partie sauvegardée
+function resumeGame(s){
+  players=Math.max(2,Math.min(7,s.players||4));
+  elapsedMs=s.elapsedMs||0;
+  totalPen=s.totalPen||0;
+  history=Array.isArray(s.history)?s.history:[];
+  warmingShown=!!s.warmingShown;
+  loupeStep=s.loupeStep||0;
+  // Si la partie tournait au moment de la coupure, le temps réel continue de compter
+  if(!s.paused) elapsedMs+=Date.now()-s.savedAt;
+  secsUsed=Math.floor(elapsedMs/1000);
+  secsLeft=Math.max(0,durMin*60-secsUsed-totalPen*60);
+  started=true;paused=!!s.paused;
+  npVals={indice:'',code:'',gate:''};currentCardNum=null;
+  document.getElementById('pcount').textContent=players;
+  document.getElementById('players-chip').textContent=players+' 🧑';
+  document.getElementById('topbar-ic-count').textContent=history.length;
+  renderHistory();
+  showScreen('s-game');
+  updateTimer();updateHeat();updateTimerControls();
+  clearInterval(timerInt);timerInt=setInterval(tick,1000);
+  if(!paused){lastTs=Date.now();requestWakeLock();}
+  if(secsLeft<=0){secsLeft=0;updateTimer();clearInterval(timerInt);endTimeup();}
+}
+
 function tick(){
   if(!started||paused)return;          // figé tant qu'on n'a pas appuyé sur DÉMARRER
-  secsLeft--;secsUsed++;
-  if(secsLeft<=0){secsLeft=0;updateTimer();clearInterval(timerInt);if(bgMusic)bgMusic.pause();endTimeup();return;}
-  if(secsLeft===600&&!warmingShown){
+  // P0: temps calculé par horodatage — fiable même si l'onglet a été gelé/en veille
+  const now=Date.now();
+  elapsedMs+=now-lastTs;lastTs=now;
+  secsUsed=Math.floor(elapsedMs/1000);
+  secsLeft=Math.max(0,durMin*60-secsUsed-totalPen*60);
+  saveState();
+  if(secsLeft<=0){secsLeft=0;updateTimer();clearInterval(timerInt);if(bgMusic)bgMusic.pause();releaseWakeLock();clearSave();endTimeup();return;}
+  if(secsLeft<=600&&!warmingShown){
     warmingShown=true;
     const h=document.getElementById('heat-label');
     h.classList.add('show');
@@ -1041,10 +1104,11 @@ function updateTimerControls(){
 
 // Bouton sous le chrono : 1er appui = lance ; ensuite = pause / reprise
 function toggleTimer(){
-  if(!started){started=true;paused=false;}
-  else{paused=!paused;}
+  if(!started){started=true;paused=false;lastTs=Date.now();requestWakeLock();}
+  else if(!paused){elapsedMs+=Date.now()-lastTs;paused=true;releaseWakeLock();}
+  else{paused=false;lastTs=Date.now();requestWakeLock();}
   if(bgMusic){if(started&&!paused)bgMusic.play().catch(()=>{});else bgMusic.pause();}
-  updateTimer();updateTimerControls();
+  updateTimer();updateTimerControls();saveState();
 }
 
 function updateHeat(){
@@ -1054,8 +1118,9 @@ function updateHeat(){
 
 function applyPenalty(min){
   if(!penaltyActive||!min)return;
-  secsLeft=Math.max(0,secsLeft-min*60);
-  totalPen+=min;updateTimer();
+  totalPen+=min;
+  secsLeft=Math.max(0,durMin*60-secsUsed-totalPen*60);
+  updateTimer();saveState();
   const t=document.getElementById('penalty-toast');
   t.textContent='−'+min+' min ⏱';
   t.classList.add('show');
@@ -1064,16 +1129,17 @@ function applyPenalty(min){
 
 // Pause plein écran (bouton PAUSE de la couronne) : suspend le chrono + écran thématique
 function openPauseScreen(){
-  paused=true;
+  if(started&&!paused){elapsedMs+=Date.now()-lastTs;}
+  paused=true;releaseWakeLock();
   document.getElementById('pause-overlay').classList.add('show');
   if(bgMusic)bgMusic.pause();
-  updateTimer();updateTimerControls();
+  updateTimer();updateTimerControls();saveState();
 }
 function closePauseScreen(){
   document.getElementById('pause-overlay').classList.remove('show');
-  if(started)paused=false;
+  if(started){paused=false;lastTs=Date.now();requestWakeLock();}
   if(bgMusic&&started&&!paused)bgMusic.play().catch(()=>{});
-  updateTimer();updateTimerControls();
+  updateTimer();updateTimerControls();saveState();
 }
 // compat : ancien nom
 function togglePause(){ if(document.getElementById('pause-overlay').classList.contains('show')) closePauseScreen(); else openPauseScreen(); }
@@ -1083,6 +1149,7 @@ function confirmVictory(){document.getElementById('victory-confirm').classList.a
 function closeVC(){document.getElementById('victory-confirm').classList.remove('show');}
 function endVictory(){
   clearInterval(timerInt);if(bgMusic)bgMusic.pause();
+  releaseWakeLock();clearSave();
   document.getElementById('victory-confirm').classList.remove('show');
   const tu=durMin*60-secsLeft;
   const m=Math.floor(tu/60).toString().padStart(2,'0');
@@ -1102,7 +1169,7 @@ function endTimeup(){
   showScreen('s-timeup');
 }
 function continueGame(){
-  started=true;paused=false;
+  started=true;paused=false;requestWakeLock();
   document.getElementById('timer').textContent='LIBRE';
   document.getElementById('timer').style.fontSize='34px';
   document.getElementById('timer-sub').textContent='mode libre';
@@ -1111,8 +1178,9 @@ function continueGame(){
 }
 function resetGame(){
   clearInterval(timerInt);
+  releaseWakeLock();clearSave();
   if(bgMusic){bgMusic.pause();bgMusic.currentTime=0;}
-  cartes={};codes={};glaciere=null;loupeStep=0;started=false;paused=false;
+  cartes={};codes={};glaciere=null;loupeStep=0;started=false;paused=false;elapsedMs=0;lastTs=0;
   const tg=document.getElementById('crown-pause-item');if(tg){tg.style.display='';}
   const tm=document.getElementById('timer');if(tm){tm.style.fontSize='';}
   document.documentElement.style.setProperty('--accent','#ff6600');
@@ -1215,7 +1283,7 @@ function searchHint(){
   if(!seen){
     applyPenalty(penaltyMin);
     history.unshift({num,label:card.caption||'Carte n°'+num});
-    renderHistory();
+    renderHistory();saveState();
     const cnt=history.length;
     document.getElementById('topbar-ic-count').textContent=cnt;
   }
@@ -1247,7 +1315,7 @@ function renderHistory(){
   const l=document.getElementById('history-list');
   if(!history.length){s.style.display='none';return;}
   s.style.display='block';
-  l.innerHTML=history.map(h=>`<div class="history-item" onclick="reloadHint(${h.num})"><div class="history-num">${h.num}</div><div class="history-label">${h.label}</div><div class="history-arrow">Retour</div></div>`).join('');
+  l.innerHTML=history.map(h=>`<div class="history-item" onclick="reloadHint(${parseInt(h.num)||0})"><div class="history-num">${parseInt(h.num)||0}</div><div class="history-label">${escapeHtml(h.label)}</div><div class="history-arrow">Retour</div></div>`).join('');
 }
 function reloadHint(num){
   npVals.indice=String(num);searchHint();
@@ -1478,9 +1546,7 @@ const mazeGoal={x:MAZE_OX+(MAZE_COLS-0.5)*MAZE_CELL,y:MAZE_OY+(MAZE_ROWS-0.5)*MA
 function resetMaze(){
   mazeBall.x=mazeStart.x;mazeBall.y=mazeStart.y;mazeBall.vx=0;mazeBall.vy=0;mazeWon=false;
   const res=document.getElementById('maze-result');
-  if(res)res.classList.remove('visible');
-  const content=document.getElementById('maze-result-content');
-  if(content)content.innerHTML='';
+  if(res){res.classList.remove('visible');res.textContent='';}
   const gv=document.getElementById('gyro-val');
   if(gv)gv.textContent='Basculez le téléphone doucement…';
   drawMaze();
@@ -1564,17 +1630,12 @@ function onMazeWin(){
   const imgUrl=(glaciere&&glaciere.gyro_image_url)?glaciere.gyro_image_url:'';
   const code=(glaciere&&glaciere.gyro_code)?glaciere.gyro_code:'';
   const el=document.getElementById('maze-result');
-  const content=document.getElementById('maze-result-content');
-  if(el&&content){
+  if(el){
     el.classList.add('visible');
-    content.innerHTML=imgUrl?'<img src="'+imgUrl+'">':(code?code:'Aucun code configuré pour cette mission.');
+    el.innerHTML=imgUrl?'<img src="'+escapeHtml(imgUrl)+'">':(code?escapeHtml(code):'Aucun code configuré pour cette mission.');
   }
   const gv=document.getElementById('gyro-val');
   if(gv)gv.textContent='Bravo !';
-}
-function closeMazeResult(){
-  const el=document.getElementById('maze-result');
-  if(el)el.classList.remove('visible');
 }
 
 // ── MICRO (V4: mot → code auto) ──
@@ -1692,7 +1753,7 @@ function onQRDetected(content){
     el.innerHTML='✅ QR code détecté !<br>Ouverture de la vidéo…';
     window.open(ytUrl,'_blank');
   }else{
-    el.innerHTML='✅ QR code détecté !<br><span style="font-size:12px;word-break:break-all">'+content+'</span><br><span style="font-size:11px;opacity:.7">Aucune vidéo configurée pour cette mission.</span>';
+    el.innerHTML='✅ QR code détecté !<br><span style="font-size:12px;word-break:break-all">'+escapeHtml(content)+'</span><br><span style="font-size:11px;opacity:.7">Aucune vidéo configurée pour cette mission.</span>';
   }
 }
 
@@ -1838,7 +1899,7 @@ function stopLoupe(){
   const lv=document.getElementById('loupe-zoom-val');if(lv)lv.textContent='1.0×';
   loupeTrack=null;loupeZoomNative=false;loupeDigital=1;
   // Avance à la loupe suivante (linéaire)
-  if(loupeConfigs.length>0) loupeStep=Math.min(loupeStep+1,loupeConfigs.length-1);
+  if(loupeConfigs.length>0){loupeStep=Math.min(loupeStep+1,loupeConfigs.length-1);saveState();}
 }
 
 // ── AUDIO ──
