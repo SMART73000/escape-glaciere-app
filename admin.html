@@ -213,7 +213,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
           <div class="info-box green">🛒 Activez la mission quand elle est prête à être jouée. Désactivée, elle reste <strong>visible mais grisée</strong> avec un badge « 🔒 Bientôt disponible » côté joueurs.</div>
           <div class="toggle-row">
             <div>
-              <div class="toggle-label">Mission active (jouable)</div>
+              <div class="toggle-label">Mission disponible (jouable)</div>
               <div class="toggle-sub">Décoché = visible mais grisée « Bientôt disponible »</div>
             </div>
             <label class="toggle-switch">
@@ -571,7 +571,7 @@ async function uploadFile(file,name){
 
 async function toggleGlaciereActive(id,wasActive){
   try{
-    await supaFetch('glacieres?id=eq.'+id,{method:'PATCH',body:JSON.stringify({active:!wasActive})});
+    await supaFetch('glacieres?id=eq.'+id,{method:'PATCH',body:JSON.stringify({disponible:!wasActive})});
     loadGlacieres();
   }catch(e){alert('Erreur : '+e.message);loadGlacieres();}
 }
@@ -588,7 +588,7 @@ async function loadGlacieres(){
       const codes=cs.filter(c=>c.numero>=200).length;
       const url='app.smartescapegame.fr/index.html?g='+g.slug;
       const badges=[
-        g.active===false?'🔒 Bientôt disponible':'',
+        g.disponible===false?'🔒 Bientôt disponible':'',
         g.synopsis?'📖 Briefing':'',
         g.music_url?'🎵 Musique':'',
         g.bip_url?'🔔 Bip':'',
@@ -601,8 +601,8 @@ async function loadGlacieres(){
         <div class="gl-header">
           <div class="gl-name">${g.nom_escape||g.nom}</div>
           <div class="gl-actions">
-            <label class="toggle-switch" title="Mission active / bientôt disponible" style="margin-right:4px">
-              <input type="checkbox" ${g.active!==false?'checked':''} onchange="toggleGlaciereActive('${g.id}',${g.active!==false})">
+            <label class="toggle-switch" title="Mission disponible / bientôt disponible" style="margin-right:4px">
+              <input type="checkbox" ${g.disponible!==false?'checked':''} onchange="toggleGlaciereActive('${g.id}',${g.disponible!==false})">
               <span class="toggle-slider"></span>
             </label>
             <button class="gl-btn edit" onclick="editGlaciere('${g.id}')">✏️ Modifier</button>
@@ -669,7 +669,7 @@ async function editGlaciere(id){
     document.getElementById('e-gyro-access-code').value=g.gyro_access_code||'';
     // Pénalité
     document.getElementById('e-penalite-active').checked=g.penalite_active!==false;
-    document.getElementById('e-active').checked=g.active!==false;
+    document.getElementById('e-active').checked=g.disponible!==false;
     ['machine','morse','micro','loupe','indice','revoir','boussole','gyroscope','scanner'].forEach(k=>{
       document.getElementById('btn-'+k).checked=g['btn_'+k]!==false;
     });
@@ -790,7 +790,7 @@ async function saveGlaciere(){
     let gId=editingId;
     const payload={
       nom,slug,nom_escape:escape||null,telephone:tel||null,badge_text:badge||null,mission_emoji:emoji||null,
-      penalty_min:penalty,penalite_active:penaliteActive,active:active,...btnFlags,
+      penalty_min:penalty,penalite_active:penaliteActive,disponible:active,...btnFlags,
       couleur_accent:accent,couleur_bg:bg,synopsis:synopsis||null,
       citation_victoire:citation||null,
       gyro_code:gyroCode||null,scanner_youtube_url:scannerYoutube||null,
