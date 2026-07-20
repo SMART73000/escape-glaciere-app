@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.json">
 <title>Mission Apéro</title>
-<!-- BUILD v12 — P1: écran pause thématique branché, reset mission unique, pavé adaptatif -->
-<meta name="app-build" content="v12-p1-fixes">
-<script>console.log('Mission Apéro build v12-p1-fixes');</script>
+<!-- BUILD v13 — clarification: colonne active renommée disponible (nécessite ALTER TABLE) -->
+<meta name="app-build" content="v13-rename-disponible">
+<script>console.log('Mission Apéro build v13-rename-disponible');</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -880,7 +880,7 @@ async function init(){
       if(g){await loadGlaciere(g);resumeGame(saved);return;}
     }
     clearSave();
-    if(gs.length===1&&gs[0].active!==false){await loadGlaciere(gs[0]);}
+    if(gs.length===1&&gs[0].disponible!==false){await loadGlaciere(gs[0]);}
     else{renderMissions(gs);showScreen('s-missions');}
   }catch(e){console.error(e);showScreen('s-setup');}
 }
@@ -896,7 +896,7 @@ function renderMissions(gs){
     // P0 anti-XSS : URL nettoyée (guillemets/chevrons) avant injection dans le style
     const bgUrl=g.mission_bg_url?String(g.mission_bg_url).replace(/["'<>\\]/g,''):'';
     const bg=bgUrl?`url("${bgUrl}")`:(isAnniv?'linear-gradient(135deg,#cc00aa,#ff88ff)':'linear-gradient(135deg,#ff6600,#ffaa00)');
-    const locked=g.active===false; // Étape 4 : mission visible mais grisée
+    const locked=g.disponible===false; // Étape 4 : mission visible mais grisée
     return `<div class="mission-card${locked?' locked':''}" data-id="${escapeHtml(g.id)}"${locked?'':' onclick="selectMissionById(this)"'}>
       <div class="mission-bg" style="background:${bg}"></div>
       <div class="mission-overlay"></div>
@@ -919,7 +919,7 @@ function selectMissionById(el){
 
 async function selectMission(id){
   const g=allGlacieres.find(x=>x.id===id);
-  if(!g||g.active===false) return;
+  if(!g||g.disponible===false) return;
   await loadGlaciere(g);
 }
 
