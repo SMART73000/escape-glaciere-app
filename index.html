@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.json">
 <title>Mission Apéro</title>
-<!-- BUILD v11 — P0: chrono horodaté + Wake Lock, reprise de partie (localStorage), anti-XSS -->
-<meta name="app-build" content="v11-p0-fixes">
-<script>console.log('Mission Apéro build v11-p0-fixes');</script>
+<!-- BUILD v12 — P1: écran pause thématique branché, reset mission unique, pavé adaptatif -->
+<meta name="app-build" content="v12-p1-fixes">
+<script>console.log('Mission Apéro build v12-p1-fixes');</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -1054,6 +1054,7 @@ function resumeGame(s){
   updateTimer();updateHeat();updateTimerControls();
   clearInterval(timerInt);timerInt=setInterval(tick,1000);
   if(!paused){lastTs=Date.now();requestWakeLock();}
+  else{document.getElementById('pause-overlay').classList.add('show');}
   if(secsLeft<=0){secsLeft=0;updateTimer();clearInterval(timerInt);endTimeup();}
 }
 
@@ -1103,12 +1104,15 @@ function updateTimerControls(){
 }
 
 // Bouton sous le chrono : 1er appui = lance ; ensuite = pause / reprise
+// Bouton de la couronne : 1er appui = lance ; ensuite = ouvre/ferme l'écran pause thématique
 function toggleTimer(){
-  if(!started){started=true;paused=false;lastTs=Date.now();requestWakeLock();}
-  else if(!paused){elapsedMs+=Date.now()-lastTs;paused=true;releaseWakeLock();}
-  else{paused=false;lastTs=Date.now();requestWakeLock();}
-  if(bgMusic){if(started&&!paused)bgMusic.play().catch(()=>{});else bgMusic.pause();}
-  updateTimer();updateTimerControls();saveState();
+  if(!started){
+    started=true;paused=false;lastTs=Date.now();requestWakeLock();
+    if(bgMusic)bgMusic.play().catch(()=>{});
+    updateTimer();updateTimerControls();saveState();
+  }
+  else if(!paused){openPauseScreen();}
+  else{closePauseScreen();}
 }
 
 function updateHeat(){
@@ -1191,7 +1195,7 @@ function resetGame(){
   const smissions=document.getElementById('s-missions');
   smissions.style.backgroundImage='none';
   smissions.scrollTop=0;
-  showScreen('s-missions');
+  init(); // P1: recharge missions/glacière — corrige l'écran vide en mission unique
 }
 
 // ── CONFETTI ──
@@ -1207,7 +1211,15 @@ function launchConfetti(){
 }
 
 // ── NUMPAD ──
-function np(type,d){if(npVals[type].length>=4)return;npVals[type]+=d;refreshND(type);}
+// P1: la limite s'adapte à la longueur du code configuré (plus de blocage silencieux à 4)
+function npMax(type){
+  if(type==='gate'&&pendingGateAction&&glaciere){
+    const c=(pendingGateAction==='boussole')?glaciere.boussole_access_code:glaciere.gyro_access_code;
+    if(c)return Math.max(4,String(c).trim().length);
+  }
+  return 4;
+}
+function np(type,d){if(npVals[type].length>=npMax(type))return;npVals[type]+=d;refreshND(type);}
 function npDel(type){npVals[type]=npVals[type].slice(0,-1);refreshND(type);if(type==='indice'){document.getElementById('hint-result').classList.remove('visible');document.getElementById('hint-error').classList.remove('visible');document.getElementById('jc-message').classList.remove('visible');}}
 function refreshND(type){document.getElementById('nd-'+type).textContent=npVals[type]||'—';}
 
