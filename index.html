@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.json">
 <title>Mission Apéro</title>
-<!-- BUILD v13 — clarification: colonne active renommée disponible (nécessite ALTER TABLE) -->
-<meta name="app-build" content="v13-rename-disponible">
-<script>console.log('Mission Apéro build v13-rename-disponible');</script>
+<!-- BUILD v14 — Lot 4: service worker hors ligne, erreur réseau visible, saisie clavier MICRO -->
+<meta name="app-build" content="v14-lot4-offline">
+<script>console.log('Mission Apéro build v14-lot4-offline');</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -708,6 +708,12 @@ body::before{display:none;}
     <div class="micro-wave" id="micro-wave">🎤</div>
     <div class="micro-status" id="micro-status">APPUYEZ POUR PARLER</div>
     <button onclick="toggleMicro()" id="micro-btn" style="width:100%;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--red),#aa0000);color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer;margin-top:12px">🎤 PARLER</button>
+    <!-- Lot 4 : saisie clavier de secours (Firefox / iOS sans reconnaissance vocale) -->
+    <button id="micro-kb-btn" onclick="showMicroFallback()" style="width:100%;padding:8px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">⌨️ Saisir le mot au clavier</button>
+    <div id="micro-fallback" style="display:none;margin-top:10px;gap:8px">
+      <input id="micro-text-input" type="text" autocomplete="off" autocapitalize="none" placeholder="Tapez le mot de passe…" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border2);background:rgba(0,0,0,.3);color:var(--ice);font-family:var(--fb);font-size:16px;text-align:center">
+      <button onclick="submitMicroText()" style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#007a42);color:#fff;font-family:var(--fd);font-size:17px;letter-spacing:3px;cursor:pointer;margin-top:8px">✓ VALIDER</button>
+    </div>
     <div class="micro-result" id="micro-result"></div>
     <!-- V4: code révélé auto après mot reconnu -->
     <div id="micro-code-reveal" style="display:none;margin-top:12px;text-align:center;padding:14px;border-radius:12px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);">
@@ -866,6 +872,38 @@ async function supaFetch(path,opts={}){
   return r.json();
 }
 
+// ── Lot 4 : service worker (mode hors ligne) ──
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+
+// ── Lot 4 : préchargement des médias de la mission (mis en cache par le SW) ──
+function prefetchMedia(g,cartesArr){
+  const urls=[g.logo_url,g.mission_bg_url,g.game_bg_url,g.pause_bg_url,g.music_url,g.bip_url,
+    g.morse_url,g.loupe1_url,g.loupe2_url,g.loupe3_url,g.gyro_image_url]
+    .concat((cartesArr||[]).map(c=>c.image_url))
+    .filter(Boolean);
+  urls.forEach(u=>{try{fetch(u).catch(()=>{});}catch(_){}});
+}
+
+// ── Lot 4 : erreur de connexion visible (fini le basculement silencieux) ──
+function showConnectionError(){
+  showScreen('s-loading');
+  const s=document.getElementById('s-loading');
+  const lt=s.querySelector('.load-txt');
+  if(lt)lt.innerHTML='CONNEXION IMPOSSIBLE';
+  if(!document.getElementById('retry-btn')){
+    const d=document.createElement('div');
+    d.id='retry-msg';
+    d.style.cssText='font-size:13px;color:var(--muted);max-width:280px;line-height:1.6;margin:0 auto';
+    d.textContent='Impossible de charger les missions. Vérifiez votre connexion internet puis réessayez.';
+    s.appendChild(d);
+    const b=document.createElement('button');
+    b.id='retry-btn';b.textContent='🔄 RÉESSAYER';
+    b.style.cssText='margin-top:8px;padding:12px 32px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-family:var(--fd);font-size:18px;letter-spacing:3px;cursor:pointer';
+    b.onclick=()=>{b.remove();d.remove();if(lt)lt.innerHTML='CHARGEMENT<span class="load-dots"></span>';init();};
+    s.appendChild(b);
+  }
+}
+
 // ── INIT ──
 async function init(){
   try{
@@ -882,7 +920,7 @@ async function init(){
     clearSave();
     if(gs.length===1&&gs[0].disponible!==false){await loadGlaciere(gs[0]);}
     else{renderMissions(gs);showScreen('s-missions');}
-  }catch(e){console.error(e);showScreen('s-setup');}
+  }catch(e){console.error(e);showConnectionError();}
 }
 
 function renderMissions(gs){
@@ -941,10 +979,11 @@ async function loadGlaciere(g){
     applyBranding();
     if(g.music_url){bgMusic=new Audio(g.music_url);bgMusic.loop=true;bgMusic.volume=0.25;}
     if(g.bip_url){bipAudio=new Audio(g.bip_url);}
+    prefetchMedia(g,cs); // Lot 4 : met les médias en cache pour le hors ligne
     showScreen('s-setup');
   }catch(e){
     console.error('Erreur loadGlaciere:',e);
-    showScreen('s-setup');
+    showConnectionError();
   }
 }
 
@@ -1224,7 +1263,7 @@ function npDel(type){npVals[type]=npVals[type].slice(0,-1);refreshND(type);if(ty
 function refreshND(type){document.getElementById('nd-'+type).textContent=npVals[type]||'—';}
 
 // ── PANELS ──
-function openPanel(id){document.getElementById('panel-'+id).classList.add('show');}
+function openPanel(id){document.getElementById('panel-'+id).classList.add('show');if(id==='micro')initMicroPanel();}
 function closePanel(id){
   document.getElementById('panel-'+id).classList.remove('show');
   if(id==='mecanisme'){stopGyro();stopScanner();}
@@ -1668,31 +1707,59 @@ function wordOverlapRatio(captionNorm,spokenNorm){
   capWords.forEach(w=>{if(spokenWords.has(w))hits++;});
   return hits/capWords.length;
 }
+// Lot 4 : validation commune (voix OU clavier)
+function handleSpokenText(rawTxt){
+  const txt=normalizeSpeech(rawTxt);
+  const res=document.getElementById('micro-result');
+  res.textContent='🎤 Entendu : "'+rawTxt+'"';
+  res.classList.add('visible');
+  // V5: comparaison tolérante par recouvrement de mots (accents/ponctuation ignorés, quelques mots peuvent être mal reconnus)
+  let best=null,bestScore=0;
+  Object.values(cartes).forEach(c=>{
+    if(!c.caption||c.numero<200)return;
+    const score=wordOverlapRatio(normalizeSpeech(c.caption),txt);
+    if(score>bestScore){bestScore=score;best=c;}
+  });
+  const matched=(bestScore>=0.7)?best:null;
+  if(matched&&matched.caption_code){
+    document.getElementById('micro-code-val').textContent=matched.caption_code;
+    document.getElementById('micro-code-reveal').style.display='block';
+  }
+  return !!matched;
+}
+function showMicroFallback(){
+  document.getElementById('micro-fallback').style.display='block';
+  document.getElementById('micro-kb-btn').style.display='none';
+  const inp=document.getElementById('micro-text-input');
+  inp.focus();
+}
+function submitMicroText(){
+  const raw=document.getElementById('micro-text-input').value.trim();
+  if(!raw)return;
+  const ok=handleSpokenText(raw);
+  const res=document.getElementById('micro-result');
+  res.textContent=ok?'✅ Mot reconnu !':'❌ "'+raw+'" — ce n\'est pas le bon mot, réessayez.';
+  document.getElementById('micro-text-input').value='';
+}
+// Lot 4 : à l'ouverture du panneau, bascule auto sur le clavier si la voix n'est pas supportée
+function initMicroPanel(){
+  const supported=('webkitSpeechRecognition' in window||'SpeechRecognition' in window);
+  if(!supported){
+    document.getElementById('micro-status').textContent='VOIX NON SUPPORTÉE — UTILISEZ LE CLAVIER';
+    document.getElementById('micro-btn').style.display='none';
+    showMicroFallback();
+  }
+}
 function startMicro(){
   if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
-    document.getElementById('micro-status').textContent='NON SUPPORTÉ SUR CE NAVIGATEUR';return;
+    document.getElementById('micro-status').textContent='VOIX NON SUPPORTÉE — UTILISEZ LE CLAVIER';
+    showMicroFallback();return;
   }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   recognition=new SR();
   recognition.lang='fr-FR';recognition.continuous=false;recognition.interimResults=false;
   recognition.onresult=e=>{
-    const rawTxt=e.results[0][0].transcript.trim();
-    const txt=normalizeSpeech(rawTxt);
-    const res=document.getElementById('micro-result');
-    res.textContent='🎤 Entendu : "'+rawTxt+'"';
-    res.classList.add('visible');
-    // V5: comparaison tolérante par recouvrement de mots (accents/ponctuation ignorés, quelques mots peuvent être mal reconnus)
-    let best=null,bestScore=0;
-    Object.values(cartes).forEach(c=>{
-      if(!c.caption||c.numero<200)return;
-      const score=wordOverlapRatio(normalizeSpeech(c.caption),txt);
-      if(score>bestScore){bestScore=score;best=c;}
-    });
-    const matched=(bestScore>=0.7)?best:null;
-    if(matched&&matched.caption_code){
-      document.getElementById('micro-code-val').textContent=matched.caption_code;
-      document.getElementById('micro-code-reveal').style.display='block';
-    }
+    handleSpokenText(e.results[0][0].transcript.trim());
     stopMicro();
   };
   recognition.onerror=()=>stopMicro();
