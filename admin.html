@@ -280,9 +280,16 @@ textarea.bo-input{resize:vertical;min-height:90px;}
             <div><div class="toggle-label">🕹️ JEU (gyroscope)</div></div>
             <label class="toggle-switch"><input type="checkbox" id="btn-gyroscope" checked><span class="toggle-slider"></span></label>
           </div>
-          <div class="bo-field" style="margin-top:8px"><label>🔒 Code d'accès requis pour lancer le labyrinthe (laisser vide = accès libre)</label><input type="text" class="bo-input" id="e-gyro-access-code" placeholder="ex: 1234"></div>
-          <div class="bo-field"><label>🎯 Code affiché quand le labyrinthe est réussi</label><input type="text" class="bo-input" id="e-gyro-code" placeholder="ex: 4271"></div>
-          <div class="upload-zone" id="gyroimg-zone" style="margin-top:8px"><input type="file" accept="image/*" onchange="handleImg(event,'gyroimg')"><img class="uz-preview-img" id="gyroimg-preview"><div class="uz-label" id="gyroimg-label"><span>🖼</span>Image affichée quand le labyrinthe est réussi (optionnel)</div></div>
+          <div class="bo-field" style="margin-top:8px"><label>🎮 Jeu de cette mission (les joueurs ne choisissent pas : seul ce jeu s'ouvre)</label>
+            <select class="bo-input" id="e-jeu-type">
+              <option value="">🔵 Labyrinthe à bille (incliner le téléphone)</option>
+              <option value="slalom">⛷️ Slalom à ski (incliner le téléphone)</option>
+              <option value="petales">🌼 Attrape les pétales (glisser le doigt)</option>
+            </select>
+          </div>
+          <div class="bo-field"><label>🔒 Code d'accès requis pour lancer le jeu (laisser vide = accès libre)</label><input type="text" class="bo-input" id="e-gyro-access-code" placeholder="ex: 1234"></div>
+          <div class="bo-field"><label>🎯 Code affiché quand le jeu est réussi</label><input type="text" class="bo-input" id="e-gyro-code" placeholder="ex: 4271"></div>
+          <div class="upload-zone" id="gyroimg-zone" style="margin-top:8px"><input type="file" accept="image/*" onchange="handleImg(event,'gyroimg')"><img class="uz-preview-img" id="gyroimg-preview"><div class="uz-label" id="gyroimg-label"><span>🖼</span>Image affichée quand le jeu est réussi (optionnel)</div></div>
           <div class="toggle-row">
             <div><div class="toggle-label">📷 Lecteur QR</div></div>
             <label class="toggle-switch"><input type="checkbox" id="btn-scanner" checked><span class="toggle-slider"></span></label>
@@ -621,7 +628,7 @@ function newGlaciere(){
   editingId=null;musicFile=null;bipFile=null;morseFile=null;logoFile=null;bgFile=null;gyroImgFile=null;
   loupeFiles={1:null,2:null,3:null};
   existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:'',gyroimg:''};
-  ['e-nom','e-slug','e-escape','e-badge','e-emoji','e-tel','e-synopsis','e-gyro-code','e-scanner-youtube','e-boussole-code','e-boussole-access-code','e-gyro-access-code'].forEach(id=>document.getElementById(id).value='');
+  ['e-nom','e-slug','e-escape','e-badge','e-emoji','e-tel','e-synopsis','e-gyro-code','e-scanner-youtube','e-boussole-code','e-boussole-access-code','e-gyro-access-code','e-jeu-type'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('e-boussole-dir').value='0';
   document.getElementById('e-boussole-seconds').value='3';
   document.getElementById('e-penalty').value='2';
@@ -667,6 +674,7 @@ async function editGlaciere(id){
     document.getElementById('e-boussole-code').value=g.boussole_code||'';
     document.getElementById('e-boussole-access-code').value=g.boussole_access_code||'';
     document.getElementById('e-gyro-access-code').value=g.gyro_access_code||'';
+    document.getElementById('e-jeu-type').value=g.jeu_type||'';
     // Pénalité
     document.getElementById('e-penalite-active').checked=g.penalite_active!==false;
     document.getElementById('e-active').checked=g.disponible!==false;
@@ -743,6 +751,7 @@ async function saveGlaciere(){
   const boussoleCode=document.getElementById('e-boussole-code').value.trim();
   const boussoleAccessCode=document.getElementById('e-boussole-access-code').value.trim();
   const gyroAccessCode=document.getElementById('e-gyro-access-code').value.trim();
+  const jeuType=document.getElementById('e-jeu-type').value;
   const accent=document.getElementById('hex-accent').value;
   const bg=document.getElementById('hex-bg').value;
   const loupe1Filtre=document.getElementById('loupe1-filtre').value;
@@ -795,7 +804,7 @@ async function saveGlaciere(){
       citation_victoire:citation||null,
       gyro_code:gyroCode||null,scanner_youtube_url:scannerYoutube||null,
       boussole_target_deg:boussoleDir,boussole_hold_seconds:boussoleSeconds,boussole_code:boussoleCode||null,
-      boussole_access_code:boussoleAccessCode||null,gyro_access_code:gyroAccessCode||null,
+      boussole_access_code:boussoleAccessCode||null,gyro_access_code:gyroAccessCode||null,jeu_type:jeuType||null,
       music_url:musicUrl||null,bip_url:bipUrl||null,morse_url:morseUrl||null,
       mission_bg_url:bgUrl||null,
       game_bg_url:gameBgUrl||null,pause_bg_url:pauseBgUrl||null,
