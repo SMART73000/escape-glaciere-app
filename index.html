@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#07111f">
 <link rel="manifest" href="manifest.json">
 <title>Mission Apéro</title>
-<!-- BUILD v14 — Lot 4: service worker hors ligne, erreur réseau visible, saisie clavier MICRO -->
-<meta name="app-build" content="v14-lot4-offline">
-<script>console.log('Mission Apéro build v14-lot4-offline');</script>
+<!-- BUILD v15 — jeux par mission (jeu_type : labyrinthe / slalom / petales) -->
+<meta name="app-build" content="v15-jeux-missions">
+<script>console.log('Mission Apéro build v15-jeux-missions');</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -646,12 +646,12 @@ body::before{display:none;}
       <button class="meca-btn" id="meca-btn-loupe" onclick="closePanel('mecanisme');openPanel('loupe')"><span class="meca-emoji">🔍</span><div class="meca-label">LOUPE</div></button>
     </div>
     <div id="meca-gyroscope" style="display:none">
-      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
+      <div id="game-instr" style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px">Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯</div>
       <div class="maze-wrap" style="width:100%;display:flex;justify-content:center;margin:0 auto;position:relative">
         <canvas id="maze-canvas" width="290" height="480" style="max-width:100%;max-height:48vh;width:auto;height:auto;display:block;border-radius:12px;background:#0a0a1a;box-shadow:0 0 0 2px rgba(0,212,255,.25)"></canvas>
       </div>
       <div class="gyro-val" id="gyro-val">Basculez le téléphone doucement…</div>
-      <button id="maze-reset-btn" onclick="resetMaze()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">↺ Recommencer le labyrinthe</button>
+      <button id="maze-reset-btn" onclick="resetCurrentGame()" style="width:100%;padding:10px;border-radius:12px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--fb);font-size:13px;cursor:pointer;margin-top:8px">↺ Recommencer le labyrinthe</button>
       <div class="scanner-result" id="maze-result"></div>
     </div>
     <div id="meca-scanner" style="display:none">
@@ -1285,7 +1285,7 @@ function requestAccessCode(type){
   pendingGateAction=type;
   npVals.gate='';refreshND('gate');
   document.getElementById('gate-error').style.display='none';
-  document.getElementById('gate-title').textContent=(type==='boussole')?'🔒 CODE — BOUSSOLE':'🔒 CODE — LABYRINTHE';
+  document.getElementById('gate-title').textContent=(type==='boussole')?'🔒 CODE — BOUSSOLE':'🔒 CODE — JEU';
   openPanel('gate');
 }
 function submitGateCode(){
@@ -1412,7 +1412,7 @@ function showMeca(type){
   document.getElementById('meca-gyroscope').style.display='none';
   document.getElementById('meca-scanner').style.display='none';
   stopGyro();stopScanner();
-  if(type==='gyroscope'){document.getElementById('meca-gyroscope').style.display='block';startGyro();}
+  if(type==='gyroscope'){document.getElementById('meca-gyroscope').style.display='block';startCurrentGame();}
   if(type==='scanner'){document.getElementById('meca-scanner').style.display='block';}
 }
 // iOS 13+ : l'accès aux capteurs d'orientation exige une permission, déclenchée par un appui utilisateur.
@@ -1605,7 +1605,7 @@ function resetMaze(){
 function startGyro(){
   if(!window.DeviceOrientationEvent){document.getElementById('gyro-val').textContent='Capteur non supporté';return;}
   gyroActive=true;
-  resetMaze();
+  resetCurrentGame();
   ensureOrientationPermission().then(ok=>{
     if(!gyroActive)return;
     if(!ok){document.getElementById('gyro-val').textContent='Accès au capteur refusé';return;}
@@ -1618,6 +1618,7 @@ function stopGyro(){
   window.removeEventListener('deviceorientation',handleGyro,true);
   if(mazeRAF)cancelAnimationFrame(mazeRAF);
   mazeRAF=null;
+  stopPetales();
 }
 function handleGyro(e){
   if(!gyroActive)return;
@@ -1625,8 +1626,8 @@ function handleGyro(e){
 }
 function mazeLoop(){
   if(!gyroActive)return;
-  updateMazePhysics();
-  drawMaze();
+  if(gameType()==='slalom'){updateSlalom();drawSlalom();}
+  else{updateMazePhysics();drawMaze();}
   mazeRAF=requestAnimationFrame(mazeLoop);
 }
 function updateMazePhysics(){
@@ -1687,6 +1688,186 @@ function onMazeWin(){
   }
   const gv=document.getElementById('gyro-val');
   if(gv)gv.textContent='Bravo !';
+}
+
+// ══════════════════════════════════════════
+// ── JEUX PAR MISSION (colonne glacieres.jeu_type) ──
+// vide / 'labyrinthe' = labyrinthe à bille (mission 1, inchangé)
+// 'slalom'  = descente à ski entre les portes (gyroscope)
+// 'petales' = attraper les pétales de cempasúchil (au doigt)
+// ══════════════════════════════════════════
+function gameType(){const t=(glaciere&&glaciere.jeu_type)?String(glaciere.jeu_type).trim().toLowerCase():'';return (t==='slalom'||t==='petales')?t:'labyrinthe';}
+const GAME_TXT={
+  labyrinthe:["Inclinez le téléphone pour guider la bille jusqu'à la case dorée 🎯","↺ Recommencer le labyrinthe"],
+  slalom:["Inclinez le téléphone à gauche et à droite pour passer entre les portes ⛷️ — évitez les sapins !","↺ Recommencer la descente"],
+  petales:["Glissez le doigt pour guider la créature : attrapez 20 pétales, évitez les piments ! 🌼","↺ Recommencer"]
+};
+function setResult(){const res=document.getElementById('maze-result');if(res){res.classList.remove('visible');res.textContent='';}}
+function startCurrentGame(){
+  const t=gameType();
+  const ins=document.getElementById('game-instr');if(ins)ins.textContent=GAME_TXT[t][0];
+  const rb=document.getElementById('maze-reset-btn');if(rb)rb.textContent=GAME_TXT[t][1];
+  if(t==='petales')startPetales(); else startGyro();
+}
+function resetCurrentGame(){
+  const t=gameType();
+  if(t==='slalom')resetSlalom(); else if(t==='petales')resetPetales(); else resetMaze();
+}
+
+// ── SLALOM (mission 2) ──
+let ski=null;
+const SKI_GOAL=12, SKI_Y=110, SKI_GAP=40;
+function resetSlalom(){
+  ski={x:MAZE_W/2,vx:0,speed:2.2,dist:0,passed:0,gates:[],trees:[],crash:0,nextY:SKI_Y+170,rng:mulberry32(1979),msg:'',msgT:0};
+  mazeWon=false;setResult();
+  const gv=document.getElementById('gyro-val');if(gv)gv.textContent='Portes : 0 / '+SKI_GOAL;
+  drawSlalom();
+}
+function spawnSlalom(){
+  while(ski.nextY<ski.dist+MAZE_H+60){
+    const gx=60+ski.rng()*(MAZE_W-120);
+    ski.gates.push({x:gx,y:ski.nextY,done:false,red:ski.gates.length%2===0});
+    const n=1+Math.floor(ski.rng()*2);
+    for(let i=0;i<n;i++){
+      let tx=16+ski.rng()*(MAZE_W-32);
+      if(Math.abs(tx-gx)<SKI_GAP+22) tx=(gx<MAZE_W/2)?Math.min(MAZE_W-16,gx+SKI_GAP+40+ski.rng()*60):Math.max(16,gx-SKI_GAP-40-ski.rng()*60);
+      ski.trees.push({x:tx,y:ski.nextY+60+ski.rng()*40});
+    }
+    ski.nextY+=150;
+  }
+}
+function updateSlalom(){
+  if(mazeWon||!ski)return;
+  const g=Math.max(-30,Math.min(30,gyroGamma));
+  ski.vx+=g*0.03; ski.vx*=0.88; ski.vx=Math.max(-4,Math.min(4,ski.vx));
+  ski.x=Math.max(14,Math.min(MAZE_W-14,ski.x+ski.vx));
+  if(ski.msgT>0)ski.msgT--;
+  if(ski.crash>0){ski.crash--;return;}
+  ski.speed=Math.min(3.6,2.2+ski.passed*0.11);
+  ski.dist+=ski.speed;
+  spawnSlalom();
+  const wy=ski.dist+SKI_Y;
+  ski.gates.forEach(gt=>{
+    if(!gt.done&&gt.y<=wy){
+      gt.done=true;
+      if(Math.abs(ski.x-gt.x)<SKI_GAP-6){ski.passed++;ski.msg='✔';}
+      else{ski.passed=Math.max(0,ski.passed-1);ski.msg='Porte ratée !';}
+      ski.msgT=40;
+    }
+  });
+  ski.trees.forEach(tr=>{
+    if(!tr.hit&&Math.abs(tr.x-ski.x)<14&&Math.abs(tr.y-wy)<14){
+      tr.hit=true;ski.crash=55;ski.passed=Math.max(0,ski.passed-2);ski.msg='Aïe, le sapin !';ski.msgT=55;
+    }
+  });
+  ski.gates=ski.gates.filter(gt=>gt.y>ski.dist-40);
+  ski.trees=ski.trees.filter(tr=>tr.y>ski.dist-40);
+  const gv=document.getElementById('gyro-val');if(gv)gv.textContent='Portes : '+ski.passed+' / '+SKI_GOAL;
+  if(ski.passed>=SKI_GOAL){mazeWon=true;onMazeWin();}
+}
+function drawSlalom(){
+  const cv=document.getElementById('maze-canvas');if(!cv||!ski)return;
+  const ctx=cv.getContext('2d');
+  const gr=ctx.createLinearGradient(0,0,0,MAZE_H);gr.addColorStop(0,'#eef6ff');gr.addColorStop(1,'#d6e8f8');
+  ctx.fillStyle=gr;ctx.fillRect(0,0,MAZE_W,MAZE_H);
+  ctx.strokeStyle='rgba(120,160,200,.25)';ctx.lineWidth=1;
+  for(let i=0;i<8;i++){const y=((i*70-ski.dist)%560+560)%560-40;ctx.beginPath();ctx.moveTo(0,y);ctx.quadraticCurveTo(MAZE_W/2,y+18,MAZE_W,y);ctx.stroke();}
+  ski.gates.forEach(gt=>{
+    const y=gt.y-ski.dist, col=gt.red?'#e53935':'#1e5bd8';
+    [gt.x-SKI_GAP,gt.x+SKI_GAP].forEach(px=>{
+      ctx.fillStyle='#555';ctx.fillRect(px-1.5,y-26,3,28);
+      ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(px,y-26);ctx.lineTo(px+(px<gt.x?14:-14),y-20);ctx.lineTo(px,y-14);ctx.fill();
+    });
+    if(!gt.done){ctx.strokeStyle=col+'55';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(gt.x-SKI_GAP,y);ctx.lineTo(gt.x+SKI_GAP,y);ctx.stroke();ctx.setLineDash([]);}
+  });
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.font='26px sans-serif';
+  ski.trees.forEach(tr=>{ctx.fillText('🌲',tr.x,tr.y-ski.dist);});
+  ctx.font='30px sans-serif';
+  ctx.save();ctx.translate(ski.x,SKI_Y);ctx.rotate(Math.max(-0.4,Math.min(0.4,ski.vx*0.1)));
+  ctx.fillText(ski.crash>0?'💥':'⛷️',0,0);ctx.restore();
+  if(ski.msgT>0&&ski.msg){ctx.font='bold 18px sans-serif';ctx.fillStyle=ski.msg==='✔'?'#1b9e4b':'#d32f2f';ctx.fillText(ski.msg,MAZE_W/2,40);}
+  ctx.fillStyle='rgba(7,17,31,.75)';ctx.fillRect(0,MAZE_H-26,MAZE_W,26);
+  ctx.fillStyle='#ffc84a';ctx.fillRect(4,MAZE_H-20,(MAZE_W-8)*Math.min(1,ski.passed/SKI_GOAL),14);
+}
+
+// ── PÉTALES (mission 3, au doigt) ──
+let pet=null, petRAF=null, petActive=false;
+const PET_GOAL=20, PET_Y=MAZE_H-58;
+function resetPetales(){
+  pet={x:MAZE_W/2,items:[],caught:0,t:0,flash:0,rng:mulberry32(1102),stars:[]};
+  for(let i=0;i<40;i++)pet.stars.push({x:pet.rng()*MAZE_W,y:pet.rng()*MAZE_H,r:pet.rng()*1.4+0.4});
+  mazeWon=false;setResult();
+  const gv=document.getElementById('gyro-val');if(gv)gv.textContent='Pétales : 0 / '+PET_GOAL;
+  drawPetales();
+}
+function petPointer(e){
+  if(!pet)return;
+  const r=e.currentTarget.getBoundingClientRect();
+  pet.x=Math.max(20,Math.min(MAZE_W-20,(e.clientX-r.left)*MAZE_W/r.width));
+  if(e.cancelable)e.preventDefault();
+}
+function startPetales(){
+  petActive=true;resetPetales();
+  const cv=document.getElementById('maze-canvas');
+  cv.style.touchAction='none';
+  cv.addEventListener('pointerdown',petPointer);cv.addEventListener('pointermove',petPointer);
+  petLoop();
+}
+function stopPetales(){
+  petActive=false;
+  const cv=document.getElementById('maze-canvas');
+  if(cv){cv.removeEventListener('pointerdown',petPointer);cv.removeEventListener('pointermove',petPointer);cv.style.touchAction='';}
+  if(petRAF)cancelAnimationFrame(petRAF);petRAF=null;
+}
+function petLoop(){if(!petActive)return;updatePetales();drawPetales();petRAF=requestAnimationFrame(petLoop);}
+function updatePetales(){
+  if(mazeWon||!pet)return;
+  pet.t++; if(pet.flash>0)pet.flash--;
+  const every=Math.max(20,38-pet.caught);
+  if(pet.t%every===0){
+    const chili=pet.rng()<0.28;
+    pet.items.push({x:20+pet.rng()*(MAZE_W-40),y:-20,vy:1.5+pet.rng()*1.1+pet.caught*0.035,rot:pet.rng()*6,chili});
+  }
+  pet.items.forEach(it=>{
+    it.y+=it.vy;it.rot+=0.05;
+    if(!it.gone&&Math.abs(it.x-pet.x)<30&&Math.abs(it.y-PET_Y)<22){
+      it.gone=true;
+      if(it.chili){pet.caught=Math.max(0,pet.caught-3);pet.flash=30;}
+      else pet.caught++;
+    }
+  });
+  pet.items=pet.items.filter(it=>!it.gone&&it.y<MAZE_H+20);
+  const gv=document.getElementById('gyro-val');if(gv)gv.textContent='Pétales : '+pet.caught+' / '+PET_GOAL;
+  if(pet.caught>=PET_GOAL){mazeWon=true;onMazeWin();}
+}
+function drawFlower(ctx,x,y,rot){
+  ctx.save();ctx.translate(x,y);ctx.rotate(rot);
+  ctx.fillStyle='#ff8a00';
+  for(let k=0;k<8;k++){const a=k*Math.PI/4;ctx.beginPath();ctx.arc(Math.cos(a)*7,Math.sin(a)*7,5.5,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle='#ffb300';ctx.beginPath();ctx.arc(0,0,6,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#e65100';ctx.beginPath();ctx.arc(0,0,2.5,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+function drawPetales(){
+  const cv=document.getElementById('maze-canvas');if(!cv||!pet)return;
+  const ctx=cv.getContext('2d');
+  const gr=ctx.createLinearGradient(0,0,0,MAZE_H);gr.addColorStop(0,'#2a0d4a');gr.addColorStop(1,'#5a1f6e');
+  ctx.fillStyle=gr;ctx.fillRect(0,0,MAZE_W,MAZE_H);
+  ctx.fillStyle='rgba(255,236,170,.8)';pet.stars.forEach(s=>{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();});
+  const cols=['#ff4fa3','#33c6d6','#ffb300','#9b4dd6','#ff8a00'];
+  for(let i=0;i<6;i++){ctx.fillStyle=cols[i%5];ctx.beginPath();ctx.moveTo(i*50,0);ctx.lineTo(i*50+42,0);ctx.lineTo(i*50+42,18);ctx.lineTo(i*50+21,24);ctx.lineTo(i*50,18);ctx.fill();}
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  pet.items.forEach(it=>{
+    if(it.chili){ctx.save();ctx.translate(it.x,it.y);ctx.rotate(it.rot*0.3);ctx.font='26px sans-serif';ctx.fillText('🌶️',0,0);ctx.restore();}
+    else drawFlower(ctx,it.x,it.y,it.rot);
+  });
+  ctx.font='44px sans-serif';
+  if(pet.flash>0&&pet.flash%10<5)ctx.globalAlpha=0.35;
+  ctx.fillText('🐉',pet.x,PET_Y);ctx.globalAlpha=1;
+  if(pet.flash>0){ctx.font='bold 17px sans-serif';ctx.fillStyle='#ff5252';ctx.fillText('Ça pique ! −3',MAZE_W/2,48);}
+  ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(0,MAZE_H-14,MAZE_W,14);
+  ctx.fillStyle='#ff8a00';ctx.fillRect(3,MAZE_H-11,(MAZE_W-6)*Math.min(1,pet.caught/PET_GOAL),8);
 }
 
 // ── MICRO (V4: mot → code auto) ──
