@@ -163,8 +163,10 @@ textarea.bo-input{resize:vertical;min-height:90px;}
   <div class="gate-icon">🔑</div>
   <div class="gate-title">Back-Office V7</div>
   <div class="gate-sub">Mission Apéro — Accès créateur</div>
-  <input type="password" class="gate-pin" id="gate-pin" placeholder="····" maxlength="4" onkeydown="if(event.key==='Enter')checkPin()">
+  <input type="email" class="gate-pin" id="gate-email" placeholder="e-mail" autocomplete="username" style="font-size:17px;letter-spacing:0;margin-bottom:10px">
+  <input type="password" class="gate-pin" id="gate-pin" placeholder="mot de passe" autocomplete="current-password" style="font-size:17px;letter-spacing:0" onkeydown="if(event.key==='Enter')checkPin()">
   <button class="gate-btn" onclick="checkPin()">ENTRER</button>
+  <div id="gate-err" style="color:var(--red);font-size:13px;margin-top:10px;min-height:16px"></div>
 </div>
 
 <!-- MAIN -->
@@ -483,10 +485,7 @@ textarea.bo-input{resize:vertical;min-height:90px;}
     <div id="tp-config" class="tp">
       <div class="bo-sec">
         <span class="bo-stitle">🔑 Sécurité</span>
-        <div class="bo-field"><label>PIN actuel</label><input type="password" class="bo-input" id="cfg-old" placeholder="PIN actuel" maxlength="4"></div>
-        <div class="bo-field"><label>Nouveau PIN (4 chiffres)</label><input type="password" class="bo-input" id="cfg-new" placeholder="Nouveau PIN" maxlength="4"></div>
-        <button class="save-btn" onclick="changePin()">💾 CHANGER LE PIN</button>
-        <div class="feedback" id="pin-fb"></div>
+        <div class="info-box blue">Connexion par compte Supabase (e-mail + mot de passe).<br>Pour changer le mot de passe : Supabase → Authentication → Users.</div>
       </div>
       <div class="bo-sec">
         <span class="bo-stitle">📱 QR Codes</span>
@@ -521,42 +520,64 @@ const SUPABASE_URL = 'https://krqkqcnsmcmerwbfencb.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_2TzK9VfplPjCRi_WhPj4nA_BooLFTQs';
 // ══════════════════════════════════════════
 
-const PIN_KEY='bo_pin_v4';
 let editingId=null, cardCtr=0;
 let musicFile=null, bipFile=null, morseFile=null, logoFile=null, bgFile=null, gameBgFile=null, pauseBgFile=null, gyroImgFile=null;
 let loupeFiles={1:null,2:null,3:null};
 let existingUrls={music:'',bip:'',morse:'',logo:'',bg:'',loupe1:'',loupe2:'',loupe3:'',gamebg:'',pausebg:'',gyroimg:''};
 
-function getPin(){return localStorage.getItem(PIN_KEY)||'1234';}
-function checkPin(){
-  const v=document.getElementById('gate-pin').value;
-  if(v===getPin()){
-    document.getElementById('s-gate').style.display='none';
-    document.getElementById('s-main').style.cssText='display:flex;flex-direction:column;';
-    loadGlacieres();
-  } else {
+// ── Connexion (Supabase Auth) ──
+const AUTH_KEY='bo_session_v1';
+let session=null;
+try{session=JSON.parse(localStorage.getItem(AUTH_KEY)||'null');}catch(e){session=null;}
+function saveSession(j){
+  session={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600)};
+  try{localStorage.setItem(AUTH_KEY,JSON.stringify(session));}catch(e){}
+}
+async function authReq(grant,body){
+  const r=await fetch(SUPABASE_URL+'/auth/v1/token?grant_type='+grant,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error_description||j.msg||j.error||'Connexion refusée');
+  return j;
+}
+async function getToken(){
+  if(!session) throw new Error('Non connecté');
+  if(session.expires_at-60<Date.now()/1000){
+    try{saveSession(await authReq('refresh_token',{refresh_token:session.refresh_token}));}
+    catch(e){logout();throw new Error('Session expirée, reconnecte-toi');}
+  }
+  return session.access_token;
+}
+function showMain(){
+  document.getElementById('s-gate').style.display='none';
+  document.getElementById('s-main').style.cssText='display:flex;flex-direction:column;';
+  loadGlacieres();
+}
+async function checkPin(){
+  const email=document.getElementById('gate-email').value.trim();
+  const pw=document.getElementById('gate-pin').value;
+  const err=document.getElementById('gate-err'); err.textContent='';
+  try{
+    saveSession(await authReq('password',{email,password:pw}));
+    document.getElementById('gate-pin').value='';
+    showMain();
+  }catch(e){
     const inp=document.getElementById('gate-pin');
-    inp.classList.add('error');
-    setTimeout(()=>inp.classList.remove('error'),500);
-    inp.value='';
+    inp.classList.add('error');setTimeout(()=>inp.classList.remove('error'),500);
+    inp.value='';err.textContent='❌ E-mail ou mot de passe incorrect';
   }
 }
-function logout(){document.getElementById('s-gate').style.display='flex';document.getElementById('s-main').style.display='none';document.getElementById('gate-pin').value='';}
-function changePin(){
-  const old=document.getElementById('cfg-old').value;
-  const nw=document.getElementById('cfg-new').value;
-  const fb=document.getElementById('pin-fb');
-  if(old!==getPin()){fb.textContent='❌ PIN actuel incorrect';fb.style.color='var(--red)';fb.classList.add('show');return;}
-  if(nw.length!==4){fb.textContent='❌ PIN doit faire 4 chiffres';fb.style.color='var(--red)';fb.classList.add('show');return;}
-  localStorage.setItem(PIN_KEY,nw);
-  fb.textContent='✅ PIN modifié !';fb.style.color='var(--green)';fb.classList.add('show');
-  document.getElementById('cfg-old').value='';document.getElementById('cfg-new').value='';
-  setTimeout(()=>fb.classList.remove('show'),2500);
+function logout(){
+  if(session){fetch(SUPABASE_URL+'/auth/v1/logout',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token}}).catch(()=>{});}
+  session=null;try{localStorage.removeItem(AUTH_KEY);}catch(e){}
+  document.getElementById('s-gate').style.display='flex';document.getElementById('s-main').style.display='none';document.getElementById('gate-pin').value='';
 }
+// reconnexion automatique si une session existe
+if(session){getToken().then(showMain).catch(()=>{});}
 
 async function supaFetch(path,opts={}){
+  const tok=await getToken();
   const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer':'return=representation',...opts.headers},
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+tok,'Content-Type':'application/json','Prefer':'return=representation',...opts.headers},
     ...opts
   });
   const text=await r.text();
@@ -569,7 +590,7 @@ async function uploadFile(file,name){
   const path=name+'_'+Date.now()+'.'+ext;
   const r=await fetch(SUPABASE_URL+'/storage/v1/object/indices/'+path,{
     method:'POST',
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':file.type},
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+(await getToken()),'Content-Type':file.type},
     body:file
   });
   if(!r.ok) throw new Error('Upload échoué');
